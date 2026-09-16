@@ -11,7 +11,6 @@ README-ci ne répète pas cette partie.
 | Fichier | Rôle |
 |---|---|
 | `STYLE_GUIDE.md` | le vocabulaire visuel et les règles de style (à lire en premier) |
-| `SCRIPT_PROMPT.md` | prompt prêt à l'emploi pour générer un nouveau script compatible template-1 |
 | `style-kit.css` | les classes CSS réutilisables |
 | `generator_helpers.py` | les fonctions Python qui génèrent le HTML/GSAP de chaque patron |
 | `gen_starter.py` | un générateur **exécutable** qui assemble un exemple |
@@ -22,7 +21,53 @@ README-ci ne répète pas cette partie.
 pas de `meta.json`) — c'est une bibliothèque à copier dans un projet HyperFrames
 existant ou nouveau.
 
-## 1. Voir l'exemple tourner (2 minutes)
+## 1. Prévisualiser et rendre une composition (utilisation quotidienne)
+
+Ces commandes s'appliquent à N'IMPORTE QUELLE composition du projet — pas
+seulement l'exemple de `template-1/` — utilise-les au jour le jour pendant
+que tu travailles sur `compositions/chapitre-1.html` (ou tout autre
+chapitre).
+
+### Prévisualisation en direct dans le navigateur
+
+```bash
+npx hyperframes preview --background      # démarre le studio, ouvre le navigateur automatiquement
+npx hyperframes preview --status          # vérifie qu'il tourne toujours
+npx hyperframes preview --stop            # l'arrête en fin de session
+```
+
+Ouvre `http://localhost:3002/#project/nouveau-projet` si le navigateur ne
+s'ouvre pas tout seul. Toute modification d'un fichier de composition (ou
+une regénération via `python3 compositions/gen_chapitreN.py`) se recharge
+automatiquement dans le studio — pas besoin de relancer la commande.
+
+### Rendu brouillon (rapide, pour vérifier un montage avant le rendu final)
+
+```bash
+npx hyperframes render . -c compositions/chapitre-1.html -o renders/chapitre-1-draft.mp4 -q draft
+```
+
+### Rendu final (qualité livraison)
+
+```bash
+npx hyperframes render . -c compositions/chapitre-1.html -o renders/chapitre-1.mp4 -q delivery --low-memory-mode
+```
+
+Niveaux de qualité disponibles (`-q`) : `draft` (rapide, pour vérifier),
+`looks` (défaut, CRF 16), `standard`/`high`, `delivery` (le plus exigeant —
+à réserver à l'export final). `--low-memory-mode` force le profil de rendu
+sécurisé (1 seul worker, capture par screenshot, pas de calibrage
+automatique du nombre de workers) pour éviter la sur-consommation mémoire
+sur une machine contrainte — activé automatiquement si la machine a
+≤ 8 Go de RAM, mais peut aussi être forcé explicitement comme ci-dessus.
+Le `.` avant `-c` cible le dossier du projet courant (ici équivalent à
+l'omettre, puisque la commande est déjà lancée depuis la racine du projet).
+
+`npm run render -- -c ... -o ...` (défini dans `package.json`, épingle
+`hyperframes@0.8.33`) fait la même chose que `npx hyperframes render` si tu
+préfères passer par le script npm.
+
+## 2. Voir l'exemple tourner (2 minutes)
 
 ```bash
 cd template-1
@@ -51,7 +96,7 @@ rendu à jour) : `example-composition.html` doit vivre dans le dossier
 (`template-1/` reste hors du champ scanné par `npx hyperframes lint`, voir
 STYLE_GUIDE §6). C'est exactement ce que fait la section suivante.
 
-## 2. Réutiliser le template
+## 3. Réutiliser le template
 
 Deux cas selon que tu ajoutes un chapitre à CE projet ou que tu démarres une
 vidéo complètement différente.
@@ -111,7 +156,7 @@ npx hyperframes preview --stop            # à la fin de la review
 npm run render -- -c compositions/chapitre-2.html -o renders/chapitre-2.mp4
 ```
 
-Puis commite dans git (voir §3 plus bas).
+Puis commite dans git (voir §4 plus bas).
 
 ### Cas B — une toute nouvelle vidéo (autre sujet, autre projet)
 
@@ -144,7 +189,7 @@ permet à `template-1/` de rester valable d'un projet à l'autre : le
 générateur (Cas A, étapes 1-3) reste presque identique, seul le contenu
 change.
 
-## 3. Avant de committer
+## 4. Avant de committer
 
 Ce projet est versionné avec git (voir historique : `git log --oneline`).
 Après chaque étape significative (nouveau chapitre généré, patron ajouté au
@@ -160,11 +205,11 @@ Les gros fichiers vidéo (`*.mp4`/`*.mov`/`*.webm`) et les rendus
 (`renders/`) sont déjà exclus par `.gitignore` — seuls le code des
 compositions et le contenu du script sont suivis.
 
-## 4. Checklist rapide
+## 5. Checklist rapide
 
 - [ ] `python3 compositions/gen_<nom>.py` tourne sans erreur
 - [ ] `npm run check` → 0 erreur (les 4 avertissements bénins habituels du
       projet sont OK, voir CUT_REPORT_CHAPITRE1.md pour la liste connue)
-- [ ] Prévisualisé au moins une fois avec `npx hyperframes preview --background`
-- [ ] Rendu testé en `-q draft` avant un rendu final en qualité `delivery`
+- [ ] Prévisualisé au moins une fois avec `npx hyperframes preview --background` (§1)
+- [ ] Rendu testé en `-q draft` avant un rendu final en `-q delivery --low-memory-mode` (§1)
 - [ ] Committé dans git avec un message qui explique le changement
