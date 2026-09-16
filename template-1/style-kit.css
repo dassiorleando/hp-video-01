@@ -23,6 +23,16 @@ html,body { margin:0; padding:0; background:#000; }
 #scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
 .clip { position:absolute; inset:0; }
 
+/* ---- vidéo présentateur -------------------------------------------------
+   OBLIGATOIRE sur tout <video id="main-video"> : sans cette règle, le
+   <video> se rend à sa résolution intrinsèque (ex. 3840x2160) à l'intérieur
+   du canevas d'authoring 1920x1080, au lieu de remplir son conteneur .clip —
+   résultat : la vidéo apparaît cadrée/zoomée sur son coin supérieur gauche,
+   le présentateur n'étant plus centré (bug réel trouvé le 2026-09-16 dans
+   compositions/cold-open.html, absent de chapitre-1.html qui définissait
+   cette règle localement dans son propre générateur plutôt qu'ici). */
+#main-video { width:100%; height:100%; object-fit:cover; }
+
 /* ---- ambiance globale (grade / vignette / grain) ----------------------
    À placer en overlay plein cadre, par-dessus la vidéo en direct, pour un
    rendu cohérent d'une vidéo à l'autre. */
