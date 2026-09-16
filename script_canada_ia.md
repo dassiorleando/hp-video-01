@@ -212,6 +212,8 @@ Dans une compétition scientifique de ce calibre, ce n'est pas une amélioration
 
 **C'est une rupture.**
 
+[CARTE-CITATION (plein cadre, fond photo désaturé de la salle de comparaison des résultats) : le mot « RUPTURE » s'imprime en rouge, façon tampon administratif, au centre de l'image — même logique de tampon que le reste de la vidéo (« IMPASSE », « FINANCEMENT REFUSÉ »), un temps d'arrêt bref avant l'enchaînement sur le graphique.]
+
 [CAPSULE-DONNÉE (plein cadre, fond bleu nuit quadrillé) : deux barres verticales montent, étiquetées « AlexNet : 15,3 % » et « Deuxième équipe : 26,2 % » — la barre AlexNet se remplit en rouge vif jusqu'en haut, sans onde de choc ni tremblement d'écran, juste un remplissage net synchronisé à un impact sonore grave.]
 
 Soyons précis : AlexNet n'est pas le premier réseau neuronal de l'histoire. ImageNet a été développée aux États-Unis par Fei-Fei Li et son équipe. Yann LeCun travaillait sur les réseaux convolutifs depuis des années.
@@ -404,6 +406,8 @@ Et il y a un chiffre qui résume tout ça :
 
 Sept sur dix.
 
+[CARTE-CITATION (plein cadre, fond bleu nuit quadrillé) : les mots « SEPT SUR DIX » s'impriment en rouge, façon tampon administratif, au centre de l'image, juste après que les icônes ont fini de glisser hors-cadre — même logique de tampon que le reste de la vidéo.]
+
 Le Canada n'a pas juste exporté quelques chercheurs. Il exporte, en continu, le contrôle de ses propres entreprises.
 
 Maintenant — est-ce que ça veut dire que tout est perdu? Non. Le pays garde un écosystème de recherche de classe mondiale : Mila, Vector, Amii. Il a des entreprises comme Cohere, fondée à Toronto en 2019, qui développe des modèles fondamentaux pour les organisations.
@@ -460,7 +464,7 @@ Pas « trop cher ». Pas « trop compliqué ».
 
 Non pertinent.
 
-[TEXTE KINÉTIQUE (plein cadre, fond bleu nuit quadrillé) : le mot « NON PERTINENT » s'écrit en lettres capitales jaunes, comme les phrases surlignées dans les cartes-citation du reste de la vidéo — pas d'effet de verre qui craque, juste un texte net et affirmé qui reste figé à l'écran une seconde de trop.]
+[CARTE-CITATION (plein cadre, fond bleu nuit quadrillé) : le mot « NON PERTINENT » s'imprime en rouge, façon tampon administratif, au centre de l'image — même logique de tampon que le reste de la vidéo (« IMPASSE », « FINANCEMENT REFUSÉ »), plutôt qu'un texte kinétique jaune.]
 
 Et l'adoption est profondément inégale. L'information, la finance et les services professionnels sont en avance. Les entreprises urbaines sont à 21 %… les entreprises rurales, à moins de 10 %.
 
@@ -515,6 +519,8 @@ Le Canada peut avoir les meilleurs chercheurs du monde.
 Si ses propres entreprises n'utilisent pas leurs technologies, les gains de productivité apparaîtront ailleurs.
 
 Point final.
+
+[CARTE-CITATION (incrustation sur la vidéo en direct — tu restes visible en arrière-plan —, fond bleu nuit quadrillé) : les mots « POINT FINAL » s'impriment en rouge, façon tampon administratif, au centre de l'image — même logique de tampon que le reste de la vidéo, juste avant le cut sec au noir.]
 
 [PLAN FIXE — cut sec au noir immédiatement après le mot « Point final », sans fondu, pour une fin de chapitre sèche et sans appel.]
 

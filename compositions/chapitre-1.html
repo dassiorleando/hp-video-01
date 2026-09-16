@@ -66,6 +66,12 @@ html,body { margin:0; padding:0; background:#000; }
    for the same punchy full-frame emphasis — the other hero words stay
    top-anchored. */
 #hero-hw4 { align-items:center; padding-top:0; }
+/* v21/v22: "PLUSIEURS DÉCENNIES", "AVANT CHATGPT" and "DU TEMPS" moved off
+   the presenter's face to the right side of the frame — same right-side
+   positioning convention as the archive-clipping badge, but plain text
+   (no frame/box). */
+#hero-hw1, #hero-hw2, #hero-hw3 { justify-content:flex-end; padding-right:130px; }
+#hero-hw1 .hero-text, #hero-hw2 .hero-text, #hero-hw3 .hero-text { max-width:820px; text-align:right; }
 .hero-text {
   max-width:1500px; font-size:74px; font-weight:900; text-transform:uppercase;
   color:#60a5fa; line-height:1.05; text-align:center; text-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0;
@@ -587,24 +593,24 @@ const tl = gsap.timeline({ paused: true });
 
 tl.to("#readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
 tl.fromTo("#lab-illo", { opacity: 0 }, { opacity: 0.8, duration: 0.6 }, 0.15);
-tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
-tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
+tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
 tl.to("#lab-light-0-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
-tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
-tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
-tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
-tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
+tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
+tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
+tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
 tl.to("#lab-light-2-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
-tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
-tl.to("#lab-light-3-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
-tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
-tl.to("#lab-light-4-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
+tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-3-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
+tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-4-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
 tl.to("#lab-light-4-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
-tl.to("#lab-light-4-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
-tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
-tl.to("#lab-light-5-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
-tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-4-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-5-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
 tl.fromTo("#idea-bulb", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 1.0);
 tl.to("#idea-bulb", { scale: 1.12, duration: 0.6, yoyo: true, repeat: 3 }, 1.4);
 tl.fromTo("#decade-track", { opacity: 0 }, { opacity: 0.9, duration: 0.3 }, 0.65);
