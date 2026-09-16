@@ -3,9 +3,16 @@
    Extrait de compositions/chapitre-1.html. Voir ../../STYLE_GUIDE.md pour le
    vocabulaire du script et la logique derrière chaque classe.
 
-   Usage : copier les blocs pertinents dans le <style> d'un nouveau générateur
-   de composition. Ce fichier n'est PAS mounté par HyperFrames (ce n'est pas
-   une sous-composition) — c'est une bibliothèque de référence à copier/adapter.
+   Usage : copier les blocs pertinents dans le bloc style d'un nouveau
+   générateur de composition (ou lire ce fichier directement et l'insérer
+   tel quel entre des balises style — voir compositions/gen_cold_open.py
+   pour cet usage). Ce fichier n'est PAS mounté par HyperFrames (ce n'est
+   pas une sous-composition) — c'est une bibliothèque de référence.
+   ATTENTION : n'écris jamais le texte litéral d'une balise style ouvrante
+   ou fermante dans un commentaire de ce fichier, même en exemple — un
+   générateur qui insère ce fichier tel quel dans du HTML transformerait ce
+   texte en vraie balise et casserait le bloc de style qui l'englobe (bug
+   réel trouvé le 2026-09-16 dans compositions/cold-open.html).
    ========================================================================= */
 
 /* ---- base + vrai 4K (voir STYLE_GUIDE §5) -----------------------------
