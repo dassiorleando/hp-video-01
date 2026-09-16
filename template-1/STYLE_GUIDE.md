@@ -11,10 +11,10 @@ HyperFrames ne "lit" pas ce fichier pour générer un rendu — c'est un humain
 (ou moi) qui interprète ces notes pour construire une composition HTML/CSS/GSAP
 dans `compositions/`. Écrire un nouveau script avec le même vocabulaire de
 crochets ne produit donc pas automatiquement le même rendu : il faut toujours
-construire la composition. Ce guide + `compositions/components/style-kit.css`
-et `compositions/components/generator_helpers.py` existent pour que cette
-construction reparte d'une base déjà conforme au style, au lieu de tout
-redécider à zéro.
+construire la composition. Ce guide + `style-kit.css`, `generator_helpers.py`
+et `gen_starter.py` (tous dans ce même dossier `template-1/`) existent pour
+que cette construction reparte d'une base déjà conforme au style, au lieu de
+tout redécider à zéro.
 
 ---
 
@@ -131,17 +131,41 @@ source 4K n'est plus sous-échantillonnée en 1080p avant le rendu. Zéro
 risque de valeur de pixel oubliée. → voir `#scale-2x` dans le kit et le
 gabarit `generator_helpers.py`.
 
-## 6. Comment démarrer une prochaine vidéo avec ce style
+## 6. Contenu de `template-1/`
 
-1. Écrire le script de contenu en réutilisant le même vocabulaire de notes
-   entre crochets (§2) — ça donne à quiconope construit la composition un plan
-   d'exécution précis sans ambiguïté.
-2. Copier `compositions/components/style-kit.css` dans le nouveau projet (ou
-   dans un nouveau générateur du même projet) comme base CSS — il contient
-   déjà toutes les classes de ce guide, prêtes à l'emploi.
-3. Utiliser `compositions/components/generator_helpers.py` comme point de
-   départ du script générateur Python (fonctions `stamp_block()`,
-   `split_screen_block()`, `data_card_panel()`, `hero_word_block()`,
-   `scale_2x_wrapper()`) plutôt que de réécrire chaque bloc à la main.
-4. Adapter uniquement le contenu spécifique (textes, timings, photos) —
-   la charte visuelle reste stable d'une vidéo à l'autre.
+| Fichier | Rôle |
+|---|---|
+| `STYLE_GUIDE.md` | ce document — le vocabulaire et les règles |
+| `style-kit.css` | les classes CSS réutilisables, à copier dans le `<style>` du nouveau générateur |
+| `generator_helpers.py` | fonctions Python de référence (`stamp_block()`, `hero_word_block()`, `data_card_panel()`, `split_screen_block()`, `ken_burns_zoom()`, `scale_2x_wrapper()`) |
+| `gen_starter.py` | squelette générateur **exécutable** qui assemble les trois fichiers ci-dessus en une mini-composition d'exemple — le point de départ concret pour un nouveau générateur |
+
+## 7. Comment l'utiliser pour une vidéo à produire
+
+**Cas A — un nouveau chapitre de CE projet (`nouveau-projet`)**, ex. chapitre 2 :
+1. Copier `template-1/gen_starter.py` vers `compositions/gen_chapitre2.py` (à
+   côté de `gen_chapitre1_v2.py`).
+2. En haut du fichier copié, remplacer le bloc `<style>` par le contenu de
+   `template-1/style-kit.css`, et importer/coller les fonctions de
+   `template-1/generator_helpers.py` dont tu as besoin.
+3. Remplacer le contenu d'exemple par les scènes du chapitre 2, en suivant
+   les notes entre crochets déjà écrites dans `script_canada_ia.md` (§2 de ce
+   guide te dit quelle fonction du kit correspond à quelle note).
+4. Générer avec `python3 compositions/gen_chapitre2.py`, lancer
+   `npx hyperframes lint .`, puis `npx hyperframes render -c
+   compositions/chapitre-2.html -o renders/chapitre-2.mp4`.
+
+**Cas B — une toute nouvelle vidéo (autre sujet, autre projet)** :
+1. Créer un nouveau projet HyperFrames (`npx hyperframes init ...` ou
+   l'équivalent) — un sujet différent mérite son propre projet, avec son
+   propre script de contenu et ses propres assets.
+2. Copier le dossier `template-1/` entier dans ce nouveau projet.
+3. Écrire le script de contenu du nouveau sujet en réutilisant le même
+   vocabulaire de notes entre crochets (§2) — CADRE-TÉLÉ, CARTE-CITATION,
+   CAPSULE-DONNÉE, tampon administratif, etc. C'est ce qui permet à
+   `template-1/` de rester valable d'un projet à l'autre.
+4. Dupliquer `template-1/gen_starter.py` vers le générateur du nouveau
+   projet et l'adapter comme au Cas A, étapes 2-4.
+
+Dans les deux cas, seul le **contenu** change (textes, timings, photos,
+assets) — la charte visuelle (`template-1/`) reste stable.
