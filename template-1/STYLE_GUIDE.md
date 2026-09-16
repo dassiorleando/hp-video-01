@@ -207,6 +207,25 @@ source 4K n'est plus sous-échantillonnée en 1080p avant le rendu. Zéro
 risque de valeur de pixel oubliée. → voir `#scale-2x` dans le kit et le
 gabarit `generator_helpers.py`.
 
+## 5bis. Fondu de sortie sur un `.clip` : toujours via `.clip-inner`
+
+Le framework HyperFrames gère déjà automatiquement le montage/démontage de
+tout élément `class="clip"` à ses bornes `data-start`/`data-duration`. Si un
+fondu de sortie GSAP anime l'opacité du `.clip` LUI-MÊME (au lieu d'un
+enfant) et que ce fondu se termine pile à la frontière `data-duration`,
+`npm run check` lève une vraie erreur (`gsap_exit_missing_hard_kill`) : un
+seek non-linéaire (rendu par workers parallèles, scrubbing dans le Studio)
+peut retomber juste après le fondu sans qu'un état final "dur" ait été posé.
+
+**Règle** : le contenu visuel d'une scène plein-cadre avec fondu de sortie
+va dans un `<div class="clip-inner">` imbriqué dans le `.clip` (voir
+`.clip-inner` dans `style-kit.css`), et c'est CET enfant — jamais le `.clip`
+parent — qui reçoit le tween de sortie, suivi d'un `tl.set(..., { opacity:
+0 }, <borne data-duration>)` de verrouillage dur. Voir
+`chapter_opening_card_block()` dans `generator_helpers.py` pour un exemple
+complet. Bug réel trouvé le 2026-09-16 sur `#chapter-card`
+(`chapitre-1.html`), corrigé partout où ce patron existe.
+
 ## 6. Contenu de `template-1/`
 
 | Fichier | Rôle |
