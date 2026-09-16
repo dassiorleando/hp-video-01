@@ -5,11 +5,11 @@ gen_starter.py — squelette générateur EXÉCUTABLE pour démarrer une nouvell
 composition HyperFrames dans le style "documentaire face caméra"
 (voir STYLE_GUIDE.md et style-kit.css dans ce même dossier template-1/).
 
-CE QUE FAIT CE FICHIER : il assemble un exemple minimal (~10s) qui utilise
-CHAQUE bloc du kit une fois — carton de progression, CADRE-TÉLÉ, CAPSULE-DONNÉE
-plein cadre, CAPSULE-DONNÉE en incrustation, split-screen, mot-héros à droite,
-tampon administratif — pour que tu voies immédiatement le résultat avant
-d'adapter avec ton propre contenu.
+CE QUE FAIT CE FICHIER : il assemble un exemple minimal (~17s) qui utilise
+la majorité des blocs du kit une fois — mot-héros à droite, split-screen
+face-safe, CAPSULE-DONNÉE en incrustation, tampon administratif, montage
+rafale, texte kinétique, coupure au noir + texte massif — pour que tu voies
+immédiatement le résultat avant d'adapter avec ton propre contenu.
 
 COMMENT L'ADAPTER POUR UNE VRAIE VIDÉO :
   1. Copie ce fichier vers compositions/gen_<nom-du-chapitre>.py
@@ -116,6 +116,49 @@ def split_screen_block(sid, photo_src, caption, source_label, start, end, video_
     return html_snippet, js_lines
 
 
+def montage_block(mid, items, start, item_duration=0.5, hard_cut=True):
+    html_parts = [f'  <div id="{mid}" class="clip montage-rafale" data-start="{start}" '
+                  f'data-duration="{round(item_duration*len(items),2)}">\n']
+    js_lines = []
+    for i, (icon_html, label) in enumerate(items):
+        item_id = f'{mid}-{i}'
+        item_start = round(start + i * item_duration, 3)
+        html_parts.append(
+            f'    <div class="montage-item" id="{item_id}">\n      {icon_html}\n'
+            f'      <div class="montage-label">{esc(label)}</div>\n    </div>\n'
+        )
+        if hard_cut:
+            js_lines.append(f'tl.set("#{item_id}", {{ opacity: 1 }}, {item_start});')
+            js_lines.append(f'tl.set("#{item_id}", {{ opacity: 0 }}, {round(item_start+item_duration,3)});')
+        else:
+            js_lines.append(f'tl.fromTo("#{item_id}", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.12 }}, {item_start});')
+            js_lines.append(f'tl.to("#{item_id}", {{ opacity: 0, duration: 0.12 }}, {round(item_start+item_duration-0.12,3)});')
+    html_parts.append('  </div>\n')
+    return ''.join(html_parts), js_lines
+
+
+def kinetic_text_block(kid, words, start, stagger=0.12):
+    spans = ''.join(f'<span class="kinetic-word">{esc(w)}</span>' for w in words)
+    html_snippet = f'  <div class="kinetic-text clip" id="{kid}" data-start="{start}" data-duration="3">{spans}</div>\n'
+    js_lines = [f'tl.fromTo("#{kid} .kinetic-word", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.25, stagger: {stagger} }}, {start});']
+    return html_snippet, js_lines
+
+
+def hardcut_block(hid, text, start, duration, fade_out=True):
+    html_snippet = (
+        f'  <div class="hardcut-text" id="{hid}" data-start="{start}" '
+        f'data-duration="{round(duration,2)}">{esc(text)}</div>\n'
+    )
+    js_lines = [
+        f'tl.set("#hardcut-black", {{ opacity: 1 }}, {start});',
+        f'tl.fromTo("#{hid}", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(start+0.1,3)});',
+    ]
+    if fade_out:
+        js_lines.append(f'tl.to("#{hid}", {{ opacity: 0, duration: 0.3 }}, {round(start+duration-0.35,3)});')
+        js_lines.append(f'tl.to("#hardcut-black", {{ opacity: 0, duration: 0.4 }}, {round(start+duration-0.3,3)});')
+    return html_snippet, js_lines
+
+
 # ---------------------------------------------------------------------------
 # EXEMPLE — remplace tout ce qui suit par le contenu réel de ta vidéo
 # ---------------------------------------------------------------------------
@@ -123,7 +166,7 @@ def split_screen_block(sid, photo_src, caption, source_label, start, end, video_
 COMP_ID = "exemple"
 INTRO_PAD = 1.0
 VIDEO_SRC = "assets/video.mp4"          # <- ta vidéo de présentateur
-TOTAL_DUR = 12.0
+TOTAL_DUR = 17.0
 t = make_t(INTRO_PAD)
 
 parts = []
@@ -148,6 +191,9 @@ parts.append(
     f'  </div>\n\n'
 )
 
+# overlay noir partagé, réutilisé par chaque coupure au noir de la composition
+parts.append(f'  <div id="hardcut-black" class="clip" data-start="0" data-duration="{TOTAL_DUR}"></div>\n\n')
+
 timeline_js = []
 
 # mot-héros "information", aligné à droite (t = 1s)
@@ -171,6 +217,22 @@ timeline_js += js
 
 # tampon administratif — verdict court, t = 8.5-9.7s
 h, js = stamp_block("stamp-1", "Rupture", t(8.5), 1.2)
+parts.append(h); timeline_js += js
+
+# MONTAGE RAFALE — jump cuts secs, t = 10.0-11.5s
+h, js = montage_block("montage-1", [
+    ("<div style=\"width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;\"></div>", "Exemple A"),
+    ("<div style=\"width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;\"></div>", "Exemple B"),
+    ("<div style=\"width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;\"></div>", "Exemple C"),
+], t(10.0), item_duration=0.5, hard_cut=True)
+parts.append(h); timeline_js += js
+
+# TEXTE KINÉTIQUE — mots qui s'écrivent en jaune, t = 12.0s
+h, js = kinetic_text_block("kinetic-1", ["Exemple", "de", "texte", "kinétique"], t(12.0))
+parts.append(h); timeline_js += js
+
+# coupure au noir + texte massif, t = 14.5-16.5s
+h, js = hardcut_block("hardcut-1", "EXEMPLE DE QUESTION DRAMATIQUE?", t(14.5), 2.0)
 parts.append(h); timeline_js += js
 
 parts.append(html_close)

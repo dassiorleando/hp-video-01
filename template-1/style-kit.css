@@ -82,15 +82,33 @@ html,body { margin:0; padding:0; background:#000; }
 .hero--stamp { align-items:center; padding-top:0; }
 .hero--stamp .hero-text { font-size:104px; color:#ef4444; border:7px solid #ef4444; padding:16px 50px; text-shadow:none; transform:rotate(-7deg) scale(1.4); }
 
-/* ---- split-screen face-safe (photo gauche 50% / vidéo droite 50%) -----
-   Voir STYLE_GUIDE §2. Le recentrage de la vidéo (#main-video { x }) se
-   fait via GSAP, pas en CSS — voir generator_helpers.py:split_screen_block(). */
+/* ---- SPLIT-SCREEN, VARIANTE 1 : face-safe (photo gauche 50% / vidéo droite 50%) ----
+   Le présentateur reste visible à droite pendant qu'une photo occupe la
+   gauche. Voir STYLE_GUIDE §2. Le recentrage de la vidéo (#main-video { x })
+   se fait via GSAP, pas en CSS — voir generator_helpers.py:split_screen_block().
+   ATTENTION : ne pas confondre avec la variante 2 ci-dessous — les notes
+   "SPLIT SCREEN VERTICAL/HORIZONTAL/COMPARATIF" du script ne décrivent PAS
+   cette variante, voir plus bas. */
 .split-photo-panel { position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; box-shadow:10px 0 40px rgba(0,0,0,0.55); opacity:0; }
 .split-photo-panel img { width:100%; height:100%; object-fit:cover; filter:grayscale(0.35) brightness(0.68) contrast(1.06); }
 .split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
 .split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
 .split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
 .split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
+
+/* ---- SPLIT-SCREEN, VARIANTE 2 : deux panneaux graphiques côte à côte ----
+   C'est CE patron que décrivent "SPLIT SCREEN VERTICAL/HORIZONTAL/
+   COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
+   CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
+   présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin. */
+.split2 { position:absolute; inset:0; display:flex; }
+.split2.split2--horizontal { flex-direction:column; }
+.split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
+.split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
+.split2:not(.split2--horizontal) .split2-divider { top:0; left:50%; width:2px; height:100%; transform:translateX(-1px); }
+.split2--horizontal .split2-divider { left:0; top:50%; width:100%; height:2px; transform:translateY(-1px); }
+.split2-label { position:absolute; bottom:24px; font-size:18px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; opacity:0; }
 
 /* ---- mentions "Source" / badges de date / surlignage jaune ------------- */
 .source-tag {
@@ -144,3 +162,78 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- particules ambiantes (drift subtil, persistant) --------------------- */
 .particle { fill:#3b82f6; opacity:0.22; }
+
+/* =========================================================================
+   Patrons ajoutés lors de l'audit d'alignement complet du script (les 6
+   chapitres + cold open + conclusion) — ces catégories sont fréquentes
+   dans le script mais n'avaient encore jamais été construites en HTML.
+   ========================================================================= */
+
+/* ---- MONTAGE ICÔNES / MONTAGE RAFALE ------------------------------------
+   Séquence rapide de plans très courts (0.3-1s chacun), un seul visible à
+   la fois — icône ou photo, avec une étiquette jaune qui s'accroche
+   brièvement. En jump cut sec (pas de fondu) pour "MONTAGE RAFALE", léger
+   fondu pour "MONTAGE ICÔNES". Un seul conteneur, un enfant .montage-item
+   par plan, visibilité pilotée par le timeline JS (voir
+   generator_helpers.py:montage_block()). */
+.montage-rafale { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.montage-item { position:absolute; display:flex; flex-direction:column; align-items:center; gap:18px; opacity:0; }
+.montage-item .montage-icon { width:140px; height:140px; }
+.montage-item .montage-label {
+  padding:8px 20px; background:#facc15; color:#1a1408; font-size:20px; font-weight:800;
+  letter-spacing:0.03em; border-radius:4px; white-space:nowrap;
+}
+
+/* ---- coupure au noir + texte massif -------------------------------------
+   Pour les moments les plus dramatiques (question rhétorique, révélation) :
+   cut sec (pas de fondu) vers un écran noir total, puis un texte blanc
+   massif apparaît en fondu rapide, centré, police austère. Différent du
+   tampon administratif (.stamp-text) : pas de rouge, pas de rotation, pas
+   de bordure — la gravité vient du noir total et de l'échelle du texte, pas
+   d'un style "verdict tamponné". */
+#hardcut-black { z-index:90; background:#000; opacity:0; pointer-events:none; }
+.hardcut-text {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding:0 160px; font-size:96px; font-weight:900; text-align:center; text-transform:uppercase;
+  color:#fff; line-height:1.15; letter-spacing:0.01em; opacity:0; z-index:91;
+}
+
+/* ---- TEXTE KINÉTIQUE -----------------------------------------------------
+   Mots qui s'écrivent un à un (write-on) ou un mot qui se substitue à un
+   autre (swap) — toujours en jaune, même famille visuelle que .hl (le
+   surlignage en ligne). Container positionnable en incrustation à côté du
+   visage (voir script : "à côté du visage du présentateur qui reste net")
+   ou plein cadre. */
+.kinetic-text { display:flex; flex-wrap:wrap; gap:0.35em; font-size:52px; font-weight:800; color:#facc15; }
+.kinetic-word { opacity:0; }
+/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT) */
+.kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
+.kinetic-swap .kinetic-swap-word { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; }
+
+/* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
+   Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,
+   qui s'allument une à une au rythme de la narration (ex. les trois villes
+   du chapitre 3, les trois batailles du chapitre 6). Cascade : une liste
+   qui s'empile verticalement, un élément à la fois (ex. les quatre secteurs
+   du chapitre 5). */
+.triptych { position:absolute; inset:0; display:flex; }
+.triptych-col { flex:1 1 33.333%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; opacity:0.35; }
+.triptych-col.active { opacity:1; }
+.triptych-col .triptych-icon { width:120px; height:120px; }
+.triptych-col .triptych-label { font-size:24px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:#fff; text-align:center; max-width:80%; }
+.cascade-list { position:absolute; inset:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:22px; padding-left:200px; }
+.cascade-item { display:flex; align-items:center; gap:20px; opacity:0; transform:translateY(14px); }
+.cascade-item .cascade-icon { width:56px; height:56px; flex:none; }
+.cascade-item .cascade-label { font-size:32px; font-weight:700; color:#e2e8f0; }
+
+/* ---- INSERT INTERFACE (mock d'UI, ex. zone de commentaire YouTube) ------
+   Faux élément d'interface sobre et crédible, en incrustation coin d'écran
+   — jamais un vrai logo/UI officiel, une reconstitution générique. */
+.interface-mock {
+  position:absolute; left:48px; bottom:48px; width:520px; padding:14px 18px;
+  background:#fff; border-radius:24px; box-shadow:0 18px 40px rgba(0,0,0,0.4);
+  display:flex; align-items:center; gap:12px; opacity:0;
+}
+.interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
+.interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
+.interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }

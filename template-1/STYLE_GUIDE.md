@@ -84,13 +84,69 @@ phrase encore accompagnée d'explication n'en est pas un.
 
 → `.stamp-text` dans le kit.
 
-### Split-screen face-safe
-Photo à gauche (50%), vidéo du présentateur à droite (50%). La vidéo doit
-être **recentrée** (translation horizontale pure, jamais de zoom) pour que le
-visage reste bien au centre de la moitié visible plutôt que coupé à la
-jonction. → `.split-photo-panel`, `.split-divider`, `.split-caption`,
-`.split-source` + le recentrage `#main-video { x: ... }` dans
-`generator_helpers.py`.
+### Split-screen — DEUX variantes distinctes, à ne pas confondre
+1. **Face-safe** (invention chapitre 1, pas une note du script) : photo à
+   gauche (50%), vidéo du présentateur à droite (50%), recentrée
+   (translation horizontale pure, jamais de zoom) pour que le visage reste
+   au centre de la moitié visible. → `.split-photo-panel`, `.split-divider`,
+   `.split-caption`, `.split-source`, `split_screen_block()`.
+2. **Deux panneaux graphiques** (c'est CE que décrivent les notes "SPLIT
+   SCREEN VERTICAL/HORIZONTAL/COMPARATIF" du script, ch. 2-4) : deux
+   illustrations opposées l'une à l'autre, plein cadre — le présentateur
+   n'est PAS visible pendant ce plan. → `.split2`, `.split2-panel`,
+   `.split2-divider`, `split2_block()` (paramètre `horizontal=True` pour un
+   empilement haut/bas plutôt que côte à côte).
+
+### Montage icônes / montage rafale
+Séquence très rapide de plans courts (0.3-1s chacun), un seul visible à la
+fois, souvent avec une étiquette jaune qui s'accroche brièvement à l'image.
+"MONTAGE RAFALE" = jump cut sec, sans fondu ; "MONTAGE ICÔNES" = léger fondu
+entre chaque plan. → `.montage-rafale`, `.montage-item`, `montage_block()`
+(paramètre `hard_cut`).
+
+### Coupure au noir + texte massif
+Pour les moments de bascule les plus dramatiques (question rhétorique,
+révélation) : cut SEC (pas de fondu) vers un écran noir total, puis un texte
+blanc massif apparaît en fondu rapide, centré, police austère. **Différent
+du tampon administratif** : pas de rouge, pas de bordure, pas de rotation —
+la gravité vient du noir total et de l'échelle du texte, pas d'un style
+"verdict tamponné". → `#hardcut-black`, `.hardcut-text`, `hardcut_block()`.
+
+### Texte kinétique
+Mots en jaune qui s'écrivent un à un (write-on), ou un mot qui en remplace
+un autre au même endroit (swap, ex. « CAPITAL » → « CLIENT »). Même famille
+visuelle que `.hl` (le surlignage en ligne dans une CARTE-CITATION).
+→ `.kinetic-text` / `.kinetic-word` (write-on), `.kinetic-swap` (swap),
+`kinetic_text_block()`, `kinetic_swap_block()`.
+
+### Triptyque fixe / montage en cascade / montage-écho
+- **Triptyque** : trois colonnes égales avec icône + intitulé, qui
+  s'allument une à une au rythme de la narration (ex. les trois villes du
+  chapitre 3). → `.triptych`, `.triptych-col`, `triptych_block()`.
+- **Cascade** : une liste qui s'empile verticalement, un élément à la fois
+  (ex. les quatre secteurs du chapitre 5). → `.cascade-list`,
+  `.cascade-item`, `cascade_block()`.
+- **Montage-écho** : réutilise un élément déjà construit ailleurs dans la
+  vidéo (ex. la même médaille Turing qui réapparaît) — pas de nouvelle
+  classe CSS nécessaire, juste dupliquer/réafficher l'élément existant avec
+  un éventuel changement de teinte.
+
+### Insert interface
+Faux élément d'UI sobre et crédible (ex. zone de commentaire YouTube), en
+incrustation coin d'écran — **jamais** un vrai logo ou une UI officielle
+reproduite, une reconstitution générique suffit. → `.interface-mock`,
+`interface_mock_block()`.
+
+### Face caméra
+Pas un patron visuel en soi (pas d'overlay CSS) — une indication de cadrage
+et de ton pour le tournage (ex. « PLAN RAPPROCHÉ », « TRÈS GROS PLAN »,
+« regard sceptique »). La catégorie la plus fréquente du script (11 usages)
+après CAPSULE-DONNÉE ; à traiter au tournage, pas dans le générateur.
+
+### Séquence comique / insert visuel comique
+Pas une classe CSS distincte — un plan tenu volontairement "une seconde de
+trop" pour l'effet comique, en réutilisant `.photo-card` ou `.montage-item`
+avec un timing délibérément plus long qu'ailleurs.
 
 ### Mots-héros (hero words)
 Courts mots-clés qui apparaissent brièvement par-dessus la vidéo en direct
@@ -137,8 +193,19 @@ gabarit `generator_helpers.py`.
 |---|---|
 | `STYLE_GUIDE.md` | ce document — le vocabulaire et les règles |
 | `style-kit.css` | les classes CSS réutilisables, à copier dans le `<style>` du nouveau générateur |
-| `generator_helpers.py` | fonctions Python de référence (`stamp_block()`, `hero_word_block()`, `data_card_panel()`, `split_screen_block()`, `ken_burns_zoom()`, `scale_2x_wrapper()`) |
-| `gen_starter.py` | squelette générateur **exécutable** qui assemble les trois fichiers ci-dessus en une mini-composition d'exemple — le point de départ concret pour un nouveau générateur |
+| `generator_helpers.py` | fonctions Python de référence : `stamp_block()`, `hero_word_block()`, `data_card_panel()`, `split_screen_block()`, `split2_block()`, `montage_block()`, `hardcut_block()`, `kinetic_text_block()`, `kinetic_swap_block()`, `triptych_block()`, `cascade_block()`, `interface_mock_block()`, `ken_burns_zoom()`, `scale_2x_wrapper()` |
+| `gen_starter.py` | squelette générateur **exécutable** qui assemble la majorité des blocs ci-dessus en une mini-composition d'exemple — le point de départ concret pour un nouveau générateur |
+| `example-composition.html` | la sortie de `gen_starter.py`, pour prévisualiser sans exécuter |
+
+**Audit d'alignement (2026-09-16)** : les patrons ci-dessus ont été vérifiés
+contre le vocabulaire complet du script (117 notes entre crochets, cold open
++ 6 chapitres + conclusion) et couvrent maintenant toutes les catégories
+récurrentes. Restent volontairement hors kit (pas des patrons visuels
+réutilisables, voir §2) : FACE CAMÉRA, PLAN FIXE, et les indications
+purement sonores (TRANSITION MUSICALE, FONDU SONORE FINAL, SFX). Les
+cartons d'ouverture/fermeture du cold open (CARTON DE TITRE, CARTON DE
+FERMETURE) vivent dans `compositions/cold-open.html`, une composition à
+part avec son propre style — pas encore extraits dans ce kit.
 
 ## 7. Comment l'utiliser pour une vidéo à produire
 

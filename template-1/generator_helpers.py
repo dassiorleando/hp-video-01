@@ -171,6 +171,200 @@ def ken_burns_zoom(selector: str, start: float, duration: float, target_scale: f
 
 
 # ---------------------------------------------------------------------------
+# Fonctions ajoutées lors de l'audit d'alignement complet du script (les 6
+# chapitres + cold open + conclusion) — voir style-kit.css pour les classes
+# CSS correspondantes.
+# ---------------------------------------------------------------------------
+
+def split2_block(gid: str, left_inner_html: str, right_inner_html: str,
+                  start: float, end: float, horizontal: bool = False,
+                  left_label: str = "", right_label: str = ""):
+    """SPLIT SCREEN à deux panneaux graphiques (VARIANTE 2 — voir style-kit.css).
+    Deux illustrations opposées, plein cadre, PAS le présentateur + une photo
+    (ça, c'est split_screen_block ci-dessus). horizontal=True empile les deux
+    panneaux (haut/bas) plutôt que côte à côte.
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    dur = round(end - start, 2)
+    cls = 'split2 split2--horizontal' if horizontal else 'split2'
+    html_snippet = (
+        f'  <div id="{gid}" class="clip {cls}" data-start="{start}" data-duration="{dur}">\n'
+        f'    <div class="split2-panel" id="{gid}-a">\n{left_inner_html}\n'
+        f'      <div class="split2-label">{esc(left_label)}</div>\n    </div>\n'
+        f'    <div class="split2-divider"></div>\n'
+        f'    <div class="split2-panel" id="{gid}-b">\n{right_inner_html}\n'
+        f'      <div class="split2-label">{esc(right_label)}</div>\n    </div>\n'
+        f'  </div>\n'
+    )
+    js_lines = [
+        f'tl.fromTo("#{gid}-a", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(start+0.05,3)});',
+        f'tl.fromTo("#{gid}-b", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(start+0.15,3)});',
+        f'tl.fromTo("#{gid} .split2-label", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3, stagger: 0.1 }}, {round(start+0.4,3)});',
+    ]
+    return html_snippet, js_lines
+
+
+def montage_block(mid: str, items, start: float, item_duration: float = 0.5,
+                   hard_cut: bool = True):
+    """MONTAGE ICÔNES / MONTAGE RAFALE — séquence rapide, un seul plan visible
+    à la fois. items = liste de (icon_or_img_html, label_text). hard_cut=True
+    reproduit un "jump cut sec, sans fondu" (MONTAGE RAFALE) ; False fait un
+    léger fondu (MONTAGE ICÔNES).
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    html_parts = [f'  <div id="{mid}" class="clip montage-rafale" data-start="{start}" '
+                  f'data-duration="{round(item_duration*len(items),2)}">\n']
+    js_lines = []
+    for i, (icon_html, label) in enumerate(items):
+        item_id = f'{mid}-{i}'
+        item_start = round(start + i * item_duration, 3)
+        html_parts.append(
+            f'    <div class="montage-item" id="{item_id}">\n'
+            f'      {icon_html}\n'
+            f'      <div class="montage-label">{esc(label)}</div>\n'
+            f'    </div>\n'
+        )
+        if hard_cut:
+            js_lines.append(f'tl.set("#{item_id}", {{ opacity: 1 }}, {item_start});')
+            js_lines.append(f'tl.set("#{item_id}", {{ opacity: 0 }}, {round(item_start+item_duration,3)});')
+        else:
+            js_lines.append(
+                f'tl.fromTo("#{item_id}", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.12 }}, {item_start});'
+            )
+            js_lines.append(
+                f'tl.to("#{item_id}", {{ opacity: 0, duration: 0.12 }}, {round(item_start+item_duration-0.12,3)});'
+            )
+    html_parts.append('  </div>\n')
+    return ''.join(html_parts), js_lines
+
+
+def hardcut_block(hid: str, text: str, start: float, duration: float,
+                   fade_out: bool = True):
+    """Coupure au noir + texte massif — pour un moment de bascule dramatique
+    (question rhétorique, révélation). Cut SEC vers le noir (tl.set, pas de
+    fondu), puis le texte apparaît en fondu rapide. Différent du tampon
+    administratif : pas de rouge/bordure/rotation, la gravité vient du noir
+    total. Suppose un seul #hardcut-black partagé par toute la composition
+    (créer une seule fois, réutiliser son id pour chaque coupure).
+
+    Retourne (html_snippet, js_timeline_lines). Le html_snippet ne contient
+    QUE le texte — ajouter <div id="hardcut-black" class="clip"></div> une
+    seule fois dans la composition, en dehors de cette fonction.
+    """
+    html_snippet = (
+        f'  <div class="hardcut-text" id="{hid}" data-start="{start}" '
+        f'data-duration="{round(duration,2)}">{esc(text)}</div>\n'
+    )
+    js_lines = [
+        f'tl.set("#hardcut-black", {{ opacity: 1 }}, {start});',
+        f'tl.fromTo("#{hid}", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(start+0.1,3)});',
+    ]
+    if fade_out:
+        js_lines.append(f'tl.to("#{hid}", {{ opacity: 0, duration: 0.3 }}, {round(start+duration-0.35,3)});')
+        js_lines.append(f'tl.to("#hardcut-black", {{ opacity: 0, duration: 0.4 }}, {round(start+duration-0.3,3)});')
+    return html_snippet, js_lines
+
+
+def kinetic_text_block(kid: str, words, start: float, stagger: float = 0.12):
+    """TEXTE KINÉTIQUE — les mots s'écrivent un à un en jaune (write-on).
+    words = liste de chaînes. Retourne (html_snippet, js_timeline_lines).
+    """
+    spans = ''.join(f'<span class="kinetic-word">{esc(w)}</span>' for w in words)
+    html_snippet = f'  <div class="kinetic-text clip" id="{kid}" data-start="{start}" data-duration="3">{spans}</div>\n'
+    js_lines = [
+        f'tl.fromTo("#{kid} .kinetic-word", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.25, stagger: {stagger} }}, {start});'
+    ]
+    return html_snippet, js_lines
+
+
+def kinetic_swap_block(kid: str, word_a: str, word_b: str, start: float, swap_at: float):
+    """TEXTE KINÉTIQUE, variante swap — un mot s'efface, un autre le remplace
+    au même endroit (ex. « CAPITAL » -> « CLIENT »). swap_at est un temps
+    ABSOLU (pas un offset) — doit être > start.
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    html_snippet = (
+        f'  <div class="kinetic-swap clip" id="{kid}" data-start="{start}" data-duration="4">\n'
+        f'    <span class="kinetic-swap-word" id="{kid}-a">{esc(word_a)}</span>\n'
+        f'    <span class="kinetic-swap-word" id="{kid}-b">{esc(word_b)}</span>\n'
+        f'  </div>\n'
+    )
+    js_lines = [
+        f'tl.fromTo("#{kid}-a", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(start+0.1,3)});',
+        f'tl.to("#{kid}-a", {{ opacity: 0, duration: 0.3 }}, {swap_at});',
+        f'tl.fromTo("#{kid}-b", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(swap_at+0.1,3)});',
+    ]
+    return html_snippet, js_lines
+
+
+def triptych_block(tid: str, cols, start: float, duration: float, activate_times):
+    """TRIPTYQUE FIXE — trois colonnes égales qui s'allument une à une. cols =
+    liste de 3 (icon_html, label_text). activate_times = liste de 3 temps
+    ABSOLUS auxquels chaque colonne passe de semi-transparente à pleine
+    opacité (voir .triptych-col dans le kit).
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    assert len(cols) == 3 and len(activate_times) == 3
+    html_parts = [f'  <div id="{tid}" class="clip triptych" data-start="{start}" data-duration="{duration}">\n']
+    js_lines = []
+    for i, ((icon_html, label), at) in enumerate(zip(cols, activate_times)):
+        col_id = f'{tid}-col{i}'
+        html_parts.append(
+            f'    <div class="triptych-col" id="{col_id}">\n'
+            f'      {icon_html}\n'
+            f'      <div class="triptych-label">{esc(label)}</div>\n'
+            f'    </div>\n'
+        )
+        js_lines.append(f'tl.to("#{col_id}", {{ opacity: 1, duration: 0.3 }}, {at});')
+    html_parts.append('  </div>\n')
+    return ''.join(html_parts), js_lines
+
+
+def cascade_block(cid: str, items, start: float, duration: float, stagger: float = 0.4):
+    """MONTAGE VERTICAL EN CASCADE — une liste qui s'empile, un élément à la
+    fois. items = liste de (icon_html, label_text).
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    html_parts = [f'  <div id="{cid}" class="clip cascade-list" data-start="{start}" data-duration="{duration}">\n']
+    for icon_html, label in items:
+        html_parts.append(
+            f'    <div class="cascade-item">\n      {icon_html}\n'
+            f'      <div class="cascade-label">{esc(label)}</div>\n    </div>\n'
+        )
+    html_parts.append('  </div>\n')
+    js_lines = [
+        f'tl.fromTo("#{cid} .cascade-item", {{ opacity: 0, y: 14 }}, '
+        f'{{ opacity: 1, y: 0, duration: 0.35, stagger: {stagger} }}, {round(start+0.1,3)});'
+    ]
+    return ''.join(html_parts), js_lines
+
+
+def interface_mock_block(iid: str, placeholder_text: str, start: float, duration: float):
+    """INSERT INTERFACE — faux élément d'UI sobre (ex. zone de commentaire),
+    jamais un vrai logo/branding officiel. Un curseur clignote via une
+    animation GSAP repeat/yoyo.
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    html_snippet = (
+        f'  <div class="interface-mock clip" id="{iid}" data-start="{start}" data-duration="{round(duration,2)}">\n'
+        f'    <div class="interface-avatar"></div>\n'
+        f'    <div class="interface-input">{esc(placeholder_text)}<span class="interface-cursor" id="{iid}-cursor"></span></div>\n'
+        f'  </div>\n'
+    )
+    js_lines = [
+        f'tl.fromTo("#{iid}", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.35 }}, {round(start+0.05,3)});',
+        f'tl.to("#{iid}-cursor", {{ opacity: 0, duration: 0.5, repeat: -1, yoyo: true }}, {round(start+0.4,3)});',
+    ]
+    return html_snippet, js_lines
+
+
+# ---------------------------------------------------------------------------
 # NOTE IMPORTANTE : ceci n'est PAS un pipeline "un clic". Une nouvelle vidéo
 # a toujours besoin d'un script générateur dédié (structure de scènes, textes,
 # timings propres à son propre script de contenu) — ce fichier réduit le
