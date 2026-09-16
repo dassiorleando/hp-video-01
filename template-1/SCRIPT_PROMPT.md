@@ -70,7 +70,11 @@ directement à une fonction de `template-1/generator_helpers.py`.
 
 - **CARTON DE CHAPITRE** — insert coin inférieur gauche, 2s, plaque sobre +
   barre de progression. Une fois par chapitre, toujours identique sauf le
-  numéro.
+  numéro. *(À la construction, ce simple insert est généralement élevé en
+  une scène d'ouverture plein écran — kicker + titre + trait, ~5-6s — voir
+  STYLE_GUIDE §2bis. C'est une décision de montage que je prends moi seul,
+  comme pour le split-screen face-safe ci-dessous : n'essaie pas de décrire
+  cette scène dans le script, la note "CARTON DE CHAPITRE" suffit.)*
 - **CADRE-TÉLÉ** — photo d'archive encadrée, coin ou plein cadre, toujours
   avec « Source : archives » (italique, coin inférieur droit) et souvent un
   badge de date (coin supérieur gauche). Précise la position si ce n'est

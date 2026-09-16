@@ -364,6 +364,71 @@ def interface_mock_block(iid: str, placeholder_text: str, start: float, duration
     return html_snippet, js_lines
 
 
+def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
+                                kicker_text: str, title_text: str, start: float = 0,
+                                duration: float = 5.8, title_font_size: int = 64,
+                                title_max_width: int = 1500, readout_width: int = 560,
+                                extra_html: str = ""):
+    """CARTON D'OUVERTURE DE CHAPITRE — scène archive plein écran (photo +
+    grain + halo + lecture système qui s'écrit en machine à écrire + kicker
+    + titre + trait). C'est la version élevée, plein cadre, utilisée au
+    tout début de chaque chapitre dans chapitre-1.html — AU-DELÀ du simple
+    insert coin inférieur gauche que le script décrit littéralement pour
+    "CARTON DE CHAPITRE" (voir STYLE_GUIDE §2bis). Les deux coexistent et
+    ne sont PAS interchangeables : garder aussi la barre de progression
+    persistante (#progress-track/#progress-label) pendant tout le chapitre
+    — cette fonction-ci ne couvre que le moment d'ouverture.
+
+    duration >= ~5s recommandé (calibré à 5.8s sur chapitre 1, v25 — en
+    dessous, le titre n'a pas le temps de respirer avant le cut vers la
+    vidéo en direct). title_font_size/title_max_width sont en pixels, dans
+    l'espace logique 1920px (voir scale_2x_wrapper) — ne pas descendre le
+    premier sous ~56px, sauf titre de chapitre très court.
+
+    extra_html : contenu additionnel propre au CONTENU de ce chapitre (une
+    frise chronologique, une illustration SVG, etc. — voir #decade-track/
+    #lab-illo dans chapitre-1.html pour un exemple), inséré tel quel juste
+    avant la fermeture de la carte. Ses propres lignes JS de timeline sont
+    à ajouter séparément par l'appelant : cette fonction ne peut pas
+    deviner leur timing, propre à chaque illustration.
+
+    Retourne (html_snippet, js_timeline_lines). La vidéo principale doit
+    démarrer à `start + duration` — utiliser make_t(duration) comme
+    INTRO_PAD pour le reste de la composition si `start == 0`.
+    """
+    overrides = []
+    if title_font_size != 64:
+        overrides.append(f'font-size:{title_font_size}px')
+    if title_max_width != 1500:
+        overrides.append(f'max-width:{title_max_width}px')
+    title_style = f' style="{"; ".join(overrides)};"' if overrides else ""
+
+    html_snippet = (
+        f'  <div id="{card_id}" class="clip chapter-opening-card" data-start="{start}" '
+        f'data-duration="{round(duration, 2)}">\n'
+        f'    <img class="chapter-opening-photo" src="{photo_src}" alt="">\n'
+        f'    <div class="chapter-opening-overlay"></div>\n'
+        f'    <div class="scanlines"></div>\n'
+        f'    <div class="chapter-opening-readout-wrap" id="{card_id}-readout-wrap">'
+        f'<div class="chapter-opening-readout" id="{card_id}-readout">{esc(readout_text)}</div></div>\n'
+        f'    <div class="chapter-opening-kicker" id="{card_id}-kicker">{esc(kicker_text)}</div>\n'
+        f'    <div class="chapter-opening-title" id="{card_id}-title"{title_style}>{esc(title_text)}</div>\n'
+        f'    <div class="chapter-opening-rule" id="{card_id}-rule"></div>\n'
+        f'{extra_html}'
+        f'  </div>\n'
+    )
+    js_lines = [
+        f'tl.to("#{card_id}-readout-wrap", {{ width: {readout_width}, duration: 0.55, ease: "steps(18)" }}, {round(start+0.05,3)});',
+        f'tl.fromTo("#{card_id}-kicker", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(start+1.5,3)});',
+        f'tl.fromTo("#{card_id}-title", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }}, {round(start+1.65,3)});',
+        f'tl.to("#{card_id}-rule", {{ width: 260, duration: 0.4, ease: "power2.out" }}, {round(start+1.9,3)});',
+        f'tl.to("#{card_id}", {{ opacity: 0, duration: 0.3 }}, {round(start+duration-0.3,3)});',
+        f'tl.fromTo("#{card_id} .chapter-opening-photo", {{ scale: 1.0 }}, '
+        f'{{ scale: 1.07, duration: {round(duration,3)}, ease: "none" }}, {start});',
+    ]
+    return html_snippet, js_lines
+
+
 # ---------------------------------------------------------------------------
 # NOTE IMPORTANTE : ceci n'est PAS un pipeline "un clic". Une nouvelle vidéo
 # a toujours besoin d'un script générateur dédié (structure de scènes, textes,

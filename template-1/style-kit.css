@@ -237,3 +237,44 @@ html,body { margin:0; padding:0; background:#000; }
 .interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
 .interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
 .interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }
+
+/* ---- CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) --------
+   Version élevée, plein cadre, du "CARTON DE CHAPITRE" du script — jouée
+   une fois au tout début de chaque chapitre, avant que la vidéo en direct
+   ne démarre (voir STYLE_GUIDE §2bis). Photo + grain + halo + une ligne de
+   "lecture système" qui s'écrit en machine à écrire, puis kicker + titre +
+   trait. NE remplace PAS la barre de progression persistante
+   (#progress-track/#progress-label ci-dessus) — les deux coexistent.
+   Valeurs de titre calibrées le 2026-09-16 (v25 de chapitre-1.html) : tenue
+   >= ~5s pour laisser le titre respirer, police généreuse pour rester
+   lisible même sur un titre de chapitre à deux lignes. */
+.chapter-opening-card {
+  background:#030509;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
+}
+.chapter-opening-card .chapter-opening-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-overlay {
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(59,130,246,0.06) 0px, rgba(59,130,246,0.06) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse at 50% 40%, rgba(30,58,95,0.45) 0%, rgba(2,4,8,0.93) 74%);
+}
+.chapter-opening-card .scanlines {
+  position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay; opacity:0.55;
+}
+.chapter-opening-card .chapter-opening-readout-wrap { overflow:hidden; width:0; }
+.chapter-opening-card .chapter-opening-readout {
+  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
+  color:#93c5fd; opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
+.chapter-opening-card .chapter-opening-title {
+  margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
+  line-height:1.2; opacity:0;
+}
+.chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }

@@ -46,6 +46,26 @@ Insert graphique coin inférieur gauche, 2 secondes, plaque sobre + barre de
 progression (`N sur TOTAL`). Un seul style pour toute la vidéo, seul le
 numéro change. → `#progress-track` / `#progress-label` dans le kit.
 
+### CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) — §2bis
+Décision de construction, pas une note du script (comme le split-screen
+face-safe plus bas) : à la construction de chapitre-1.html, ce simple
+insert de coin a été élevé en une scène plein écran jouée UNE FOIS au tout
+début de chaque chapitre, avant que la vidéo en direct ne démarre — photo +
+grain + halo + une ligne de "lecture système" qui s'écrit en machine à
+écrire, puis kicker (« CHAPITRE N ») + titre + trait. Les deux patrons
+coexistent : la barre de progression (`#progress-track`/`#progress-label`)
+reste affichée en continu pendant tout le chapitre, ce carton-ci ne couvre
+que le moment d'ouverture. → `chapter_opening_card_block()` dans
+`generator_helpers.py`, classes `.chapter-opening-*` dans `style-kit.css`.
+
+Valeurs calibrées (v25 de chapitre-1.html, 2026-09-16, suite à une demande
+de tenue plus longue et de titre plus grand) : tenue de la carte
+**>= ~5s** (défaut de la fonction : `duration=5.8`) pour laisser le titre
+respirer avant le cut ; titre en `font-size:64px` / `max-width:1500px`
+(dans l'espace logique 1920px — voir §5). Un contenu spécifique au chapitre
+(frise chronologique, illustration SVG) peut être injecté via le paramètre
+`extra_html` de la fonction plutôt que dupliqué dans le patron de base.
+
 ### CADRE-TÉLÉ
 Photo d'archive encadrée (écran vintage ou carte simple), toujours accompagnée
 de `« Source : archives »` en italique, coin inférieur droit, et souvent un

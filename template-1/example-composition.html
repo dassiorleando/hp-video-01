@@ -243,34 +243,84 @@ html,body { margin:0; padding:0; background:#000; }
 .interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
 .interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
 .interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }
+
+/* ---- CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) --------
+   Version élevée, plein cadre, du "CARTON DE CHAPITRE" du script — jouée
+   une fois au tout début de chaque chapitre, avant que la vidéo en direct
+   ne démarre (voir STYLE_GUIDE §2bis). Photo + grain + halo + une ligne de
+   "lecture système" qui s'écrit en machine à écrire, puis kicker + titre +
+   trait. NE remplace PAS la barre de progression persistante
+   (#progress-track/#progress-label ci-dessus) — les deux coexistent.
+   Valeurs de titre calibrées le 2026-09-16 (v25 de chapitre-1.html) : tenue
+   >= ~5s pour laisser le titre respirer, police généreuse pour rester
+   lisible même sur un titre de chapitre à deux lignes. */
+.chapter-opening-card {
+  background:#030509;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
+}
+.chapter-opening-card .chapter-opening-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-overlay {
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(59,130,246,0.06) 0px, rgba(59,130,246,0.06) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse at 50% 40%, rgba(30,58,95,0.45) 0%, rgba(2,4,8,0.93) 74%);
+}
+.chapter-opening-card .scanlines {
+  position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay; opacity:0.55;
+}
+.chapter-opening-card .chapter-opening-readout-wrap { overflow:hidden; width:0; }
+.chapter-opening-card .chapter-opening-readout {
+  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
+  color:#93c5fd; opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
+.chapter-opening-card .chapter-opening-title {
+  margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
+  line-height:1.2; opacity:0;
+}
+.chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
 </style>
 </head>
 <body>
-<div id="exemple" data-composition-id="exemple" data-width="3840" data-height="2160" data-fps="60" data-duration="17.0">
+<div id="exemple" data-composition-id="exemple" data-width="3840" data-height="2160" data-fps="60" data-duration="20.5">
 <div id="scale-2x">
   <div id="video-wrap" class="clip">
-    <video id="main-video" class="clip" src="assets/video.mp4" muted data-start="0" data-duration="17.0"></video>
+    <video id="main-video" class="clip" src="assets/video.mp4" muted data-start="4.0" data-duration="16.5"></video>
   </div>
 
-  <div id="hardcut-black" class="clip" data-start="0" data-duration="17.0"></div>
+  <div id="hardcut-black" class="clip" data-start="0" data-duration="20.5"></div>
 
-  <div class="hero clip hero--right" id="hero-hw1" data-start="2.0" data-duration="1.0"><div class="hero-text" id="hw1">EXEMPLE DE TITRE</div></div>
-  <div id="split-1" class="clip" data-start="3.5" data-duration="3.0" style="z-index:33; pointer-events:none;">
+  <div id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="4.0">
+    <img class="chapter-opening-photo" src="assets/photos/circuit-board.jpg" alt="">
+    <div class="chapter-opening-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="chapter-opening-readout-wrap" id="chapter-open-readout-wrap"><div class="chapter-opening-readout" id="chapter-open-readout">SYSTÈME D'ARCHIVES — EXEMPLE</div></div>
+    <div class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE X</div>
+    <div class="chapter-opening-title" id="chapter-open-title">Titre d'exemple du carton d'ouverture</div>
+    <div class="chapter-opening-rule" id="chapter-open-rule"></div>
+  </div>
+  <div class="hero clip hero--right" id="hero-hw1" data-start="5.0" data-duration="1.0"><div class="hero-text" id="hw1">EXEMPLE DE TITRE</div></div>
+  <div id="split-1" class="clip" data-start="6.5" data-duration="3.0" style="z-index:33; pointer-events:none;">
     <div class="split-photo-panel" id="split-1-panel"><img src="assets/photos/circuit-board.jpg" alt=""><div class="split-tint"></div></div>
     <div class="split-divider" id="split-1-divider"></div>
     <div class="split-caption" id="split-1-caption">Légende de l'archive</div>
     <div class="split-source" id="split-1-source">Source : archives</div>
   </div>
-  <div id="panel-1-wrap" class="clip" data-start="7.0" data-duration="2.0">
+  <div id="panel-1-wrap" class="clip" data-start="10.0" data-duration="2.0">
     <div class="map-panel" id="panel-1">
       <div class="map-title" style="font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px;">EXEMPLE DE DONNÉE</div>
       <div style="font-size:64px; font-weight:900; color:#fff;">42&nbsp;%</div>
     </div>
   </div>
-  <div id="stamp-1-wrap" class="clip" data-start="9.5" data-duration="1.2">
+  <div id="stamp-1-wrap" class="clip" data-start="12.5" data-duration="1.2">
     <div class="stamp-text" id="stamp-1">Rupture</div>
   </div>
-  <div id="montage-1" class="clip montage-rafale" data-start="11.0" data-duration="1.5">
+  <div id="montage-1" class="clip montage-rafale" data-start="14.0" data-duration="1.5">
     <div class="montage-item" id="montage-1-0">
       <div style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
       <div class="montage-label">Exemple A</div>
@@ -284,37 +334,43 @@ html,body { margin:0; padding:0; background:#000; }
       <div class="montage-label">Exemple C</div>
     </div>
   </div>
-  <div class="kinetic-text clip" id="kinetic-1" data-start="13.0" data-duration="3"><span class="kinetic-word">Exemple</span><span class="kinetic-word">de</span><span class="kinetic-word">texte</span><span class="kinetic-word">kinétique</span></div>
-  <div class="hardcut-text" id="hardcut-1" data-start="15.5" data-duration="2.0">EXEMPLE DE QUESTION DRAMATIQUE?</div>
+  <div class="kinetic-text clip" id="kinetic-1" data-start="16.0" data-duration="3"><span class="kinetic-word">Exemple</span><span class="kinetic-word">de</span><span class="kinetic-word">texte</span><span class="kinetic-word">kinétique</span></div>
+  <div class="hardcut-text" id="hardcut-1" data-start="18.5" data-duration="2.0">EXEMPLE DE QUESTION DRAMATIQUE?</div>
 </div>
 </div>
 <script>
 window.__timelines = window.__timelines || {};
 window.__timelines["exemple"] = gsap.timeline({ paused: true });
 const tl = window.__timelines["exemple"];
-tl.fromTo("#hw1", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 2.0);
-tl.to("#hw1", { opacity: 0, duration: 0.18 }, 2.75);
-tl.fromTo("#split-1-panel", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 3.6);
-tl.fromTo("#split-1-divider", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 3.8);
-tl.fromTo("#split-1-caption, #split-1-source", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 3.95);
-tl.to("#split-1-panel, #split-1-divider, #split-1-caption, #split-1-source", { opacity: 0, duration: 0.3 }, 6.15);
-tl.fromTo("#main-video", { x: 0 }, { x: 480, duration: 0.4, ease: "power2.out", immediateRender: false }, 3.6);
-tl.to("#main-video", { x: 0, duration: 0.3 }, 6.15);
-tl.fromTo("#split-1-panel img", { scale: 1.0 }, { scale: 1.09, duration: 3.0, ease: "none" }, 3.5);
-tl.fromTo("#panel-1", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 7.05);
-tl.fromTo("#stamp-1", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 9.5);
-tl.to("#stamp-1", { opacity: 0, duration: 0.25 }, 10.4);
-tl.set("#montage-1-0", { opacity: 1 }, 11.0);
-tl.set("#montage-1-0", { opacity: 0 }, 11.5);
-tl.set("#montage-1-1", { opacity: 1 }, 11.5);
-tl.set("#montage-1-1", { opacity: 0 }, 12.0);
-tl.set("#montage-1-2", { opacity: 1 }, 12.0);
-tl.set("#montage-1-2", { opacity: 0 }, 12.5);
-tl.fromTo("#kinetic-1 .kinetic-word", { opacity: 0 }, { opacity: 1, duration: 0.25, stagger: 0.12 }, 13.0);
-tl.set("#hardcut-black", { opacity: 1 }, 15.5);
-tl.fromTo("#hardcut-1", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 15.6);
-tl.to("#hardcut-1", { opacity: 0, duration: 0.3 }, 17.15);
-tl.to("#hardcut-black", { opacity: 0, duration: 0.4 }, 17.2);
+tl.to("#chapter-open-readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
+tl.fromTo("#chapter-open-kicker", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+tl.fromTo("#chapter-open-title", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.65);
+tl.to("#chapter-open-rule", { width: 260, duration: 0.4, ease: "power2.out" }, 1.9);
+tl.to("#chapter-open", { opacity: 0, duration: 0.3 }, 3.7);
+tl.fromTo("#chapter-open .chapter-opening-photo", { scale: 1.0 }, { scale: 1.07, duration: 4.0, ease: "none" }, 0);
+tl.fromTo("#hw1", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 5.0);
+tl.to("#hw1", { opacity: 0, duration: 0.18 }, 5.75);
+tl.fromTo("#split-1-panel", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 6.6);
+tl.fromTo("#split-1-divider", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 6.8);
+tl.fromTo("#split-1-caption, #split-1-source", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 6.95);
+tl.to("#split-1-panel, #split-1-divider, #split-1-caption, #split-1-source", { opacity: 0, duration: 0.3 }, 9.15);
+tl.fromTo("#main-video", { x: 0 }, { x: 480, duration: 0.4, ease: "power2.out", immediateRender: false }, 6.6);
+tl.to("#main-video", { x: 0, duration: 0.3 }, 9.15);
+tl.fromTo("#split-1-panel img", { scale: 1.0 }, { scale: 1.09, duration: 3.0, ease: "none" }, 6.5);
+tl.fromTo("#panel-1", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 10.05);
+tl.fromTo("#stamp-1", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 12.5);
+tl.to("#stamp-1", { opacity: 0, duration: 0.25 }, 13.4);
+tl.set("#montage-1-0", { opacity: 1 }, 14.0);
+tl.set("#montage-1-0", { opacity: 0 }, 14.5);
+tl.set("#montage-1-1", { opacity: 1 }, 14.5);
+tl.set("#montage-1-1", { opacity: 0 }, 15.0);
+tl.set("#montage-1-2", { opacity: 1 }, 15.0);
+tl.set("#montage-1-2", { opacity: 0 }, 15.5);
+tl.fromTo("#kinetic-1 .kinetic-word", { opacity: 0 }, { opacity: 1, duration: 0.25, stagger: 0.12 }, 16.0);
+tl.set("#hardcut-black", { opacity: 1 }, 18.5);
+tl.fromTo("#hardcut-1", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 18.6);
+tl.to("#hardcut-1", { opacity: 0, duration: 0.3 }, 20.15);
+tl.to("#hardcut-black", { opacity: 0, duration: 0.4 }, 20.2);
 </script>
 </body>
 </html>

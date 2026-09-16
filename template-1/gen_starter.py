@@ -5,11 +5,12 @@ gen_starter.py — squelette générateur EXÉCUTABLE pour démarrer une nouvell
 composition HyperFrames dans le style "documentaire face caméra"
 (voir STYLE_GUIDE.md et style-kit.css dans ce même dossier template-1/).
 
-CE QUE FAIT CE FICHIER : il assemble un exemple minimal (~17s) qui utilise
-la majorité des blocs du kit une fois — mot-héros à droite, split-screen
-face-safe, CAPSULE-DONNÉE en incrustation, tampon administratif, montage
-rafale, texte kinétique, coupure au noir + texte massif — pour que tu voies
-immédiatement le résultat avant d'adapter avec ton propre contenu.
+CE QUE FAIT CE FICHIER : il assemble un exemple minimal (~20s) qui utilise
+la majorité des blocs du kit une fois — carton d'ouverture de chapitre,
+mot-héros à droite, split-screen face-safe, CAPSULE-DONNÉE en incrustation,
+tampon administratif, montage rafale, texte kinétique, coupure au noir +
+texte massif — pour que tu voies immédiatement le résultat avant d'adapter
+avec ton propre contenu.
 
 COMMENT L'ADAPTER POUR UNE VRAIE VIDÉO :
   1. Copie ce fichier vers compositions/gen_<nom-du-chapitre>.py
@@ -144,6 +145,41 @@ def kinetic_text_block(kid, words, start, stagger=0.12):
     return html_snippet, js_lines
 
 
+def chapter_opening_card_block(card_id, photo_src, readout_text, kicker_text, title_text,
+                                start=0, duration=5.8, title_font_size=64,
+                                title_max_width=1500, readout_width=560, extra_html=""):
+    overrides = []
+    if title_font_size != 64:
+        overrides.append(f'font-size:{title_font_size}px')
+    if title_max_width != 1500:
+        overrides.append(f'max-width:{title_max_width}px')
+    title_style = f' style="{"; ".join(overrides)};"' if overrides else ""
+    html_snippet = (
+        f'  <div id="{card_id}" class="clip chapter-opening-card" data-start="{start}" '
+        f'data-duration="{round(duration, 2)}">\n'
+        f'    <img class="chapter-opening-photo" src="{photo_src}" alt="">\n'
+        f'    <div class="chapter-opening-overlay"></div>\n'
+        f'    <div class="scanlines"></div>\n'
+        f'    <div class="chapter-opening-readout-wrap" id="{card_id}-readout-wrap">'
+        f'<div class="chapter-opening-readout" id="{card_id}-readout">{esc(readout_text)}</div></div>\n'
+        f'    <div class="chapter-opening-kicker" id="{card_id}-kicker">{esc(kicker_text)}</div>\n'
+        f'    <div class="chapter-opening-title" id="{card_id}-title"{title_style}>{esc(title_text)}</div>\n'
+        f'    <div class="chapter-opening-rule" id="{card_id}-rule"></div>\n'
+        f'{extra_html}'
+        f'  </div>\n'
+    )
+    js_lines = [
+        f'tl.to("#{card_id}-readout-wrap", {{ width: {readout_width}, duration: 0.55, ease: "steps(18)" }}, {round(start+0.05,3)});',
+        f'tl.fromTo("#{card_id}-kicker", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(start+1.5,3)});',
+        f'tl.fromTo("#{card_id}-title", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }}, {round(start+1.65,3)});',
+        f'tl.to("#{card_id}-rule", {{ width: 260, duration: 0.4, ease: "power2.out" }}, {round(start+1.9,3)});',
+        f'tl.to("#{card_id}", {{ opacity: 0, duration: 0.3 }}, {round(start+duration-0.3,3)});',
+        f'tl.fromTo("#{card_id} .chapter-opening-photo", {{ scale: 1.0 }}, '
+        f'{{ scale: 1.07, duration: {round(duration,3)}, ease: "none" }}, {start});',
+    ]
+    return html_snippet, js_lines
+
+
 def hardcut_block(hid, text, start, duration, fade_out=True):
     html_snippet = (
         f'  <div class="hardcut-text" id="{hid}" data-start="{start}" '
@@ -164,9 +200,9 @@ def hardcut_block(hid, text, start, duration, fade_out=True):
 # ---------------------------------------------------------------------------
 
 COMP_ID = "exemple"
-INTRO_PAD = 1.0
+INTRO_PAD = 4.0                          # défaut recommandé en prod : 5.8s (voir chapter_opening_card_block) ; raccourci ici pour un exemple concis
 VIDEO_SRC = "assets/video.mp4"          # <- ta vidéo de présentateur
-TOTAL_DUR = 17.0
+TOTAL_DUR = 20.5
 t = make_t(INTRO_PAD)
 
 parts = []
@@ -183,11 +219,11 @@ parts.append('</style>\n</head>\n<body>\n')
 html_open, html_close = scale_2x_wrapper(COMP_ID, TOTAL_DUR)
 parts.append(html_open)
 
-# vidéo du présentateur, plein cadre, du début à la fin
+# vidéo du présentateur, plein cadre, à partir de la fin du carton d'ouverture
 parts.append(
     f'  <div id="video-wrap" class="clip">\n'
     f'    <video id="main-video" class="clip" src="{VIDEO_SRC}" muted '
-    f'data-start="0" data-duration="{TOTAL_DUR}"></video>\n'
+    f'data-start="{t(0)}" data-duration="{round(TOTAL_DUR-INTRO_PAD,2)}"></video>\n'
     f'  </div>\n\n'
 )
 
@@ -196,7 +232,16 @@ parts.append(f'  <div id="hardcut-black" class="clip" data-start="0" data-durati
 
 timeline_js = []
 
-# mot-héros "information", aligné à droite (t = 1s)
+# carton d'ouverture de chapitre — scène archive plein écran, t = 0 à INTRO_PAD
+h, js = chapter_opening_card_block(
+    "chapter-open", "assets/photos/circuit-board.jpg",
+    "SYSTÈME D'ARCHIVES — EXEMPLE", "CHAPITRE X",
+    "Titre d'exemple du carton d'ouverture",
+    start=0, duration=INTRO_PAD,
+)
+parts.append(h); timeline_js += js
+
+# mot-héros "information", aligné à droite (t = 1s après la fin du carton)
 h, js = hero_word_block("hw1", "EXEMPLE DE TITRE", t(1.0), 1.0, variant="right")
 parts.append(h); timeline_js += js
 
