@@ -72,6 +72,14 @@ html,body { margin:0; padding:0; background:#000; }
    (no frame/box). */
 #hero-hw1, #hero-hw2, #hero-hw3 { justify-content:flex-end; padding-right:130px; }
 #hero-hw1 .hero-text, #hero-hw2 .hero-text, #hero-hw3 .hero-text { max-width:820px; text-align:right; }
+/* v23: "TOUT BASCULE" restyled as a red administrative stamp — same visual
+   language (color, border, rotation, punchy stamp-in) as "IMPASSE" /
+   "FINANCEMENT REFUSÉ" elsewhere in the chapter, reused for every
+   "definitive verdict" beat across the script. */
+#hero-hw4 .hero-text {
+  font-size:104px; color:#ef4444; border:7px solid #ef4444; padding:16px 50px;
+  text-shadow:none; transform:rotate(-7deg) scale(1.4);
+}
 .hero-text {
   max-width:1500px; font-size:74px; font-weight:900; text-transform:uppercase;
   color:#60a5fa; line-height:1.05; text-align:center; text-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0;
@@ -593,24 +601,24 @@ const tl = gsap.timeline({ paused: true });
 
 tl.to("#readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
 tl.fromTo("#lab-illo", { opacity: 0 }, { opacity: 0.8, duration: 0.6 }, 0.15);
-tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
-tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
-tl.to("#lab-light-0-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
-tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
-tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
-tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
-tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
-tl.to("#lab-light-2-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
-tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
+tl.to("#lab-light-0-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
+tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
+tl.to("#lab-light-2-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
 tl.to("#lab-light-3-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
-tl.to("#lab-light-4-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-4-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
-tl.to("#lab-light-4-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
-tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-4-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
+tl.to("#lab-light-4-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-4-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
+tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
 tl.to("#lab-light-5-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
-tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
+tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
 tl.fromTo("#idea-bulb", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 1.0);
 tl.to("#idea-bulb", { scale: 1.12, duration: 0.6, yoyo: true, repeat: 3 }, 1.4);
 tl.fromTo("#decade-track", { opacity: 0 }, { opacity: 0.9, duration: 0.3 }, 0.65);
@@ -669,8 +677,8 @@ tl.fromTo("#hw2", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1
 tl.to("#hw2", { opacity: 0, duration: 0.18 }, 8.95);
 tl.fromTo("#hw3", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 108.0);
 tl.to("#hw3", { opacity: 0, duration: 0.18 }, 108.85);
-tl.fromTo("#hw4", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 150.3);
-tl.to("#hw4", { opacity: 0, duration: 0.18 }, 151.75);
+tl.fromTo("#hw4", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 150.3);
+tl.to("#hw4", { opacity: 0, duration: 0.25 }, 151.7);
 tl.fromTo("#dossier-frame", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 81.1);
 tl.fromTo("#epoch-tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 81.5);
 tl.fromTo("#skyline-wrap", { opacity: 0 }, { opacity: 0.6, duration: 0.5 }, 81.3);
