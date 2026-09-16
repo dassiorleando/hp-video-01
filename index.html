@@ -5,60 +5,60 @@
     <meta name="viewport" content="width=1080, height=1920">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
-      body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      #root * { margin: 0; padding: 0; box-sizing: border-box; }
+      #root { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      .clip { position: absolute; top: 0; left: 0; width: 1080px; height: 1920px; pointer-events: none; }
+      #root .clip { position: absolute; top: 0; left: 0; width: 1080px; height: 1920px; pointer-events: none; }
 
-      #main-video {
+      #root #main-video {
         object-fit: cover;
         background: #000;
         filter: contrast(1.06) saturate(1.1);
         transform-origin: 50% 38%;
       }
 
-      #grade {
+      #root #grade {
         z-index: 4;
         mix-blend-mode: overlay;
         background: linear-gradient(155deg, rgba(10, 23, 48, 0.55) 0%, rgba(10, 23, 48, 0.1) 40%, rgba(96, 165, 250, 0.05) 60%, rgba(37, 99, 235, 0.35) 100%);
       }
 
-      #vignette {
+      #root #vignette {
         z-index: 5;
         background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.58) 100%);
       }
 
-      #edge-glow-l, #edge-glow-r {
+      #root #edge-glow-l, #root #edge-glow-r {
         z-index: 6;
         width: 10px;
         height: 1920px;
       }
-      #edge-glow-l { left: 0; background: linear-gradient(180deg, transparent 0%, rgba(37, 99, 235, 0.55) 35%, rgba(96, 165, 250, 0.55) 65%, transparent 100%); opacity: 0.6; }
-      #edge-glow-r { left: auto; right: 0; background: linear-gradient(180deg, transparent 0%, rgba(96, 165, 250, 0.5) 35%, rgba(37, 99, 235, 0.5) 65%, transparent 100%); opacity: 0.6; }
+      #root #edge-glow-l { left: 0; background: linear-gradient(180deg, transparent 0%, rgba(37, 99, 235, 0.55) 35%, rgba(96, 165, 250, 0.55) 65%, transparent 100%); opacity: 0.6; }
+      #root #edge-glow-r { left: auto; right: 0; background: linear-gradient(180deg, transparent 0%, rgba(96, 165, 250, 0.5) 35%, rgba(37, 99, 235, 0.5) 65%, transparent 100%); opacity: 0.6; }
 
-      #intro {
+      #root #intro {
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(160deg, #0a1730 0%, #0f2a63 55%, #1d4ed8 100%);
         z-index: 30;
       }
-      #intro .intro-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-      #intro .wordmark { font-size: 72px; font-weight: 800; letter-spacing: 4px; color: #ffffff; display: flex; }
-      #intro .ltr.q { color: #60a5fa; }
-      #intro .rule { width: 84px; height: 4px; background: #60a5fa; border-radius: 2px; }
+      #root #intro .intro-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+      #root #intro .wordmark { font-size: 72px; font-weight: 800; letter-spacing: 4px; color: #ffffff; display: flex; }
+      #root #intro .ltr.q { color: #60a5fa; }
+      #root #intro .rule { width: 84px; height: 4px; background: #60a5fa; border-radius: 2px; }
 
-      #lower-third { z-index: 20; display: flex; align-items: flex-end; }
-      #lower-third .lt-wrap { display: flex; align-items: stretch; margin: 0 0 300px 44px; opacity: 0; }
-      #lower-third .lt-bar { width: 7px; background: #2563eb; border-radius: 4px 0 0 4px; }
-      #lower-third .lt-box { background: rgba(10, 18, 40, 0.85); padding: 14px 26px 14px 20px; border-radius: 0 8px 8px 0; overflow: hidden; position: relative; }
-      #lower-third .lt-fill { position: absolute; inset: 0; background: #2563eb; transform-origin: left center; }
-      #lower-third .lt-name { font-size: 30px; font-weight: 700; color: #ffffff; line-height: 1.15; position: relative; }
-      #lower-third .lt-role { font-size: 19px; font-weight: 400; color: #93c5fd; margin-top: 3px; position: relative; }
+      #root #lower-third { z-index: 20; display: flex; align-items: flex-end; }
+      #root #lower-third .lt-wrap { display: flex; align-items: stretch; margin: 0 0 300px 44px; opacity: 0; }
+      #root #lower-third .lt-bar { width: 7px; background: #2563eb; border-radius: 4px 0 0 4px; }
+      #root #lower-third .lt-box { background: rgba(10, 18, 40, 0.85); padding: 14px 26px 14px 20px; border-radius: 0 8px 8px 0; overflow: hidden; position: relative; }
+      #root #lower-third .lt-fill { position: absolute; inset: 0; background: #2563eb; transform-origin: left center; }
+      #root #lower-third .lt-name { font-size: 30px; font-weight: 700; color: #ffffff; line-height: 1.15; position: relative; }
+      #root #lower-third .lt-role { font-size: 19px; font-weight: 400; color: #93c5fd; margin-top: 3px; position: relative; }
 
-      #badge { z-index: 15; display: flex; justify-content: flex-end; align-items: flex-end; }
-      #badge .badge-pill {
+      #root #badge { z-index: 15; display: flex; justify-content: flex-end; align-items: flex-end; }
+      #root #badge .badge-pill {
         margin: 0 32px 64px 0;
         padding: 8px 18px;
         border-radius: 999px;
@@ -71,18 +71,18 @@
         opacity: 0;
       }
 
-      #progress { z-index: 17; display: flex; align-items: flex-start; }
-      #progress .progress-track { width: 1080px; height: 5px; background: rgba(255, 255, 255, 0.14); }
-      #progress .progress-fill { width: 1080px; height: 5px; background: linear-gradient(90deg, #2563eb, #60a5fa); transform-origin: left center; }
+      #root #progress { z-index: 17; display: flex; align-items: flex-start; }
+      #root #progress .progress-track { width: 1080px; height: 5px; background: rgba(255, 255, 255, 0.14); }
+      #root #progress .progress-fill { width: 1080px; height: 5px; background: linear-gradient(90deg, #2563eb, #60a5fa); transform-origin: left center; }
 
-      .callout { z-index: 26; display: flex; align-items: flex-start; justify-content: flex-start; }
-      .callout .cta-wrap { margin: 150px 0 0 60px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; opacity: 0; }
-      .callout .cta-label { font-size: 18px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #60a5fa; }
-      .callout .cta-value { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.05; }
-      .callout .cta-bar { width: 46px; height: 4px; background: #2563eb; border-radius: 3px; margin-top: 3px; }
+      #root .callout { z-index: 26; display: flex; align-items: flex-start; justify-content: flex-start; }
+      #root .callout .cta-wrap { margin: 150px 0 0 60px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; opacity: 0; }
+      #root .callout .cta-label { font-size: 18px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #60a5fa; }
+      #root .callout .cta-value { font-size: 42px; font-weight: 800; color: #ffffff; line-height: 1.05; }
+      #root .callout .cta-bar { width: 46px; height: 4px; background: #2563eb; border-radius: 3px; margin-top: 3px; }
 
-      .hero { z-index: 27; display: flex; align-items: flex-start; justify-content: center; }
-      .hero-text {
+      #root .hero { z-index: 27; display: flex; align-items: flex-start; justify-content: center; }
+      #root .hero-text {
         margin-top: 960px;
         max-width: 940px;
         font-size: 66px;
@@ -95,16 +95,16 @@
         opacity: 0;
       }
 
-      #outro {
+      #root #outro {
         z-index: 40;
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(160deg, #0a1730 0%, #0f2a63 55%, #1d4ed8 100%);
       }
-      #outro .outro-inner { max-width: 900px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; opacity: 0; }
-      #outro .outro-line { font-size: 34px; font-weight: 700; line-height: 1.35; color: #ffffff; }
-      #outro .outro-cta { font-size: 22px; font-weight: 600; letter-spacing: 2px; color: #60a5fa; text-transform: uppercase; }
+      #root #outro .outro-inner { max-width: 900px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 26px; opacity: 0; }
+      #root #outro .outro-line { font-size: 34px; font-weight: 700; line-height: 1.35; color: #ffffff; }
+      #root #outro .outro-cta { font-size: 22px; font-weight: 600; letter-spacing: 2px; color: #60a5fa; text-transform: uppercase; }
     </style>
   </head>
   <body>
