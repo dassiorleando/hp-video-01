@@ -11,6 +11,7 @@ README-ci ne répète pas cette partie.
 | Fichier | Rôle |
 |---|---|
 | `STYLE_GUIDE.md` | le vocabulaire visuel et les règles de style (à lire en premier) |
+| `SCRIPT_PROMPT.md` | prompt prêt à l'emploi pour générer un nouveau script compatible template-1 |
 | `style-kit.css` | les classes CSS réutilisables |
 | `generator_helpers.py` | les fonctions Python qui génèrent le HTML/GSAP de chaque patron |
 | `gen_starter.py` | un générateur **exécutable** qui assemble un exemple |
