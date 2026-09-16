@@ -16,11 +16,11 @@ renders/
 
 # Large raw source footage (kept outside git; back up separately)
 chapitre1/
-compositions/assets/*.mp4
 
-# Big top-level video drafts
-/cold_open.mp4
-/sample-edit.mp4
+# All video files -- large binaries, kept out of git entirely
+*.mp4
+*.mov
+*.webm
 
 # Node
 node_modules/
