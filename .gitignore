@@ -1,0 +1,26 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# HyperFrames caches (regenerated automatically)
+.thumbnails/
+.transcode-cache/
+.waveform-cache/
+
+# Scratch / staging folders used during file transfers
+_to_delete/
+_transfer/
+
+# Rendered output videos (large, regenerable from compositions via `npx hyperframes render`)
+renders/
+
+# Large raw source footage (kept outside git; back up separately)
+chapitre1/
+compositions/assets/*.mp4
+
+# Big top-level video drafts
+/cold_open.mp4
+/sample-edit.mp4
+
+# Node
+node_modules/

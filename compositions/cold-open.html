@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  html,body { margin:0; padding:0; background:#000; }
+  #cold-open {
+    position:relative; width:1920px; height:1080px; overflow:hidden;
+    background:#000; font-family: "Helvetica Neue", Arial, sans-serif;
+    color:#fff;
+  }
+  .clip { position:absolute; inset:0; }
+
+  /* ---- intro black card ---- */
+  #intro-card { background:#000; display:flex; align-items:center; justify-content:center; z-index:50; }
+  #intro-card .line { font-size:64px; font-weight:800; letter-spacing:0.04em; opacity:0; }
+  #intro-card .rule { position:absolute; bottom:38%; left:50%; width:0; height:3px; background:#3b82f6; transform:translateX(-50%); }
+
+  /* ---- video layer ---- */
+  #video-wrap { z-index:10; }
+  #main-video { width:100%; height:100%; object-fit:cover; }
+  #grade { background:linear-gradient(180deg, rgba(10,20,40,0.18), rgba(10,20,40,0.32)); mix-blend-mode:multiply; z-index:15; }
+  #vignette { box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.55); z-index:16; }
+
+  /* ---- hero words ---- */
+  .hero { z-index:30; display:flex; align-items:flex-end; justify-content:center; pointer-events:none; }
+  .hero-text {
+    margin-bottom:120px; max-width:1500px; font-size:84px; font-weight:900;
+    text-transform:uppercase; color:#60a5fa; line-height:1.05; text-align:center;
+    text-shadow: 0 8px 30px rgba(0,0,0,0.6); opacity:0;
+  }
+
+  /* ---- callouts (label/value, top-left) ---- */
+  .callout { z-index:31; display:flex; align-items:flex-start; justify-content:flex-start; pointer-events:none; }
+  .callout-box { margin:70px 0 0 80px; opacity:0; }
+  .callout-label { font-size:26px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; }
+  .callout-value { font-size:56px; font-weight:800; color:#fff; margin-top:4px; }
+
+  /* ---- AlexNet ranking chart ---- */
+  #chart-card { z-index:32; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+  #chart-card .chart-title { font-size:32px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:36px; opacity:0; }
+  .bar-row { display:flex; align-items:center; width:900px; margin-bottom:26px; }
+  .bar-label { width:260px; font-size:28px; font-weight:700; text-align:right; padding-right:24px; }
+  .bar-track { flex:1; height:44px; background:rgba(255,255,255,0.08); border-radius:8px; overflow:hidden; }
+  .bar-fill { height:100%; width:0%; border-radius:8px; }
+  .bar-fill.alexnet { background:#3b82f6; }
+  .bar-fill.other { background:#64748b; }
+  .bar-pct { margin-left:20px; font-size:30px; font-weight:800; width:110px; }
+
+  /* ---- 5 buildings graphic ---- */
+  #buildings-card { z-index:32; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+  #buildings-card .bc-title { font-size:30px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:44px; opacity:0; }
+  .buildings-row { display:flex; align-items:flex-end; gap:34px; }
+  .building { width:86px; background:#2a3550; border-radius:6px 6px 0 0; opacity:0.9; }
+  .building.lit { background:#3b82f6; box-shadow:0 0 40px 6px rgba(59,130,246,0.55); }
+  .bc-caption { margin-top:34px; font-size:26px; color:#cbd5e1; opacity:0; }
+
+  /* ---- outro title card ---- */
+  #outro-card { background:#000; z-index:60; display:flex; align-items:center; justify-content:center; }
+  #outro-card .outro-text { max-width:1500px; font-size:58px; font-weight:800; text-align:center; line-height:1.25; opacity:0; }
+  #outro-card .accent { color:#60a5fa; }
+
+  /* ---- badge ---- */
+  #badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
+  #badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-tflr" id="cold-open" data-composition-id="cold-open" data-width="1920" data-height="1080" data-duration="107.82">
+
+  <div data-hf-id="hf-um1m" id="intro-card" class="clip" data-start="0" data-duration="1.35">
+    <div data-hf-id="hf-ij9j" class="line" id="intro-line">TORONTO, 2012</div>
+    <div data-hf-id="hf-4axd" class="rule" id="intro-rule"></div>
+  </div>
+
+  <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
+    <video data-hf-id="hf-ac4b" id="main-video" class="clip" src="assets/cold_open_cut.mp4" muted data-start="1.35" data-duration="103.87" data-hf-media-start-basis="local"></video>
+  </div>
+  <audio data-hf-id="hf-f0fs" id="main-audio" src="assets/cold_open_cut.mp4" data-start="1.35" data-duration="103.87" data-hf-media-start-basis="local"></audio>
+
+  <div data-hf-id="hf-nyzv" id="grade" class="clip" data-start="1.35" data-duration="103.87"></div>
+  <div data-hf-id="hf-yd38" id="vignette" class="clip" data-start="1.35" data-duration="103.87"></div>
+  <div data-hf-id="hf-qngv" class="hero clip" id="hero-2012" data-start="1.35" data-duration="1.10"><div data-hf-id="hf-c4p7" class="hero-text" id="hw1">2012</div></div>
+  <div data-hf-id="hf-fjdp" class="hero clip" id="hero-alexnet" data-start="32.25" data-duration="1.00"><div data-hf-id="hf-jb24" class="hero-text" id="hw2">AlexNet</div></div>
+  <div data-hf-id="hf-i2z1" class="hero clip" id="hero-google" data-start="37.75" data-duration="1.00"><div data-hf-id="hf-dnnz" class="hero-text" id="hw3">Google</div></div>
+  <div data-hf-id="hf-uww4" class="hero clip" id="hero-ilya" data-start="41.95" data-duration="1.00"><div data-hf-id="hf-6cja" class="hero-text" id="hw4">Ilya Sutskever</div></div>
+  <div data-hf-id="hf-g41k" class="hero clip" id="hero-openai" data-start="44.35" data-duration="1.00"><div data-hf-id="hf-adgc" class="hero-text" id="hw5">OpenAI</div></div>
+  <div data-hf-id="hf-v2kx" class="hero clip" id="hero-turing" data-start="48.05" data-duration="1.10"><div data-hf-id="hf-kds3" class="hero-text" id="hw6">Prix Turing</div></div>
+  <div data-hf-id="hf-3sf4" class="hero clip" id="hero-nobel" data-start="52.05" data-duration="1.20"><div data-hf-id="hf-m98t" class="hero-text" id="hw7">Prix Nobel</div></div>
+  <div data-hf-id="hf-ng56" class="hero clip" id="hero-4sur5" data-start="68.65" data-duration="1.20"><div data-hf-id="hf-k7ay" class="hero-text" id="hw8">4 entreprises sur 5</div></div>
+  <div data-hf-id="hf-fb8p" class="callout clip" id="callout-toronto" data-start="2.35" data-duration="3.40">
+    <div data-hf-id="hf-px0h" class="callout-box" id="cta1">
+      <div data-hf-id="hf-eq5h" class="callout-label">Universite de Toronto</div>
+      <div data-hf-id="hf-z8oh" class="callout-value">2012</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-qdca" id="chart-card" class="clip" data-start="32.55" data-duration="4.60">
+    <div data-hf-id="hf-36u1" class="chart-title" id="chart-title">Taux d'erreur -- ImageNet 2012</div>
+    <div data-hf-id="hf-vxho" class="bar-row">
+      <div data-hf-id="hf-l179" class="bar-label">AlexNet</div>
+      <div data-hf-id="hf-2kxp" class="bar-track"><div data-hf-id="hf-3v6k" class="bar-fill alexnet" id="bar1"></div></div>
+      <div data-hf-id="hf-96zm" class="bar-pct" id="pct1">0%</div>
+    </div>
+    <div data-hf-id="hf-x17o" class="bar-row">
+      <div data-hf-id="hf-rf3e" class="bar-label">2e equipe</div>
+      <div data-hf-id="hf-dok1" class="bar-track"><div data-hf-id="hf-zhmo" class="bar-fill other" id="bar2"></div></div>
+      <div data-hf-id="hf-aaax" class="bar-pct" id="pct2">0%</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-jndr" id="buildings-card" class="clip" data-start="68.85" data-duration="6.80">
+    <div data-hf-id="hf-62kg" class="bc-title" id="bc-title">Adoption de l'IA au Canada</div>
+    <div data-hf-id="hf-131k" class="buildings-row"><div data-hf-id="hf-4yua" class="building" id="bld0" style="height:130px;"></div><div data-hf-id="hf-w695" class="building" id="bld1" style="height:150px;"></div><div data-hf-id="hf-kwp6" class="building" id="bld2" style="height:110px;"></div><div data-hf-id="hf-400x" class="building" id="bld3" style="height:170px;"></div><div data-hf-id="hf-b2dm" class="building lit" id="bld4" style="height:140px;"></div></div>
+    <div data-hf-id="hf-4s3r" class="bc-caption" id="bc-caption">1 entreprise sur 5 utilise l'IA</div>
+  </div>
+  <div data-hf-id="hf-da8v" id="badge" class="clip" data-start="3.35" data-duration="101.87">
+    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
+  </div>
+  <div data-hf-id="hf-c4cy" id="outro-card" class="clip" data-start="105.32" data-duration="2.50">
+    <div data-hf-id="hf-y78w" class="outro-text" id="outro-text">LE CANADA A INVENTÉ L'IA MODERNE…<br data-hf-id="hf-x5px"><span data-hf-id="hf-515y" class="accent">ALORS POURQUOI NE LA POSSÈDE-T-IL PAS&#160;?</span></div>
+  </div>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+tl.fromTo("#intro-line", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.15);
+tl.to("#intro-rule", { width: 340, duration: 0.5, ease: "power2.out" }, 0.35);
+tl.to("#intro-line", { opacity: 0, duration: 0.2 }, 1.1);
+
+tl.fromTo("#hw1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 1.35);
+tl.to("#hw1", { opacity: 0, duration: 0.18 }, 2.27);
+
+tl.fromTo("#hw2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 32.25);
+tl.to("#hw2", { opacity: 0, duration: 0.18 }, 33.07);
+
+tl.fromTo("#hw3", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 37.75);
+tl.to("#hw3", { opacity: 0, duration: 0.18 }, 38.57);
+
+tl.fromTo("#hw4", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 41.95);
+tl.to("#hw4", { opacity: 0, duration: 0.18 }, 42.77);
+
+tl.fromTo("#hw5", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 44.35);
+tl.to("#hw5", { opacity: 0, duration: 0.18 }, 45.17);
+
+tl.fromTo("#hw6", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 48.05);
+tl.to("#hw6", { opacity: 0, duration: 0.18 }, 48.97);
+
+tl.fromTo("#hw7", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 52.05);
+tl.to("#hw7", { opacity: 0, duration: 0.18 }, 53.07);
+
+tl.fromTo("#hw8", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2)" }, 68.65);
+tl.to("#hw8", { opacity: 0, duration: 0.18 }, 69.67);
+
+tl.fromTo("#cta1", { opacity: 0, x: -22 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 2.35);
+tl.to("#cta1", { opacity: 0, duration: 0.25 }, 5.45);
+
+tl.fromTo("#chart-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 32.65);
+tl.to("#bar1", { width: "61%", duration: 0.9, ease: "power2.out" }, 32.95);
+const pct1obj = { v: 0 };
+tl.to(pct1obj, { v: 15.3, duration: 0.9, ease: "power2.out",
+  onUpdate: function() { document.getElementById("pct1").innerText = pct1obj.v.toFixed(1) + "%"; } }, 32.95);
+tl.to("#bar2", { width: "100%", duration: 0.9, ease: "power2.out" }, 33.45);
+const pct2obj = { v: 0 };
+tl.to(pct2obj, { v: 26.2, duration: 0.9, ease: "power2.out",
+  onUpdate: function() { document.getElementById("pct2").innerText = pct2obj.v.toFixed(1) + "%"; } }, 33.45);
+tl.to("#chart-card", { opacity: 0, duration: 0.3 }, 36.85);
+
+tl.fromTo("#bc-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 68.95);
+tl.fromTo("#bld0", { opacity: 0, scaleY: 0.6, transformOrigin: "bottom" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 69.35);
+tl.fromTo("#bld1", { opacity: 0, scaleY: 0.6, transformOrigin: "bottom" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 69.41);
+tl.fromTo("#bld2", { opacity: 0, scaleY: 0.6, transformOrigin: "bottom" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 69.47);
+tl.fromTo("#bld3", { opacity: 0, scaleY: 0.6, transformOrigin: "bottom" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 69.53);
+tl.fromTo("#bld4", { opacity: 0, scaleY: 0.6, transformOrigin: "bottom" }, { opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }, 69.59);
+
+tl.fromTo("#bc-caption", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 70.15);
+tl.to("#buildings-card", { opacity: 0, duration: 0.3 }, 75.35);
+
+tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 3.55);
+
+tl.fromTo("#outro-text", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 105.52);
+
+window.__timelines["cold-open"] = tl;
+</script>
+</div>
+</body>
+</html>
