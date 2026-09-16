@@ -117,9 +117,17 @@ def split_screen_block(sid, photo_src, caption, source_label, start, end, video_
     return html_snippet, js_lines
 
 
-def montage_block(mid, items, start, item_duration=0.5, hard_cut=True):
+def montage_block(mid, items, start, item_duration=0.5, hard_cut=True, align="center"):
+    # align="left"/"right" évite de centrer le montage pile sur le
+    # présentateur (incrustation, pas plein cadre opaque) — voir la même
+    # fonction dans generator_helpers.py pour le détail.
+    align_style = {
+        "left": ' style="justify-content:flex-start; padding-left:150px;"',
+        "right": ' style="justify-content:flex-end; padding-right:150px;"',
+        "center": "",
+    }.get(align, "")
     html_parts = [f'  <div id="{mid}" class="clip montage-rafale" data-start="{start}" '
-                  f'data-duration="{round(item_duration*len(items),2)}">\n']
+                  f'data-duration="{round(item_duration*len(items),2)}"{align_style}>\n']
     js_lines = []
     for i, (icon_html, label) in enumerate(items):
         item_id = f'{mid}-{i}'

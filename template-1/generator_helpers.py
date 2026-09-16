@@ -206,16 +206,29 @@ def split2_block(gid: str, left_inner_html: str, right_inner_html: str,
 
 
 def montage_block(mid: str, items, start: float, item_duration: float = 0.5,
-                   hard_cut: bool = True):
+                   hard_cut: bool = True, align: str = "center"):
     """MONTAGE ICÔNES / MONTAGE RAFALE — séquence rapide, un seul plan visible
     à la fois. items = liste de (icon_or_img_html, label_text). hard_cut=True
     reproduit un "jump cut sec, sans fondu" (MONTAGE RAFALE) ; False fait un
     léger fondu (MONTAGE ICÔNES).
 
+    align : "center" (défaut, inchangé), "left" ou "right" — CE PATRON EST
+    UNE INCRUSTATION (le présentateur reste visible en dessous, .montage-item
+    n'a pas de fond opaque), donc "center" place les items PILE sur le
+    visage/torse du présentateur. Utiliser "left"/"right" dès qu'un
+    présentateur est visible sous le montage (règle de positionnement, voir
+    SCRIPT_PROMPT.md) — bug réel signalé le 2026-09-16 sur le montage
+    chien/voiture/bateau de cold-open.html, centré sur le présentateur.
+
     Retourne (html_snippet, js_timeline_lines).
     """
+    align_style = {
+        "left": ' style="justify-content:flex-start; padding-left:150px;"',
+        "right": ' style="justify-content:flex-end; padding-right:150px;"',
+        "center": "",
+    }.get(align, "")
     html_parts = [f'  <div id="{mid}" class="clip montage-rafale" data-start="{start}" '
-                  f'data-duration="{round(item_duration*len(items),2)}">\n']
+                  f'data-duration="{round(item_duration*len(items),2)}"{align_style}>\n']
     js_lines = []
     for i, (icon_html, label) in enumerate(items):
         item_id = f'{mid}-{i}'

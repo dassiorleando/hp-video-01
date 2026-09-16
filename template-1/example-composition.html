@@ -289,7 +289,18 @@ html,body { margin:0; padding:0; background:#000; }
    lisible même sur un titre de chapitre à deux lignes. */
 .chapter-opening-card {
   background:#030509;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
+  z-index:50;
+}
+/* Le centrage vit sur .clip-inner (l'enfant réel de la scène), PAS sur
+   .chapter-opening-card lui-même : depuis l'introduction de .clip-inner
+   (sortie GSAP, voir plus haut), le .clip-inner enfant a position:absolute;
+   inset:0, ce qui remplit tout le cadre et annule tout centrage flex posé
+   sur son parent — le texte se retrouvait épinglé en haut-gauche au lieu
+   d'être centré. Régression réelle trouvée le 2026-09-16 (signalée par
+   l'utilisateur sur le carton "TORONTO, 2012" de cold-open.html, qui suit
+   exactement ce même patron). */
+.chapter-opening-card .clip-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
 }
 .chapter-opening-card .chapter-opening-photo {
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
@@ -320,57 +331,57 @@ html,body { margin:0; padding:0; background:#000; }
 </style>
 </head>
 <body>
-<div id="exemple" data-composition-id="exemple" data-width="3840" data-height="2160" data-fps="60" data-duration="20.5">
-<div id="scale-2x">
-  <div id="video-wrap" class="clip">
-    <video id="main-video" class="clip" src="assets/video.mp4" muted data-start="4.0" data-duration="16.5"></video>
+<div data-hf-id="hf-643k" id="exemple" data-composition-id="exemple" data-width="3840" data-height="2160" data-fps="60" data-duration="20.5">
+<div data-hf-id="hf-7cuk" id="scale-2x">
+  <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
+    <video data-hf-id="hf-l7zs" id="main-video" class="clip" src="assets/video.mp4" muted data-start="4.0" data-duration="16.5"></video>
   </div>
 
-  <div id="hardcut-black" class="clip" data-start="0" data-duration="20.5"></div>
+  <div data-hf-id="hf-1qa2" id="hardcut-black" class="clip" data-start="0" data-duration="20.5"></div>
 
-  <div id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="4.0">
-    <div class="clip-inner" id="chapter-open-inner">
-    <img class="chapter-opening-photo" src="assets/photos/circuit-board.jpg" alt="">
-    <div class="chapter-opening-overlay"></div>
-    <div class="scanlines"></div>
-    <div class="chapter-opening-readout-wrap" id="chapter-open-readout-wrap"><div class="chapter-opening-readout" id="chapter-open-readout">SYSTÈME D'ARCHIVES — EXEMPLE</div></div>
-    <div class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE X</div>
-    <div class="chapter-opening-title" id="chapter-open-title">Titre d'exemple du carton d'ouverture</div>
-    <div class="chapter-opening-rule" id="chapter-open-rule"></div>
+  <div data-hf-id="hf-gjv3" id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="4.0">
+    <div data-hf-id="hf-psio" class="clip-inner" id="chapter-open-inner">
+    <img data-hf-id="hf-walb" class="chapter-opening-photo" src="assets/photos/circuit-board.jpg" alt="">
+    <div data-hf-id="hf-66jr" class="chapter-opening-overlay"></div>
+    <div data-hf-id="hf-8pzc" class="scanlines"></div>
+    <div data-hf-id="hf-z3hm" class="chapter-opening-readout-wrap" id="chapter-open-readout-wrap"><div data-hf-id="hf-jpdj" class="chapter-opening-readout" id="chapter-open-readout">SYSTÈME D'ARCHIVES — EXEMPLE</div></div>
+    <div data-hf-id="hf-agm8" class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE X</div>
+    <div data-hf-id="hf-tt45" class="chapter-opening-title" id="chapter-open-title">Titre d'exemple du carton d'ouverture</div>
+    <div data-hf-id="hf-pyuc" class="chapter-opening-rule" id="chapter-open-rule"></div>
     </div>
   </div>
-  <div class="hero clip hero--right" id="hero-hw1" data-start="5.0" data-duration="1.0"><div class="hero-text" id="hw1">EXEMPLE DE TITRE</div></div>
-  <div id="split-1" class="clip" data-start="6.5" data-duration="3.0" style="z-index:33; pointer-events:none;">
-    <div class="split-photo-panel" id="split-1-panel"><img src="assets/photos/circuit-board.jpg" alt=""><div class="split-tint"></div></div>
-    <div class="split-divider" id="split-1-divider"></div>
-    <div class="split-caption" id="split-1-caption">Légende de l'archive</div>
-    <div class="split-source" id="split-1-source">Source : archives</div>
+  <div data-hf-id="hf-be7d" class="hero clip hero--right" id="hero-hw1" data-start="5.0" data-duration="1.0"><div data-hf-id="hf-q7m7" class="hero-text" id="hw1">EXEMPLE DE TITRE</div></div>
+  <div data-hf-id="hf-11py" id="split-1" class="clip" data-start="6.5" data-duration="3.0" style="z-index:33; pointer-events:none;">
+    <div data-hf-id="hf-bi37" class="split-photo-panel" id="split-1-panel"><img data-hf-id="hf-9rsv" src="assets/photos/circuit-board.jpg" alt=""><div data-hf-id="hf-bzji" class="split-tint"></div></div>
+    <div data-hf-id="hf-pyng" class="split-divider" id="split-1-divider"></div>
+    <div data-hf-id="hf-3zm8" class="split-caption" id="split-1-caption">Légende de l'archive</div>
+    <div data-hf-id="hf-7y9y" class="split-source" id="split-1-source">Source : archives</div>
   </div>
-  <div id="panel-1-wrap" class="clip" data-start="10.0" data-duration="2.0">
-    <div class="map-panel" id="panel-1">
-      <div class="map-title" style="font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px;">EXEMPLE DE DONNÉE</div>
-      <div style="font-size:64px; font-weight:900; color:#fff;">42&nbsp;%</div>
+  <div data-hf-id="hf-yzqs" id="panel-1-wrap" class="clip" data-start="10.0" data-duration="2.0">
+    <div data-hf-id="hf-4t5j" class="map-panel" id="panel-1">
+      <div data-hf-id="hf-zkpg" class="map-title" style="font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px;">EXEMPLE DE DONNÉE</div>
+      <div data-hf-id="hf-4vzb" style="font-size:64px; font-weight:900; color:#fff;">42&#160;%</div>
     </div>
   </div>
-  <div id="stamp-1-wrap" class="clip" data-start="12.5" data-duration="1.2">
-    <div class="stamp-text" id="stamp-1">Rupture</div>
+  <div data-hf-id="hf-ycdj" id="stamp-1-wrap" class="clip" data-start="12.5" data-duration="1.2">
+    <div data-hf-id="hf-61yt" class="stamp-text" id="stamp-1">Rupture</div>
   </div>
-  <div id="montage-1" class="clip montage-rafale" data-start="14.0" data-duration="1.5">
-    <div class="montage-item" id="montage-1-0">
-      <div style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
-      <div class="montage-label">Exemple A</div>
+  <div data-hf-id="hf-vmsn" id="montage-1" class="clip montage-rafale" data-start="14.0" data-duration="1.5">
+    <div data-hf-id="hf-n0kn" class="montage-item" id="montage-1-0">
+      <div data-hf-id="hf-5mb7" style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
+      <div data-hf-id="hf-qgb7" class="montage-label">Exemple A</div>
     </div>
-    <div class="montage-item" id="montage-1-1">
-      <div style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
-      <div class="montage-label">Exemple B</div>
+    <div data-hf-id="hf-j2gm" class="montage-item" id="montage-1-1">
+      <div data-hf-id="hf-4qz7" style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
+      <div data-hf-id="hf-q206" class="montage-label">Exemple B</div>
     </div>
-    <div class="montage-item" id="montage-1-2">
-      <div style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
-      <div class="montage-label">Exemple C</div>
+    <div data-hf-id="hf-f4cl" class="montage-item" id="montage-1-2">
+      <div data-hf-id="hf-4co6" style="width:120px;height:120px;border-radius:50%;background:#1e293b;border:3px solid #3b82f6;"></div>
+      <div data-hf-id="hf-pnp5" class="montage-label">Exemple C</div>
     </div>
   </div>
-  <div class="kinetic-text clip" id="kinetic-1" data-start="16.0" data-duration="3"><span class="kinetic-word">Exemple</span><span class="kinetic-word">de</span><span class="kinetic-word">texte</span><span class="kinetic-word">kinétique</span></div>
-  <div class="hardcut-text" id="hardcut-1" data-start="18.5" data-duration="2.0">EXEMPLE DE QUESTION DRAMATIQUE?</div>
+  <div data-hf-id="hf-n3l8" class="kinetic-text clip" id="kinetic-1" data-start="16.0" data-duration="3"><span data-hf-id="hf-ee0n" class="kinetic-word">Exemple</span><span data-hf-id="hf-bnvs" class="kinetic-word">de</span><span data-hf-id="hf-tb23" class="kinetic-word">texte</span><span data-hf-id="hf-4yji" class="kinetic-word">kinétique</span></div>
+  <div data-hf-id="hf-f701" class="hardcut-text" id="hardcut-1" data-start="18.5" data-duration="2.0">EXEMPLE DE QUESTION DRAMATIQUE?</div>
 </div>
 </div>
 <script>

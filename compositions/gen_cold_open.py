@@ -29,7 +29,6 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "template-1"))
 from generator_helpers import (  # noqa: E402
     esc, make_t, scale_2x_wrapper, hero_word_block, data_card_panel,
-    montage_block,
 )
 
 COMP_ID = "cold-open"
@@ -53,29 +52,28 @@ parts.append('''
 html,body { margin:0; padding:0; background:#000; }
 
 /* ---- carton d'intro "TORONTO, 2012" ---- */
-#intro-card { background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50; }
+#intro-card { background:#000; z-index:50; }
+/* centrage sur .clip-inner, pas sur #intro-card lui-même : .clip-inner a
+   position:absolute;inset:0 (voir style-kit.css) qui annule tout centrage
+   flex posé sur son parent — sans cette règle le texte se retrouve épinglé
+   en haut-gauche au lieu d'être centré (régression réelle signalée par
+   l'utilisateur le 2026-09-16, introduite par l'ajout de .clip-inner). */
+#intro-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
 #intro-card .intro-readout-wrap { overflow:hidden; width:0; }
 #intro-card .intro-readout { font-family:"Courier New", monospace; font-size:46px; letter-spacing:0.16em; white-space:nowrap; color:#fff; font-weight:700; }
 #intro-card .intro-rule { margin-top:22px; width:0; height:3px; background:#3b82f6; }
 
-/* ---- montage chien / voiture / bateau (hésitation de l'ancienne IA) ---- */
-.guess-icon { width:110px; height:110px; }
-.guess-pct { margin-top:14px; font-size:24px; font-weight:700; color:#facc15; }
-
-/* ---- classement AlexNet (incrustation) ---- */
-.rank-title { font-size:26px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:22px; }
-.rank-row { display:flex; align-items:center; width:620px; margin-bottom:16px; }
-.rank-label { width:160px; font-size:22px; font-weight:700; text-align:right; padding-right:18px; color:#fff; }
-.rank-track { flex:1; height:30px; background:rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
-.rank-fill { height:100%; width:0%; border-radius:6px; }
-.rank-fill.alexnet { background:#3b82f6; }
-.rank-fill.other { background:#64748b; }
-.rank-pct { margin-left:16px; font-size:22px; font-weight:800; width:86px; color:#fff; }
-
-/* ---- montage logos tech génériques (formes abstraites, aucune marque réelle) ---- */
-.logo-block { width:150px; height:150px; border-radius:22px; display:flex; align-items:center; justify-content:center; }
-.logo-shape { width:64px; height:64px; }
-.logo-label { margin-top:12px; font-size:18px; font-weight:600; letter-spacing:0.04em; color:#93c5fd; text-transform:uppercase; }
+/* ---- panneau "à qui appartient l'IA" (modèles / infrastructure / --------
+   processeurs), incrustation — remplace l'ancien montage-rafale de logos
+   abstraits (jugé trop vague, 2026-09-16) par 3 lignes nommées + un
+   repère drapeau É.-U. sur chacune, pour vraiment porter le point de la
+   narration ("les modèles les plus utilisés... entreprises américaines"). */
+.own-title { font-size:26px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:22px; }
+.own-row { display:flex; align-items:center; width:560px; margin-bottom:20px; }
+.own-icon { width:54px; height:54px; flex-shrink:0; }
+.own-label { flex:1; margin-left:20px; font-size:24px; font-weight:700; color:#fff; }
+.own-flag { width:44px; height:30px; border-radius:3px; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,0.25); }
+.own-flag-label { margin-left:10px; font-size:16px; font-weight:700; letter-spacing:0.04em; color:#cbd5e1; }
 
 /* ---- 5 bâtiments (incrustation) ---- */
 .buildings-title { font-size:24px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:26px; }
@@ -131,36 +129,10 @@ parts.append(f'''  <div id="video-wrap" class="clip">
 timeline_js = []
 
 # ---------------------------------------------------------------------------
-# montage RAFALE : chien / voiture / bateau (hésitation de l'ancienne IA)
-# narration réelle : "un chien, une voiture, un bateau et bien d'autres"
-# (14.58-17.95s dans la vidéo) -> le montage illustre L4 juste après,
-# "les meilleurs systèmes... se trompent constamment" (17.95-22.36s)
-# ---------------------------------------------------------------------------
-GUESS_ICONS = {
-    "dog": ('<svg class="guess-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="3">'
-            '<circle cx="50" cy="55" r="26"/><path d="M32 40 L24 20 M68 40 L76 20" stroke-linecap="round"/>'
-            '<circle cx="42" cy="52" r="3" fill="#93c5fd"/><circle cx="58" cy="52" r="3" fill="#93c5fd"/></svg>'),
-    "car": ('<svg class="guess-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="3">'
-            '<path d="M15 60 L22 42 L78 42 L85 60" stroke-linecap="round" stroke-linejoin="round"/>'
-            '<rect x="12" y="60" width="76" height="16" rx="4"/><circle cx="30" cy="78" r="7"/><circle cx="70" cy="78" r="7"/></svg>'),
-    "boat": ('<svg class="guess-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="3">'
-             '<path d="M50 15 V55 M50 20 L72 30 L50 40 Z" fill="#93c5fd" stroke="none"/>'
-             '<path d="M20 60 L80 60 L68 78 L32 78 Z" stroke-linejoin="round"/></svg>'),
-}
-guesses = [
-    ("dog", "62 % chien?"),
-    ("car", "48 % voiture?"),
-    ("boat", "55 % bateau?"),
-    ("dog", "41 % chat?"),
-]
-montage_start = t(17.95)
-h, js = montage_block(
-    "guess-montage",
-    [(GUESS_ICONS[shape] + f'<div class="guess-pct">{esc(label)}</div>', "") for shape, label in guesses],
-    montage_start, item_duration=1.1, hard_cut=True,
-)
-parts.append(h); timeline_js += js
-
+# (montage chien/voiture/bateau retiré le 2026-09-16 à la demande de
+# l'utilisateur : "retire les illustrations d'animaux dans le cold open" —
+# la narration correspondante (14.58-22.36s) reste couverte par la vidéo
+# seule, sans illustration superposée.)
 # ---------------------------------------------------------------------------
 # mots-héros (informationnel, droite) — timing réel tiré du transcript
 # ---------------------------------------------------------------------------
@@ -177,60 +149,75 @@ for hid, text, start, dur in HEROES:
     parts.append(h); timeline_js += js
 
 # ---------------------------------------------------------------------------
-# CAPSULE-DONNÉE incrustation : classement AlexNet (taux d'erreur ImageNet 2012)
-# juste après le mot-héros "AlexNet" (~28.9s), avant "Ilya Sutskever" (33.66s)
+# (illustration du taux d'erreur AlexNet/ImageNet retirée le 2026-09-16 à la
+# demande de l'utilisateur : "on n'en parle pas dans le cold open" — le mot-
+# héros "AlexNet" reste seul, sans capsule-donnée chiffrée superposée.)
 # ---------------------------------------------------------------------------
-chart_start = t(29.0)
-chart_dur = 3.9
-chart_inner = (
-    '      <div class="rank-title">Taux d\'erreur &mdash; ImageNet 2012</div>\n'
-    '      <div class="rank-row"><div class="rank-label">AlexNet</div>'
-    '<div class="rank-track"><div class="rank-fill alexnet" id="bar1"></div></div>'
-    '<div class="rank-pct" id="pct1">0%</div></div>\n'
-    '      <div class="rank-row"><div class="rank-label">2e &eacute;quipe</div>'
-    '<div class="rank-track"><div class="rank-fill other" id="bar2"></div></div>'
-    '<div class="rank-pct" id="pct2">0%</div></div>\n'
+
+# ---------------------------------------------------------------------------
+# CAPSULE-DONNÉE incrustation : "à qui appartiennent-ils ?" — modèles /
+# infrastructure / processeurs, chacun marqué É.-U. Remplace le 2026-09-16
+# l'ancien montage-rafale de logos abstraits sans texte (jugé trop vague par
+# l'utilisateur : "améliore les illustrations parlant du fait que les
+# modèles, infrastructure et processeurs appartiennent aux USA"). Couvre la
+# même fenêtre de narration L10 "les modèles les plus utilisés...
+# entreprises américaines" (43.96s-52.62s dans le transcript réel).
+# ---------------------------------------------------------------------------
+OWN_ICON_MODEL = (
+    '<svg class="own-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="4">'
+    '<circle cx="20" cy="30" r="7"/><circle cx="20" cy="70" r="7"/>'
+    '<circle cx="50" cy="20" r="7"/><circle cx="50" cy="50" r="7"/><circle cx="50" cy="80" r="7"/>'
+    '<circle cx="80" cy="35" r="7"/><circle cx="80" cy="65" r="7"/>'
+    '<path d="M27 30 L43 21 M27 30 L43 47 M27 70 L43 53 M27 70 L43 79 '
+    'M57 21 L73 34 M57 48 L73 35 M57 52 L73 64 M57 79 L73 66" stroke-linecap="round"/></svg>'
 )
-h, js = data_card_panel("chart-panel", chart_inner, chart_start)
-# ancré en haut-droite (règle de positionnement : jamais centré sur le
-# visage — présentateur cadré buste, le bas du cadre reste plus sûr)
+OWN_ICON_INFRA = (
+    '<svg class="own-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="4">'
+    '<rect x="18" y="16" width="64" height="19" rx="3"/><rect x="18" y="40" width="64" height="19" rx="3"/>'
+    '<rect x="18" y="64" width="64" height="19" rx="3"/>'
+    '<circle cx="29" cy="25.5" r="2.6" fill="#93c5fd" stroke="none"/>'
+    '<circle cx="29" cy="49.5" r="2.6" fill="#93c5fd" stroke="none"/>'
+    '<circle cx="29" cy="73.5" r="2.6" fill="#93c5fd" stroke="none"/></svg>'
+)
+OWN_ICON_CHIP = (
+    '<svg class="own-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="4">'
+    '<rect x="30" y="30" width="40" height="40" rx="4"/>'
+    '<path d="M40 30 V17 M60 30 V17 M40 83 V70 M60 83 V70 M30 40 H17 M30 60 H17 M70 40 H83 M70 60 H83" '
+    'stroke-linecap="round"/></svg>'
+)
+OWN_FLAG = (
+    '<svg class="own-flag" viewBox="0 0 60 40">'
+    '<rect width="60" height="40" fill="#b91c1c"/>'
+    '<rect y="4.6" width="60" height="4.6" fill="#fff"/><rect y="13.8" width="60" height="4.6" fill="#fff"/>'
+    '<rect y="23" width="60" height="4.6" fill="#fff"/><rect y="32.2" width="60" height="4.6" fill="#fff"/>'
+    '<rect width="26" height="22" fill="#1d4ed8"/></svg>'
+)
+own_start = t(44.3)
+own_dur = 8.3
+own_rows = [
+    (OWN_ICON_MODEL, "Modèles"),
+    (OWN_ICON_INFRA, "Infrastructure"),
+    (OWN_ICON_CHIP, "Processeurs"),
+]
+own_inner = '      <div class="own-title">À qui appartiennent-ils&nbsp;?</div>\n' + ''.join(
+    f'      <div class="own-row" id="own-row-{i}">{icon}<div class="own-label">{esc(label)}</div>'
+    f'{OWN_FLAG}<div class="own-flag-label">É.-U.</div></div>\n'
+    for i, (icon, label) in enumerate(own_rows)
+)
+h, js = data_card_panel("own-panel", own_inner, own_start)
+# ancré en haut-droite (même emplacement que l'ancien chart-panel retiré ;
+# règle de positionnement : jamais centré sur le visage)
 parts.append(
-    f'  <div id="chart-panel-wrap" class="clip" data-start="{chart_start:.2f}" data-duration="{chart_dur}" '
+    f'  <div id="own-panel-wrap" class="clip" data-start="{own_start:.2f}" data-duration="{own_dur}" '
     f'style="display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 90px 0 0;">\n{h}  </div>\n'
 )
 timeline_js += js
-timeline_js += [
-    f'tl.to("#bar1", {{ width: "61%", duration: 0.8, ease: "power2.out" }}, {chart_start + 0.3:.2f});',
-    'const pct1obj = { v: 0 };',
-    f'tl.to(pct1obj, {{ v: 15.3, duration: 0.8, ease: "power2.out", '
-    f'onUpdate: function() {{ document.getElementById("pct1").innerText = pct1obj.v.toFixed(1) + "%"; }} }}, {chart_start + 0.3:.2f});',
-    f'tl.to("#bar2", {{ width: "100%", duration: 0.8, ease: "power2.out" }}, {chart_start + 0.8:.2f});',
-    'const pct2obj = { v: 0 };',
-    f'tl.to(pct2obj, {{ v: 26.2, duration: 0.8, ease: "power2.out", '
-    f'onUpdate: function() {{ document.getElementById("pct2").innerText = pct2obj.v.toFixed(1) + "%"; }} }}, {chart_start + 0.8:.2f});',
-]
-
-# ---------------------------------------------------------------------------
-# montage RAFALE : logos tech génériques (formes abstraites, aucune marque)
-# pendant L10 "les modèles les plus utilisés... entreprises américaines"
-# (43.96s-52.62s dans le transcript réel)
-# ---------------------------------------------------------------------------
-LOGO_SHAPES = [
-    '<svg class="logo-shape" viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" fill="#3b82f6"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="14" fill="#60a5fa"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><polygon points="50,15 85,80 15,80" fill="#93c5fd"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><rect x="15" y="35" width="70" height="30" rx="15" fill="#3b82f6"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><circle cx="35" cy="50" r="22" fill="#60a5fa"/><circle cx="65" cy="50" r="22" fill="#93c5fd" opacity="0.85"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><polygon points="50,12 88,50 50,88 12,50" fill="#3b82f6"/></svg>',
-    '<svg class="logo-shape" viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="30" fill="#60a5fa"/></svg>',
-]
-logo_start = t(44.3)
-h, js = montage_block(
-    "logo-montage",
-    [(f'<div class="logo-block">{shape}</div>', "") for shape in LOGO_SHAPES],
-    logo_start, item_duration=1.15, hard_cut=True,
-)
-parts.append(h); timeline_js += js
+for i in range(len(own_rows)):
+    row_start = round(own_start + 0.35 + i * 0.55, 3)
+    timeline_js.append(
+        f'tl.fromTo("#own-row-{i}", {{ opacity: 0, x: 24 }}, '
+        f'{{ opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }}, {row_start});'
+    )
 
 # ---------------------------------------------------------------------------
 # CAPSULE-DONNÉE incrustation : 5 bâtiments, un seul s'illumine

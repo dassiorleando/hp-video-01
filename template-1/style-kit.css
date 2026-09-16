@@ -283,7 +283,18 @@ html,body { margin:0; padding:0; background:#000; }
    lisible même sur un titre de chapitre à deux lignes. */
 .chapter-opening-card {
   background:#030509;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
+  z-index:50;
+}
+/* Le centrage vit sur .clip-inner (l'enfant réel de la scène), PAS sur
+   .chapter-opening-card lui-même : depuis l'introduction de .clip-inner
+   (sortie GSAP, voir plus haut), le .clip-inner enfant a position:absolute;
+   inset:0, ce qui remplit tout le cadre et annule tout centrage flex posé
+   sur son parent — le texte se retrouvait épinglé en haut-gauche au lieu
+   d'être centré. Régression réelle trouvée le 2026-09-16 (signalée par
+   l'utilisateur sur le carton "TORONTO, 2012" de cold-open.html, qui suit
+   exactement ce même patron). */
+.chapter-opening-card .clip-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
 }
 .chapter-opening-card .chapter-opening-photo {
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
