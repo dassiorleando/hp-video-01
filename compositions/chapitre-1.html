@@ -20,6 +20,10 @@ html,body { margin:0; padding:0; background:#000; }
    at its native detail instead of being downsampled to 1080p first. */
 #scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
 .clip { position:absolute; inset:0; }
+/* sortie GSAP correcte : le fondu de sortie + le verrou dur s'appliquent à
+   ce enfant, jamais au .clip parent lui-même (gsap_exit_missing_hard_kill,
+   bug réel trouvé le 2026-09-16 sur #chapter-card — voir style-kit.css). */
+.clip-inner { position:absolute; inset:0; }
 
 /* ---- archive / title scene ---- */
 #chapter-card {
@@ -281,6 +285,7 @@ html,body { margin:0; padding:0; background:#000; }
   </svg>
 
   <div id="chapter-card" class="clip" data-start="0" data-duration="5.8">
+   <div class="clip-inner" id="chapter-card-inner">
     <img class="chapter-photo" src="assets/photos/vintage-computer.jpg" alt="">
     <div class="chapter-photo-overlay"></div>
     <div class="scanlines"></div>
@@ -328,6 +333,7 @@ html,body { margin:0; padding:0; background:#000; }
       <path class="lab-cable" d="M150,195 Q290,215 420,175"/>
       <path class="lab-cable" d="M580,175 Q650,215 700,195"/>
     </svg>
+   </div>
   </div>
 
   <div id="video-wrap" class="clip">
@@ -601,24 +607,24 @@ const tl = gsap.timeline({ paused: true });
 
 tl.to("#readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
 tl.fromTo("#lab-illo", { opacity: 0 }, { opacity: 0.8, duration: 0.6 }, 0.15);
-tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
-tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
+tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
+tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
 tl.to("#lab-light-0-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
-tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
-tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.6);
-tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
-tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
-tl.to("#lab-light-2-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
-tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
-tl.to("#lab-light-3-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
-tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-1-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-1-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
+tl.to("#lab-light-1-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
+tl.to("#lab-light-2-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-2-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
+tl.to("#lab-light-2-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
+tl.to("#lab-light-3-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
+tl.to("#lab-light-3-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.75);
+tl.to("#lab-light-3-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.0);
 tl.to("#lab-light-4-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
 tl.to("#lab-light-4-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
 tl.to("#lab-light-4-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
-tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 1.05);
-tl.to("#lab-light-5-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
-tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.85);
+tl.to("#lab-light-5-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.95);
+tl.to("#lab-light-5-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.65);
+tl.to("#lab-light-5-2", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.8);
 tl.fromTo("#idea-bulb", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 1.0);
 tl.to("#idea-bulb", { scale: 1.12, duration: 0.6, yoyo: true, repeat: 3 }, 1.4);
 tl.fromTo("#decade-track", { opacity: 0 }, { opacity: 0.9, duration: 0.3 }, 0.65);
@@ -626,7 +632,8 @@ tl.fromTo("#decade-dot", { x: 0 }, { x: 626, duration: 0.9, ease: "power2.inOut"
 tl.fromTo("#chapter-kicker", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
 tl.fromTo("#chapter-title", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.65);
 tl.to("#chapter-rule", { width: 260, duration: 0.4, ease: "power2.out" }, 1.9);
-tl.to("#chapter-card", { opacity: 0, duration: 0.3 }, 5.5);
+tl.to("#chapter-card-inner", { opacity: 0, duration: 0.3 }, 5.5);
+tl.set("#chapter-card-inner", { opacity: 0 }, 5.8);
 tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 150.05, ease: "none" }, 5.8);
 tl.fromTo(".chapter-photo", { scale: 1.0 }, { scale: 1.07, duration: 5.8, ease: "none" }, 0);
 tl.set("#main-video", { x: 0 }, 0);

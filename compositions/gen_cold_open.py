@@ -107,8 +107,10 @@ parts.append(html_open)
 # typographique qu'au cold open") — garder ce patron stable dans le temps.
 # ---------------------------------------------------------------------------
 parts.append(f'''  <div id="intro-card" class="clip" data-start="0" data-duration="{INTRO_PAD}">
+    <div class="clip-inner" id="intro-card-inner">
     <div class="intro-readout-wrap" id="intro-readout-wrap"><div class="intro-readout" id="intro-readout">TORONTO, 2012</div></div>
     <div class="intro-rule" id="intro-rule"></div>
+    </div>
   </div>
 
 ''')
@@ -332,7 +334,8 @@ parts.append(f'const tl = window.__timelines["{COMP_ID}"];\n')
 parts.append(
     f'tl.to("#intro-readout-wrap", {{ width: 500, duration: 0.6, ease: "steps(13)" }}, 0.1);\n'
     f'tl.to("#intro-rule", {{ width: 300, duration: 0.35, ease: "power2.out" }}, 0.75);\n'
-    f'tl.to("#intro-card", {{ opacity: 0, duration: 0.25 }}, {round(INTRO_PAD - 0.3, 2)});\n'
+    f'tl.to("#intro-card-inner", {{ opacity: 0, duration: 0.25 }}, {round(INTRO_PAD - 0.3, 2)});\n'
+    f'tl.set("#intro-card-inner", {{ opacity: 0 }}, {INTRO_PAD});\n'
 )
 
 parts.append('\n'.join(timeline_js))

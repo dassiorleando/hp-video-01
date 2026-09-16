@@ -406,6 +406,7 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
     html_snippet = (
         f'  <div id="{card_id}" class="clip chapter-opening-card" data-start="{start}" '
         f'data-duration="{round(duration, 2)}">\n'
+        f'    <div class="clip-inner" id="{card_id}-inner">\n'
         f'    <img class="chapter-opening-photo" src="{photo_src}" alt="">\n'
         f'    <div class="chapter-opening-overlay"></div>\n'
         f'    <div class="scanlines"></div>\n'
@@ -415,14 +416,21 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
         f'    <div class="chapter-opening-title" id="{card_id}-title"{title_style}>{esc(title_text)}</div>\n'
         f'    <div class="chapter-opening-rule" id="{card_id}-rule"></div>\n'
         f'{extra_html}'
+        f'    </div>\n'
         f'  </div>\n'
     )
+    exit_at = round(start + duration - 0.3, 3)
+    hard_kill_at = round(start + duration, 3)
     js_lines = [
         f'tl.to("#{card_id}-readout-wrap", {{ width: {readout_width}, duration: 0.55, ease: "steps(18)" }}, {round(start+0.05,3)});',
         f'tl.fromTo("#{card_id}-kicker", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(start+1.5,3)});',
         f'tl.fromTo("#{card_id}-title", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }}, {round(start+1.65,3)});',
         f'tl.to("#{card_id}-rule", {{ width: 260, duration: 0.4, ease: "power2.out" }}, {round(start+1.9,3)});',
-        f'tl.to("#{card_id}", {{ opacity: 0, duration: 0.3 }}, {round(start+duration-0.3,3)});',
+        # sortie sur l'enfant .clip-inner (jamais le .clip lui-même — voir
+        # STYLE_GUIDE / .clip-inner dans style-kit.css), + verrou dur pile à
+        # data-duration pour un seek non-linéaire (gsap_exit_missing_hard_kill).
+        f'tl.to("#{card_id}-inner", {{ opacity: 0, duration: 0.3 }}, {exit_at});',
+        f'tl.set("#{card_id}-inner", {{ opacity: 0 }}, {hard_kill_at});',
         f'tl.fromTo("#{card_id} .chapter-opening-photo", {{ scale: 1.0 }}, '
         f'{{ scale: 1.07, duration: {round(duration,3)}, ease: "none" }}, {start});',
     ]

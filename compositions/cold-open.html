@@ -29,6 +29,22 @@ html,body { margin:0; padding:0; background:#000; }
 #scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
 .clip { position:absolute; inset:0; }
 
+/* ---- .clip-inner : sortie GSAP correcte pour une scène plein-cadre -----
+   Le framework HyperFrames gère déjà la visibilité de tout élément
+   `class="clip"` (montage/démontage automatique à data-start/data-duration).
+   Si un fondu de sortie GSAP anime l'opacité du `.clip` LUI-MÊME (au lieu
+   d'un enfant) et que ce fondu se termine pile à la frontière data-duration,
+   `hyperframes check` lève une vraie erreur (gsap_exit_missing_hard_kill) :
+   un seek non-linéaire (rendu par workers parallèles, scrubbing) peut
+   retomber juste après le fondu sans qu'un état final "dur" ait été posé.
+   Convention : le contenu visuel d'une scène plein-cadre avec fondu de
+   sortie va dans un <div class="clip-inner"> imbriqué dans le `.clip`, et
+   c'est CET enfant (jamais le `.clip` parent) qui reçoit le tween de sortie
+   + un tl.set(...) de verrouillage dur pile à data-duration. Bug réel
+   trouvé le 2026-09-16 sur #chapter-card (chapitre-1.html ET
+   chapter_opening_card_block() dans generator_helpers.py). */
+.clip-inner { position:absolute; inset:0; }
+
 /* ---- vidéo présentateur -------------------------------------------------
    OBLIGATOIRE sur tout <video id="main-video"> : sans cette règle, le
    <video> se rend à sa résolution intrinsèque (ex. 3840x2160) à l'intérieur
@@ -352,8 +368,10 @@ html,body { margin:0; padding:0; background:#000; }
 <div id="cold-open" data-composition-id="cold-open" data-width="3840" data-height="2160" data-fps="60" data-duration="93.09">
 <div id="scale-2x">
   <div id="intro-card" class="clip" data-start="0" data-duration="2.2">
+    <div class="clip-inner" id="intro-card-inner">
     <div class="intro-readout-wrap" id="intro-readout-wrap"><div class="intro-readout" id="intro-readout">TORONTO, 2012</div></div>
     <div class="intro-rule" id="intro-rule"></div>
+    </div>
   </div>
 
   <div id="video-wrap" class="clip">
@@ -453,7 +471,8 @@ window.__timelines["cold-open"] = gsap.timeline({ paused: true });
 const tl = window.__timelines["cold-open"];
 tl.to("#intro-readout-wrap", { width: 500, duration: 0.6, ease: "steps(13)" }, 0.1);
 tl.to("#intro-rule", { width: 300, duration: 0.35, ease: "power2.out" }, 0.75);
-tl.to("#intro-card", { opacity: 0, duration: 0.25 }, 1.9);
+tl.to("#intro-card-inner", { opacity: 0, duration: 0.25 }, 1.9);
+tl.set("#intro-card-inner", { opacity: 0 }, 2.2);
 tl.set("#guess-montage-0", { opacity: 1 }, 20.15);
 tl.set("#guess-montage-0", { opacity: 0 }, 21.25);
 tl.set("#guess-montage-1", { opacity: 1 }, 21.25);
