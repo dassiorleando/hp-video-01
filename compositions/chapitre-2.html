@@ -500,8 +500,11 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- CAPSULE-DONNÉE "carte plate" (Toronto -> le monde) — plein cadre --- */
 #spread-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#spread-card .spread-title { font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:20px; opacity:0; }
-.spread-ring { fill:none; stroke:#3b82f6; opacity:0; }
+/* AGRANDI le 2026-09-17 (retour utilisateur "je trouve cette illustration
+   petite") : titre + SVG (rendu à 1.5x son viewBox d'origine, voir plus bas)
+   + traits de contour plus épais pour rester lisibles à cette taille. */
+#spread-card .spread-title { font-size:42px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:28px; opacity:0; }
+.spread-ring { fill:none; stroke:#3b82f6; stroke-width:3; opacity:0; }
 .spread-dot { fill:#60a5fa; opacity:0; }
 .spread-origin { fill:#facc15; }
 </style>
@@ -523,6 +526,16 @@ html,body { margin:0; padding:0; background:#000; }
 
   <audio data-hf-id="hf-5y69" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="2.2" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
   <audio data-hf-id="hf-6zpw" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="4.2" data-duration="191.72" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
+
+
+  <audio data-hf-id="hf-1hyh" id="whoosh-0" src="assets/whoosh.mp3" data-start="0.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-et7e" id="whoosh-1" src="assets/whoosh.mp3" data-start="6.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-iuoz" id="whoosh-2" src="assets/whoosh.mp3" data-start="15.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-z1jm" id="whoosh-3" src="assets/whoosh.mp3" data-start="34.7" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-2i9k" id="whoosh-4" src="assets/whoosh.mp3" data-start="65.8" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-s8a5" id="whoosh-5" src="assets/whoosh.mp3" data-start="82.9" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-pqs6" id="whoosh-6" src="assets/whoosh.mp3" data-start="111.6" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-z8pb" id="whoosh-7" src="assets/whoosh.mp3" data-start="160.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
 
   <div data-hf-id="hf-mmx0" id="grade" class="clip" data-start="2.2" data-duration="193.725"></div>
   <div data-hf-id="hf-djs1" id="vignette" class="clip" data-start="2.2" data-duration="193.725"></div>
@@ -764,7 +777,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-jtq7" class="split2-label">Approche de Toronto (2012)</div>
     </div>
   </div>
-  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;">
+  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;" data-hidden="">
     <div data-hf-id="hf-7jpw" class="montage-item" id="dog-montage-0">
       <svg data-hf-id="hf-rtoe" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:none; transform:none;"><ellipse data-hf-id="hf-tqmu" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-hb6g" cx="34" cy="38" r="14" /><path data-hf-id="hf-pnkt" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gfae" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
       <div data-hf-id="hf-i5dq" class="montage-label">de face</div>
@@ -873,20 +886,20 @@ html,body { margin:0; padding:0; background:#000; }
   <div data-hf-id="hf-tr1w" id="spread-card" class="clip" data-start="160.2" data-duration="3.4">
     <div data-hf-id="hf-uqf8" class="grid-bg"></div>
     <div data-hf-id="hf-t1l0" class="spread-title" id="spread-title">L’INDUSTRIE INVESTIT MASSIVEMENT</div>
-    <svg data-hf-id="hf-dhve" viewBox="0 0 700 340" width="700" height="340">
+    <svg data-hf-id="hf-dez8" viewBox="0 0 700 340" width="980" height="476">
       <circle data-hf-id="hf-n40a" class="spread-ring" id="spread-ring-0" cx="350" cy="170" r="4" />
       <circle data-hf-id="hf-umrj" class="spread-ring" id="spread-ring-1" cx="350" cy="170" r="4" />
       <circle data-hf-id="hf-v9zw" class="spread-ring" id="spread-ring-2" cx="350" cy="170" r="4" />
       <circle data-hf-id="hf-tift" class="spread-ring" id="spread-ring-3" cx="350" cy="170" r="4" />
-      <circle data-hf-id="hf-bjqy" class="spread-origin" cx="350" cy="170" r="9" />
-        <circle data-hf-id="hf-1qdc" class="spread-dot" id="spread-dot-0" cx="150" cy="90" r="7" />
-        <circle data-hf-id="hf-irga" class="spread-dot" id="spread-dot-1" cx="620" cy="60" r="7" />
-        <circle data-hf-id="hf-lmcz" class="spread-dot" id="spread-dot-2" cx="60" cy="260" r="7" />
-        <circle data-hf-id="hf-v31e" class="spread-dot" id="spread-dot-3" cx="560" cy="300" r="7" />
-        <circle data-hf-id="hf-oy6b" class="spread-dot" id="spread-dot-4" cx="330" cy="40" r="7" />
-        <circle data-hf-id="hf-mghn" class="spread-dot" id="spread-dot-5" cx="400" cy="320" r="7" />
-        <circle data-hf-id="hf-xnmm" class="spread-dot" id="spread-dot-6" cx="520" cy="200" r="7" />
-        <circle data-hf-id="hf-lx0o" class="spread-dot" id="spread-dot-7" cx="120" cy="180" r="7" />
+      <circle data-hf-id="hf-y75h" class="spread-origin" cx="350" cy="170" r="13" />
+        <circle data-hf-id="hf-m9yi" class="spread-dot" id="spread-dot-0" cx="150" cy="90" r="10" />
+        <circle data-hf-id="hf-1gs4" class="spread-dot" id="spread-dot-1" cx="620" cy="60" r="10" />
+        <circle data-hf-id="hf-jqiv" class="spread-dot" id="spread-dot-2" cx="60" cy="260" r="10" />
+        <circle data-hf-id="hf-chpo" class="spread-dot" id="spread-dot-3" cx="560" cy="300" r="10" />
+        <circle data-hf-id="hf-hfbr" class="spread-dot" id="spread-dot-4" cx="330" cy="40" r="10" />
+        <circle data-hf-id="hf-cjr3" class="spread-dot" id="spread-dot-5" cx="400" cy="320" r="10" />
+        <circle data-hf-id="hf-cz7s" class="spread-dot" id="spread-dot-6" cx="520" cy="200" r="10" />
+        <circle data-hf-id="hf-w5lu" class="spread-dot" id="spread-dot-7" cx="120" cy="180" r="10" />
     </svg>
     <div data-hf-id="hf-tvfm" class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
@@ -1151,14 +1164,14 @@ tl.fromTo("#spread-ring-0", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr
 tl.fromTo("#spread-ring-1", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 90 }, duration: 2.2, ease: "power1.out" }, 161.3);
 tl.fromTo("#spread-ring-2", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 140 }, duration: 2.2, ease: "power1.out" }, 161.8);
 tl.fromTo("#spread-ring-3", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 190 }, duration: 2.2, ease: "power1.out" }, 162.3);
-tl.fromTo("#spread-dot-0", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.0);
-tl.fromTo("#spread-dot-1", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.35);
-tl.fromTo("#spread-dot-2", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.7);
-tl.fromTo("#spread-dot-3", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.05);
-tl.fromTo("#spread-dot-4", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.4);
-tl.fromTo("#spread-dot-5", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.75);
-tl.fromTo("#spread-dot-6", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 163.1);
-tl.fromTo("#spread-dot-7", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 163.45);
+tl.fromTo("#spread-dot-0", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.0);
+tl.fromTo("#spread-dot-1", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.35);
+tl.fromTo("#spread-dot-2", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.7);
+tl.fromTo("#spread-dot-3", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.05);
+tl.fromTo("#spread-dot-4", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.4);
+tl.fromTo("#spread-dot-5", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.75);
+tl.fromTo("#spread-dot-6", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 163.1);
+tl.fromTo("#spread-dot-7", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 163.45);
 tl.to("#spread-card", { opacity: 0, duration: 0.3 }, 163.3);
 tl.set("#explose-montage-0", { opacity: 1 }, 163.6);
 tl.set("#explose-montage-0", { opacity: 0 }, 167.3);

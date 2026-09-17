@@ -164,8 +164,11 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- CAPSULE-DONNÉE "carte plate" (Toronto -> le monde) — plein cadre --- */
 #spread-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#spread-card .spread-title { font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:20px; opacity:0; }
-.spread-ring { fill:none; stroke:#3b82f6; opacity:0; }
+/* AGRANDI le 2026-09-17 (retour utilisateur "je trouve cette illustration
+   petite") : titre + SVG (rendu à 1.5x son viewBox d'origine, voir plus bas)
+   + traits de contour plus épais pour rester lisibles à cette taille. */
+#spread-card .spread-title { font-size:42px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:28px; opacity:0; }
+.spread-ring { fill:none; stroke:#3b82f6; stroke-width:3; opacity:0; }
 .spread-dot { fill:#60a5fa; opacity:0; }
 .spread-origin { fill:#facc15; }
 ''')
@@ -206,7 +209,26 @@ parts.append(f'''  <div id="video-wrap" class="clip">
   <audio id="bgmusic-1" src="assets/bgmusic.mp3" data-start="{INTRO_PAD}" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
   <audio id="bgmusic-2" src="assets/bgmusic.mp3" data-start="{INTRO_PAD+2.0}" data-duration="{round(VIDEO_DUR-2.0,2)}" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
 
-  <div id="grade" class="clip" data-start="{INTRO_PAD}" data-duration="{VIDEO_DUR}"></div>
+''')
+
+# ---------------------------------------------------------------------------
+# whoosh stingers à chaque nouvelle carte plein cadre (AJOUTÉ 2026-09-17,
+# retour utilisateur "il n'y a pas de signe sonore comme dans le chapitre 1?"
+# -- gen_chapitre1.py en pose un à t=0 puis à chaque CARD_* : chapitre 2 n'en
+# avait aucun. Même convention, même densité (une des 6-7 grandes scènes
+# plein cadre, pas les hero-words/tampons/badges plus petits en incrustation)
+# -- réutilise l'asset partagé compositions/assets/whoosh.mp3, déjà présent.
+# ---------------------------------------------------------------------------
+whoosh_times = [
+    0.0, t(DUO_CARD[0]), t(MOSAIC[0]), t(SPLIT2_APPROACHES[0]),
+    t(LAYERS_TRIPTYCH[0]), t(GPU_PHOTO[0]), t(BAR_CHART[0]), t(MAP_PLATE[0]),
+]
+parts.append('\n')
+for i, w in enumerate(whoosh_times):
+    parts.append(f'  <audio id="whoosh-{i}" src="assets/whoosh.mp3" data-start="{w}" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>\n')
+parts.append('\n')
+
+parts.append(f'''  <div id="grade" class="clip" data-start="{INTRO_PAD}" data-duration="{VIDEO_DUR}"></div>
   <div id="vignette" class="clip" data-start="{INTRO_PAD}" data-duration="{VIDEO_DUR}"></div>
   <div id="grain-overlay" class="clip" data-start="0" data-duration="{TOTAL_DUR}" style="filter:url(#grain)"></div>
 
@@ -625,6 +647,15 @@ timeline_js += js
 # ---------------------------------------------------------------------------
 sp_0, sp_1 = MAP_PLATE
 DOT_POSITIONS = [(150, 90), (620, 60), (60, 260), (560, 300), (330, 40), (400, 320), (520, 200), (120, 180)]
+# AGRANDI le 2026-09-17 (retour utilisateur "je trouve cette illustration
+# petite, augmente la police et la taille des points et animations") : le
+# SVG lui-même est rendu à 1.5x son viewBox (980x476 pour un viewBox
+# inchangé de 700x340) -- ça agrandit tout proportionnellement (rings, points,
+# origine) sans recalculer une seule coordonnée. Les rayons de base des
+# points/de l'origine sont eux-mêmes augmentés en plus de ce facteur d'échelle,
+# pour un effet plus marqué qu'un simple zoom.
+DOT_R = 10
+ORIGIN_R = 13
 rings_js = []
 for i, r in enumerate([40, 90, 140, 190]):
     rings_js.append(f'tl.fromTo("#spread-ring-{i}", {{ opacity: 0.9, attr: {{ r: 4 }} }}, '
@@ -633,18 +664,18 @@ for i, r in enumerate([40, 90, 140, 190]):
 dots_html = []
 dots_js = []
 for i, (dx, dy) in enumerate(DOT_POSITIONS):
-    dots_html.append(f'        <circle class="spread-dot" id="spread-dot-{i}" cx="{dx}" cy="{dy}" r="7"/>')
-    dots_js.append(f'tl.fromTo("#spread-dot-{i}", {{ opacity: 0, r: 2 }}, {{ opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }}, '
+    dots_html.append(f'        <circle class="spread-dot" id="spread-dot-{i}" cx="{dx}" cy="{dy}" r="{DOT_R}"/>')
+    dots_js.append(f'tl.fromTo("#spread-dot-{i}", {{ opacity: 0, r: 3 }}, {{ opacity: 1, r: {DOT_R}, duration: 0.35, ease: "back.out(2)" }}, '
                     f'{round(t(sp_0)+0.8+i*0.35,3)});')
 parts.append(f'''  <div id="spread-card" class="clip" data-start="{t(sp_0)}" data-duration="{round(sp_1-sp_0,2)}">
     <div class="grid-bg"></div>
     <div class="spread-title" id="spread-title">L&rsquo;INDUSTRIE INVESTIT MASSIVEMENT</div>
-    <svg viewBox="0 0 700 340" width="700" height="340">
+    <svg viewBox="0 0 700 340" width="980" height="476">
       <circle class="spread-ring" id="spread-ring-0" cx="350" cy="170" r="4"/>
       <circle class="spread-ring" id="spread-ring-1" cx="350" cy="170" r="4"/>
       <circle class="spread-ring" id="spread-ring-2" cx="350" cy="170" r="4"/>
       <circle class="spread-ring" id="spread-ring-3" cx="350" cy="170" r="4"/>
-      <circle class="spread-origin" cx="350" cy="170" r="9"/>
+      <circle class="spread-origin" cx="350" cy="170" r="{ORIGIN_R}"/>
 {chr(10).join(dots_html)}
     </svg>
     <div class="source-tag" style="opacity:1;">Source : illustration</div>
