@@ -375,7 +375,14 @@ html,body { margin:0; padding:0; background:#000; }
 .chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
 .chapter-opening-card .chapter-opening-title {
   margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
-  line-height:1.2; opacity:0;
+  line-height:1.2; opacity:0; color:#fff;
+  /* FIX (2026-09-17, chapitre 3 -- premier retour utilisateur sur ce
+     carton) : aucune couleur n'était définie ici, contrairement à toutes
+     les autres classes de texte du carton (.chapter-opening-kicker:
+     #60a5fa, .chapter-opening-readout: #93c5fd) -- le titre héritait donc
+     de la couleur de texte par défaut du navigateur (noir), illisible sur
+     le fond sombre. Affecte potentiellement tous les chapitres utilisant
+     chapter_opening_card_block(), pas seulement chapitre 3. */
 }
 .chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
 

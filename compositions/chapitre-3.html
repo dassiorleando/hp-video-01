@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+/* =========================================================================
+   STYLE KIT — vidéos "documentaire face caméra" (style Automathing)
+   Extrait de compositions/chapitre-1.html. Voir ../../STYLE_GUIDE.md pour le
+   vocabulaire du script et la logique derrière chaque classe.
+
+   Usage : copier les blocs pertinents dans le bloc style d'un nouveau
+   générateur de composition (ou lire ce fichier directement et l'insérer
+   tel quel entre des balises style — voir compositions/gen_cold_open.py
+   pour cet usage). Ce fichier n'est PAS mounté par HyperFrames (ce n'est
+   pas une sous-composition) — c'est une bibliothèque de référence.
+   ATTENTION : n'écris jamais le texte litéral d'une balise style ouvrante
+   ou fermante dans un commentaire de ce fichier, même en exemple — un
+   générateur qui insère ce fichier tel quel dans du HTML transformerait ce
+   texte en vraie balise et casserait le bloc de style qui l'englobe (bug
+   réel trouvé le 2026-09-16 dans compositions/cold-open.html).
+   ========================================================================= */
+
+/* ---- base + vrai 4K (voir STYLE_GUIDE §5) -----------------------------
+   Tout le contenu ci-dessous est authoré en 1920x1080 ; #scale-2x agrandit
+   uniformément 2x pour remplir un canevas 3840x2160/60fps. Zéro valeur de
+   pixel à recalculer à la main. */
+html,body { margin:0; padding:0; background:#000; }
+#scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
+.clip { position:absolute; inset:0; }
+
+/* ---- .clip-inner : sortie GSAP correcte pour une scène plein-cadre -----
+   Le framework HyperFrames gère déjà la visibilité de tout élément
+   `class="clip"` (montage/démontage automatique à data-start/data-duration).
+   Si un fondu de sortie GSAP anime l'opacité du `.clip` LUI-MÊME (au lieu
+   d'un enfant) et que ce fondu se termine pile à la frontière data-duration,
+   `hyperframes check` lève une vraie erreur (gsap_exit_missing_hard_kill) :
+   un seek non-linéaire (rendu par workers parallèles, scrubbing) peut
+   retomber juste après le fondu sans qu'un état final "dur" ait été posé.
+   Convention : le contenu visuel d'une scène plein-cadre avec fondu de
+   sortie va dans un <div class="clip-inner"> imbriqué dans le `.clip`, et
+   c'est CET enfant (jamais le `.clip` parent) qui reçoit le tween de sortie
+   + un tl.set(...) de verrouillage dur pile à data-duration. Bug réel
+   trouvé le 2026-09-16 sur #chapter-card (chapitre-1.html ET
+   chapter_opening_card_block() dans generator_helpers.py). */
+.clip-inner { position:absolute; inset:0; }
+
+/* ---- vidéo présentateur -------------------------------------------------
+   OBLIGATOIRE sur tout <video id="main-video"> : sans cette règle, le
+   <video> se rend à sa résolution intrinsèque (ex. 3840x2160) à l'intérieur
+   du canevas d'authoring 1920x1080, au lieu de remplir son conteneur .clip —
+   résultat : la vidéo apparaît cadrée/zoomée sur son coin supérieur gauche,
+   le présentateur n'étant plus centré (bug réel trouvé le 2026-09-16 dans
+   compositions/cold-open.html, absent de chapitre-1.html qui définissait
+   cette règle localement dans son propre générateur plutôt qu'ici). */
+#main-video { width:100%; height:100%; object-fit:cover; }
+
+/* ---- ambiance globale (grade / vignette / grain) ----------------------
+   À placer en overlay plein cadre, par-dessus la vidéo en direct, pour un
+   rendu cohérent d'une vidéo à l'autre. */
+#grade { background:linear-gradient(180deg, rgba(10,20,40,0.18), rgba(10,20,40,0.32)); mix-blend-mode:multiply; z-index:15; }
+#vignette { box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.55); z-index:16; }
+#grain-overlay { z-index:57; mix-blend-mode:overlay; opacity:0.5; pointer-events:none; }
+/* filtre SVG associé à #grain-overlay (à mettre dans un <svg><defs>) :
+   <filter id="grain">
+     <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+     <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/>
+   </filter> */
+
+/* ---- fond "carte de données" : quadrillage bleu nuit --------------------
+   Fond standard de toute CAPSULE-DONNÉE. Le masque radial adoucit les bords
+   pour ne pas créer une grille dure jusqu'au coin de l'écran. */
+.grid-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(96,165,250,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96,165,250,0.09) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+}
+
+/* ---- panneau de lisibilité ("map-panel") -------------------------------
+   Backdrop semi-transparent à coins arrondis derrière un bloc de
+   texte/illustration en incrustation sur la vidéo en direct, pour que le
+   contenu reste lisible même sur un t-shirt à motif. Réutilisé pour toute
+   CARTE-CITATION / CAPSULE-DONNÉE en mode "incrustation". */
+.map-panel {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(4,8,16,0.6); border-radius:20px; padding:32px 44px 26px; opacity:0;
+}
+
+/* ---- tampon administratif ("style IMPASSE") ----------------------------
+   Le patron pour tout verdict court et tranchant (voir STYLE_GUIDE §2).
+   Animation GSAP associée (à coller dans le timeline builder) :
+     tl.fromTo("#ID", { opacity:0, scale:1.4 }, { opacity:1, scale:1, duration:0.18, ease:"power4.out" }, START);
+     tl.to("#ID", { opacity:0, duration:0.25 }, START + DURATION - 0.3);
+   Le conteneur parent doit centrer horizontalement/verticalement
+   (display:flex; align-items:center; justify-content:center). */
+.stamp-text {
+  font-size:104px; font-weight:900; letter-spacing:0.05em; text-transform:uppercase;
+  color:#ef4444; border:7px solid #ef4444; padding:16px 50px;
+  transform:rotate(-7deg) scale(1.4); opacity:0;
+}
+/* variante compacte pour un texte à 2 mots (ex. "Financement refusé") :
+   ajouter style="font-size:70px; padding:12px 34px;" en inline sur l'instance */
+
+/* Conteneur générique pour stamp_block() (generator_helpers.py). Même patron
+   que #impasse-stamp de chapitre-1 : display:flex DIRECTEMENT sur le même
+   élément .clip qui porte .stamp-text (pas de wrapper intermédiaire sans
+   centrage). .clip = position:absolute, donc un élément .clip n'est PAS
+   traité comme flex-item par un parent flex externe — le centrage doit
+   obligatoirement vivre ici, sur le .clip lui-même. Fix 2026-09-17 : avant
+   ce correctif, stamp_block() ne posait aucun display sur son "-wrap", ce
+   qui l'étirait plein cadre (inset:0) et donnait un bandeau diagonal pleine
+   largeur au lieu du bloc compact pivoté attendu. */
+.stamp-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
+/* ---- mots-héros (hero words) -------------------------------------------
+   Par-dessus la vidéo en direct uniquement (jamais sur une carte plein
+   cadre). Deux variantes : information (droite, sans boîte) et verdict
+   (tampon, centré — réutiliser .stamp-text par-dessus .hero-text). */
+.hero { z-index:30; display:flex; align-items:flex-start; justify-content:center; padding-top:150px; pointer-events:none; }
+.hero-text {
+  max-width:1500px; font-size:74px; font-weight:900; text-transform:uppercase;
+  color:#60a5fa; line-height:1.05; text-align:center; text-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0;
+}
+/* variante "information" — alignée à droite, hors du visage centré */
+.hero--right { justify-content:flex-end; padding-right:130px; }
+.hero--right .hero-text { max-width:820px; text-align:right; }
+/* variante "verdict" — combiner avec .stamp-text sur le même élément */
+.hero--stamp { align-items:center; padding-top:0; }
+.hero--stamp .hero-text { font-size:104px; color:#ef4444; border:7px solid #ef4444; padding:16px 50px; text-shadow:none; transform:rotate(-7deg) scale(1.4); }
+
+/* ---- SPLIT-SCREEN, VARIANTE 1 : face-safe (photo gauche 50% / vidéo droite 50%) ----
+   Le présentateur reste visible à droite pendant qu'une photo occupe la
+   gauche. Voir STYLE_GUIDE §2. Le recentrage de la vidéo (#main-video { x })
+   se fait via GSAP, pas en CSS — voir generator_helpers.py:split_screen_block().
+   ATTENTION : ne pas confondre avec la variante 2 ci-dessous — les notes
+   "SPLIT SCREEN VERTICAL/HORIZONTAL/COMPARATIF" du script ne décrivent PAS
+   cette variante, voir plus bas. */
+.split-photo-panel { position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; box-shadow:10px 0 40px rgba(0,0,0,0.55); opacity:0; }
+.split-photo-panel img { width:100%; height:100%; object-fit:cover; filter:grayscale(0.35) brightness(0.68) contrast(1.06); }
+.split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
+.split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
+.split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
+.split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
+
+/* ---- SPLIT-SCREEN, VARIANTE 2 : deux panneaux graphiques côte à côte ----
+   C'est CE patron que décrivent "SPLIT SCREEN VERTICAL/HORIZONTAL/
+   COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
+   CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
+   présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin.
+   FIX 2026-09-17 (retour utilisateur "pas premium", visage du présentateur
+   visible/encombré derrière le split) : .split2 n'avait jamais de fond
+   opaque, donc malgré ce commentaire ("le présentateur n'est pas visible"),
+   la vidéo en direct restait visible en transparence derrière tout le split
+   -- texte et icônes flottaient par-dessus le visage/torse au lieu d'un
+   vrai plein cadre. Même fond que les autres CAPSULE-DONNÉE plein cadre de
+   chapitre-1 (#hinton-card, etc.) : #03050a. */
+.split2 { position:absolute; inset:0; display:flex; background:#03050a; }
+.split2.split2--horizontal { flex-direction:column; }
+.split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
+.split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
+.split2:not(.split2--horizontal) .split2-divider { top:0; left:50%; width:2px; height:100%; transform:translateX(-1px); }
+.split2--horizontal .split2-divider { left:0; top:50%; width:100%; height:2px; transform:translateY(-1px); }
+.split2-label { position:absolute; bottom:24px; font-size:18px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; opacity:0; }
+
+/* ---- mentions "Source" / badges de date / surlignage jaune ------------- */
+.source-tag {
+  position:absolute; right:22px; bottom:18px; font-size:16px; font-style:italic;
+  color:rgba(203,213,225,0.55); letter-spacing:0.02em; opacity:0; z-index:5;
+}
+.date-badge {
+  position:absolute; top:16px; left:16px; font-size:15px; font-weight:700; letter-spacing:0.1em;
+  color:#e2e8f0; background:rgba(4,7,12,0.72); border:1px solid rgba(255,255,255,0.18);
+  padding:6px 14px; border-radius:3px; text-transform:uppercase; opacity:0; z-index:5;
+}
+.hl { background:#facc15; color:#1a1408; padding:0 3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+/* ---- CADRE-TÉLÉ : photo d'archive encadrée (coin, non plein-cadre) ----- */
+.photo-card { width:380px; opacity:0; border:2px solid rgba(96,165,250,0.55); border-radius:6px; overflow:hidden; box-shadow:0 20px 44px rgba(0,0,0,0.5); background:#03050a; }
+.photo-card img { display:block; width:100%; height:220px; object-fit:cover; filter:grayscale(0.25) brightness(0.85) contrast(1.05); }
+.photo-card .photo-caption { padding:10px 16px; font-size:16px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; background:rgba(10,14,24,0.9); }
+
+/* ---- coupure de presse (archive papier) --------------------------------- */
+.clipping-card { width:360px; padding:24px 28px; background:#efe6d2; color:#1a1408; transform:rotate(3deg); box-shadow:0 18px 40px rgba(0,0,0,0.45); opacity:0; }
+.clipping-card .headline { font-family:Georgia, "Times New Roman", serif; font-weight:900; font-size:25px; line-height:1.16; text-transform:uppercase; }
+.clipping-card .dateline { margin-top:12px; font-family:Georgia, serif; font-size:15px; font-style:italic; color:#4a3f2a; border-top:1px solid rgba(26,20,8,0.25); padding-top:9px; }
+
+/* ---- fiche dossier (portrait archive avec coins de cadre) --------------- */
+.dossier-frame { position:relative; padding:64px 96px; border:1px solid rgba(96,165,250,0.35); border-radius:6px; opacity:0; display:flex; align-items:center; gap:56px; }
+.dossier-frame .corner { position:absolute; width:26px; height:26px; border:2px solid #60a5fa; opacity:0.8; }
+.dossier-frame .corner.tl { top:-1px; left:-1px; border-right:none; border-bottom:none; }
+.dossier-frame .corner.tr { top:-1px; right:-1px; border-left:none; border-bottom:none; }
+.dossier-frame .corner.bl { bottom:-1px; left:-1px; border-right:none; border-top:none; }
+.dossier-frame .corner.br { bottom:-1px; right:-1px; border-left:none; border-top:none; }
+.dossier-avatar { width:150px; height:150px; flex:none; }
+.dossier-text { text-align:left; }
+.dossier-label { font-size:20px; font-weight:700; letter-spacing:0.22em; color:#60a5fa; }
+.dossier-name { margin-top:10px; font-size:50px; font-weight:800; color:#fff; }
+.dossier-sub { margin-top:14px; font-size:27px; color:#cbd5e1; }
+.epoch-tag { position:absolute; top:-32px; left:6px; font-size:16px; font-weight:700; letter-spacing:0.1em; color:#93c5fd; background:rgba(59,130,246,0.14); border:1px solid rgba(96,165,250,0.4); padding:7px 16px; border-radius:4px; transform:rotate(-2deg); opacity:0; white-space:nowrap; }
+
+/* ---- sous-titres brûlés (si activés) ------------------------------------ */
+.caption { position:absolute; left:0; right:0; bottom:105px; display:flex; justify-content:center; z-index:60; pointer-events:none; }
+.caption-inner {
+  max-width:1540px; padding:16px 34px 16px 26px; background:rgba(4,7,12,0.78);
+  border-left:5px solid #3b82f6; border-radius:10px;
+  font-size:33px; font-weight:600; line-height:1.32; color:#f8fafc; text-align:center;
+  box-shadow:0 14px 32px rgba(0,0,0,0.35); opacity:0;
+}
+
+/* ---- barre de progression (carton de chapitre) -------------------------- */
+#progress-track { z-index:65; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); }
+#progress-fill { position:absolute; top:0; left:0; height:100%; width:0; background:#3b82f6; }
+#progress-label { position:absolute; top:10px; left:24px; font-size:15px; font-weight:700; letter-spacing:0.14em; color:rgba(147,197,253,0.6); text-transform:uppercase; opacity:0; z-index:66; }
+
+/* ---- particules ambiantes (drift subtil, persistant) --------------------- */
+.particle { fill:#3b82f6; opacity:0.22; }
+
+/* =========================================================================
+   Patrons ajoutés lors de l'audit d'alignement complet du script (les 6
+   chapitres + cold open + conclusion) — ces catégories sont fréquentes
+   dans le script mais n'avaient encore jamais été construites en HTML.
+   ========================================================================= */
+
+/* ---- MONTAGE ICÔNES / MONTAGE RAFALE ------------------------------------
+   Séquence rapide de plans très courts (0.3-1s chacun), un seul visible à
+   la fois — icône ou photo, avec une étiquette jaune qui s'accroche
+   brièvement. En jump cut sec (pas de fondu) pour "MONTAGE RAFALE", léger
+   fondu pour "MONTAGE ICÔNES". Un seul conteneur, un enfant .montage-item
+   par plan, visibilité pilotée par le timeline JS (voir
+   generator_helpers.py:montage_block()). */
+.montage-rafale { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.montage-item { position:absolute; display:flex; flex-direction:column; align-items:center; gap:18px; opacity:0; }
+.montage-item .montage-icon { width:140px; height:140px; }
+.montage-item .montage-label {
+  padding:8px 20px; background:#facc15; color:#1a1408; font-size:20px; font-weight:800;
+  letter-spacing:0.03em; border-radius:4px; white-space:nowrap;
+}
+
+/* ---- coupure au noir + texte massif -------------------------------------
+   Pour les moments les plus dramatiques (question rhétorique, révélation) :
+   cut sec (pas de fondu) vers un écran noir total, puis un texte blanc
+   massif apparaît en fondu rapide, centré, police austère. Différent du
+   tampon administratif (.stamp-text) : pas de rouge, pas de rotation, pas
+   de bordure — la gravité vient du noir total et de l'échelle du texte, pas
+   d'un style "verdict tamponné". */
+#hardcut-black { z-index:90; background:#000; opacity:0; pointer-events:none; }
+.hardcut-text {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding:0 160px; font-size:96px; font-weight:900; text-align:center; text-transform:uppercase;
+  color:#fff; line-height:1.15; letter-spacing:0.01em; opacity:0; z-index:91;
+}
+
+/* ---- TEXTE KINÉTIQUE -----------------------------------------------------
+   Mots qui s'écrivent un à un (write-on) ou un mot qui se substitue à un
+   autre (swap) — toujours en jaune, même famille visuelle que .hl (le
+   surlignage en ligne). Container positionnable en incrustation à côté du
+   visage (voir script : "à côté du visage du présentateur qui reste net")
+   ou plein cadre. */
+.kinetic-text { display:flex; flex-wrap:wrap; gap:0.35em; font-size:52px; font-weight:800; color:#facc15; }
+.kinetic-word { opacity:0; }
+/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT)
+   FIX 2026-09-17 (audit complet du script, avant toute utilisation réelle en
+   composition) : .kinetic-swap posait position:relative sans aucune règle de
+   centrage plein cadre, alors que la seule note du script qui l'utilise
+   (chapitre 6, bataille 2, "CAPITAL" -> "CLIENT") est explicitement plein
+   cadre -- l'élément se retrouvait donc collé en haut-gauche de l'écran à
+   taille zéro (position:relative + display:inline-block, aucun ancêtre pour
+   le centrer). Même famille de bug que .stamp-wrap/.name-tag ce même jour --
+   centrage manquant sur le .clip lui-même. Nouveau wrapper .kinetic-swap-wrap
+   (posé sur l'élément .clip) fait le centrage ; .kinetic-swap reste la boîte
+   interne dimensionnée à son texte. */
+.kinetic-swap-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
+/* left:0/top:0 (avant le 2026-09-17) ne fonctionne QUE si .kinetic-swap a
+   lui-même une taille -- or ses deux enfants sont tous les deux
+   position:absolute, donc AUCUN des deux ne contribue à la taille
+   intrinsèque du parent inline-block (bug vérifié par rendu Playwright :
+   #kinetic-swap faisait 0x0, donc "left:0/top:0" plaçait chaque mot au
+   pixel exact du coin, pas centré). left:50%/top:50% + translate(-50%,-50%)
+   centre chaque mot sur le point du parent indépendamment de sa taille
+   propre (chaque mot peut avoir une largeur différente, ex. "CAPITAL" vs
+   "CLIENT") -- fonctionne même si le parent reste à 0x0. */
+.kinetic-swap .kinetic-swap-word { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); white-space:nowrap; opacity:0; }
+
+/* ---- SURIMPRESSION LISTE (voile + liste qui s'accumule) -----------------
+   Ajouté 2026-09-17 (demande utilisateur, chapitre 2 : "plus de données,
+   plus de calcul, des réseaux de plus en plus profonds, et des modèles qui
+   apprennent leurs propres représentations"). Voile plein cadre SEMI-
+   TRANSPARENT par-dessus la vidéo en direct -- contrairement à
+   #hardcut-black (noir total, opaque), le présentateur reste visible,
+   assombri, en arrière-plan. Chaque ligne de la liste s'ajoute une à une,
+   au rythme de la parole, et reste affichée (la liste s'accumule) jusqu'à
+   la fin de la surimpression entière -- voir
+   generator_helpers.py:list_overlay_block(). Ne PAS mettre position/inset
+   directement sur .list-overlay : laisser .clip gérer entièrement le
+   plein cadre (voir le bug du 2026-09-17 sur .name-tag/.split2 -- une
+   règle qui ne redéfinit qu'une partie des 4 côtés d'un .clip entre en
+   conflit avec son inset:0). */
+.list-overlay { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:38px; padding:0 180px; background:rgba(3,5,10,0.74); opacity:0; pointer-events:none; }
+.list-overlay-item { display:flex; align-items:center; gap:28px; max-width:1560px; font-size:52px; font-weight:800; line-height:1.25; color:#fff; opacity:0; }
+.list-overlay-item::before { content:""; width:16px; height:16px; border-radius:50%; background:#3b82f6; flex:none; }
+
+/* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
+   Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,
+   qui s'allument une à une au rythme de la narration (ex. les trois villes
+   du chapitre 3, les trois batailles du chapitre 6). Cascade : une liste
+   qui s'empile verticalement, un élément à la fois (ex. les quatre secteurs
+   du chapitre 5). */
+.triptych { position:absolute; inset:0; display:flex; }
+.triptych-col { flex:1 1 33.333%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; opacity:0.35; }
+.triptych-col.active { opacity:1; }
+.triptych-col .triptych-icon { width:120px; height:120px; }
+.triptych-col .triptych-label { font-size:24px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:#fff; text-align:center; max-width:80%; }
+.cascade-list { position:absolute; inset:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:22px; padding-left:200px; }
+.cascade-item { display:flex; align-items:center; gap:20px; opacity:0; transform:translateY(14px); }
+.cascade-item .cascade-icon { width:56px; height:56px; flex:none; }
+.cascade-item .cascade-label { font-size:32px; font-weight:700; color:#e2e8f0; }
+
+/* ---- INSERT INTERFACE (mock d'UI, ex. zone de commentaire YouTube) ------
+   Faux élément d'interface sobre et crédible, en incrustation coin d'écran
+   — jamais un vrai logo/UI officiel, une reconstitution générique. */
+.interface-mock {
+  position:absolute; left:48px; bottom:48px; width:520px; padding:14px 18px;
+  background:#fff; border-radius:24px; box-shadow:0 18px 40px rgba(0,0,0,0.4);
+  display:flex; align-items:center; gap:12px; opacity:0;
+}
+.interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
+.interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
+.interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }
+
+/* ---- CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) --------
+   Version élevée, plein cadre, du "CARTON DE CHAPITRE" du script — jouée
+   une fois au tout début de chaque chapitre, avant que la vidéo en direct
+   ne démarre (voir STYLE_GUIDE §2bis). Photo + grain + halo + une ligne de
+   "lecture système" qui s'écrit en machine à écrire, puis kicker + titre +
+   trait. NE remplace PAS la barre de progression persistante
+   (#progress-track/#progress-label ci-dessus) — les deux coexistent.
+   Valeurs de titre calibrées le 2026-09-16 (v25 de chapitre-1.html) : tenue
+   >= ~5s pour laisser le titre respirer, police généreuse pour rester
+   lisible même sur un titre de chapitre à deux lignes. */
+.chapter-opening-card {
+  background:#030509;
+  z-index:50;
+}
+/* Le centrage vit sur .clip-inner (l'enfant réel de la scène), PAS sur
+   .chapter-opening-card lui-même : depuis l'introduction de .clip-inner
+   (sortie GSAP, voir plus haut), le .clip-inner enfant a position:absolute;
+   inset:0, ce qui remplit tout le cadre et annule tout centrage flex posé
+   sur son parent — le texte se retrouvait épinglé en haut-gauche au lieu
+   d'être centré. Régression réelle trouvée le 2026-09-16 (signalée par
+   l'utilisateur sur le carton "TORONTO, 2012" de cold-open.html, qui suit
+   exactement ce même patron). */
+.chapter-opening-card .clip-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.chapter-opening-card .chapter-opening-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-overlay {
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(59,130,246,0.06) 0px, rgba(59,130,246,0.06) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse at 50% 40%, rgba(30,58,95,0.45) 0%, rgba(2,4,8,0.93) 74%);
+}
+.chapter-opening-card .scanlines {
+  position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay; opacity:0.55;
+}
+.chapter-opening-card .chapter-opening-readout-wrap { overflow:hidden; width:0; }
+.chapter-opening-card .chapter-opening-readout {
+  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
+  color:#93c5fd; opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
+.chapter-opening-card .chapter-opening-title {
+  margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
+  line-height:1.2; opacity:0; color:#fff;
+  /* FIX (2026-09-17, chapitre 3 -- premier retour utilisateur sur ce
+     carton) : aucune couleur n'était définie ici, contrairement à toutes
+     les autres classes de texte du carton (.chapter-opening-kicker:
+     #60a5fa, .chapter-opening-readout: #93c5fd) -- le titre héritait donc
+     de la couleur de texte par défaut du navigateur (noir), illisible sur
+     le fond sombre. Affecte potentiellement tous les chapitres utilisant
+     chapter_opening_card_block(), pas seulement chapitre 3. */
+}
+.chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
+
+/* ---- CARTON DE TITRE / CARTON DE FERMETURE (mots qui claquent, filigrane érable) ----
+   Extrait le 2026-09-17 de compositions/gen_cold_open.py (#outro-card, codé
+   en dur pour le titre du cold open) -- générique ici : la CONCLUSION du
+   script demande "même traitement typographique que le titre du cold open"
+   pour son CARTON DE FERMETURE, symétrique par construction. Voir
+   generator_helpers.py:title_card_block(). Ne pas confondre avec
+   .chapter-opening-card ci-dessus : pas de photo, pas de kicker, juste le
+   texte massif + le filigrane, sur fond noir uni. */
+.title-card { background:#03050a; z-index:60; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.title-card .maple-leaf { position:absolute; width:820px; height:820px; opacity:0.06; top:50%; left:50%; transform:translate(-50%,-50%); }
+.title-card .title-text { position:relative; max-width:1520px; font-size:58px; font-weight:800; text-align:center; line-height:1.3; color:#fff; }
+.title-card .title-word { display:inline-block; opacity:0; }
+.title-card .accent .title-word { color:#60a5fa; }
+
+/* ---- CAPSULE-DONNÉE — LIGNE DU TEMPS / JALONS ---------------------------
+   Ajouté le 2026-09-17 (audit complet du script) : des étapes lumineuses
+   qui s'allument une à une, reliées par un trait qui grandit d'une étape à
+   la suivante (ex. chapitre 4 "Toronto -> Google -> OpenAI", chapitre 6
+   "2013 -> 2026"). Voir generator_helpers.py:timeline_block(). Plein cadre
+   par défaut -- ajouter .grid-bg séparément dans la composition pour le
+   fond bleu nuit quadrillé habituel des CAPSULE-DONNÉE. */
+.timeline { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.timeline.timeline--horizontal { flex-direction:row; }
+.timeline-track { position:relative; background:rgba(96,165,250,0.25); }
+.timeline:not(.timeline--horizontal) .timeline-track { width:3px; height:60%; }
+.timeline--horizontal .timeline-track { width:60%; height:3px; }
+/* trait de progression : un vrai enfant (PAS un ::after -- GSAP ne peut pas
+   cibler un pseudo-élément par sélecteur CSS), voir timeline_block(). */
+.timeline-track-fill { position:absolute; top:0; left:0; background:#3b82f6; }
+.timeline:not(.timeline--horizontal) .timeline-track-fill { width:100%; height:0%; }
+.timeline--horizontal .timeline-track-fill { height:100%; width:0%; }
+/* jalons : enfants de .timeline-track, positionnés en % le long de sa
+   propre longueur (left pour horizontal, top pour vertical -- posé en
+   inline style par timeline_block(), réparti à intervalles égaux). */
+.timeline-milestone {
+  position:absolute; display:flex; flex-direction:column; align-items:center; gap:14px;
+  opacity:0.35; transform:translate(-50%,-50%); white-space:nowrap;
+}
+.timeline:not(.timeline--horizontal) .timeline-milestone { flex-direction:row; gap:20px; }
+.timeline-dot { width:20px; height:20px; border-radius:50%; background:#3b82f6; box-shadow:0 0 20px 4px rgba(59,130,246,0.5); transform:scale(0); flex:none; }
+.timeline-label { font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center; }
+
+html,body { margin:0; padding:0; background:#000; }
+
+/* ---- CAPSULE-DONNÉE — carte plate du Canada (plein cadre) ----------------
+   "carte plate et sobre du pays" (script) -- même parti pris d'abstraction
+   que #spread-card du chapitre 2 (pas de tracé cartographique réaliste, un
+   contour sobre + des points de ville) : un simple ruban arrondi représente
+   le pays, avec Edmonton / Toronto / Montréal positionnés dans leur ordre
+   ouest -> est relatif (pas à l'échelle). Réutilisé pour les 3 apparitions
+   de la carte (vue d'ensemble + 2 panoramiques). */
+#map-overview, #map-pan-mtl, #map-pan-edm { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.map-scene-title { font-size:38px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:24px; opacity:0; }
+.map-viewport { position:relative; width:1300px; height:462px; overflow:hidden; }
+.map-track { position:absolute; top:0; left:0; width:1300px; height:462px; }
+.canada-strip { fill:none; stroke:#3b82f6; stroke-width:3; opacity:0.55; }
+.map-city-dot { fill:#60a5fa; opacity:0; }
+.map-city-ring { fill:none; stroke:#3b82f6; opacity:0; }
+.map-city-origin { fill:#facc15; opacity:0; }
+.map-city-label { position:absolute; font-size:24px; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.04em; opacity:0; white-space:nowrap; transform:translate(-50%,0); }
+
+/* ---- CADRE-TÉLÉ générique (photo archive encadrée, coin) ---------------- */
+.archive-insert { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
+
+/* ---- CAPSULE-DONNÉE — SCHÉMA-RÉSEAU (portrait + labos, plein cadre) ------ */
+#schema-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.schema-line { fill:none; stroke:#3b82f6; stroke-width:2; opacity:0; }
+.schema-lab { opacity:0; }
+.schema-lab-label { font-size:17px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.04em; text-anchor:middle; }
+
+/* ---- CAPSULE-DONNÉE — médailles Turing / Nobel (deux plans, flash blanc) - */
+#medal-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.medal-title { font-size:32px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:34px; opacity:0; }
+.medal-name { margin-top:30px; font-size:30px; font-weight:800; color:#fff; opacity:0; text-align:center;
+  /* FIX (retour utilisateur) : cette règle n'avait pas de text-align, et le
+     conteneur position:absolute;inset:0 (voir plus bas) l'étire sur toute la
+     largeur de la carte -- le texte, aligné à gauche par défaut, se
+     retrouvait donc collé au bord gauche de l'écran au lieu d'être sous le
+     titre/les portraits. */
+}
+#medal-flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:2; }
+
+/* ---- CAPSULE-DONNÉE — compteur de croissance (plein cadre) --------------- */
+#growth-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.growth-title { font-size:32px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; opacity:0; }
+.growth-dot { fill:#60a5fa; opacity:0; }
+.growth-number { margin-top:26px; font-size:96px; font-weight:900; color:#fff; opacity:0; }
+.growth-caption { margin-top:8px; font-size:24px; color:#cbd5e1; opacity:0; }
+
+/* ---- CAPSULE-DONNÉE — carte plate incrustation (avions convergents) ----- */
+.plane-icon { position:absolute; opacity:0; }
+.plane-track { position:absolute; stroke:#60a5fa; stroke-width:2; stroke-dasharray:6 6; fill:none; opacity:0; }
+
+/* ---- SPLIT2 — sécurité / éthique ------------------------------------------ */
+.balance-icon, .net-icon-svg { width:170px; height:170px; }
+
+/* ---- CAPSULE-DONNÉE EN TROIS TEMPS (incrustation, 3 cartes fixes) -------- */
+.trois-temps-icon { width:130px; height:130px; }
+.trois-temps-caption { margin-top:18px; font-size:22px; font-weight:700; color:#fff; text-align:center; }
+
+/* ---- CAPSULE-DONNÉE — écho visuel (médaille Turing réapparaît) ----------- */
+#echo-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+/* ---- PORTRAIT — médaillon photo premium (fournies par l'utilisateur) ----
+   Traitement "archive haut de gamme" : cadre circulaire net, léger relief
+   (ombre + double liseré), photo légèrement désaturée pour rester dans la
+   palette bleu nuit du reste du chapitre plutôt qu'une photo couleur vive
+   qui jurerait avec les cartes graphiques environnantes (même logique que
+   .photo-card, qui applique déjà ce traitement aux inserts archive). */
+.portrait-frame { width:172px; height:172px; border-radius:50%; overflow:hidden; position:relative; opacity:0; flex-shrink:0; background:#03050a;
+  border:3px solid rgba(147,197,253,0.9);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.55), 0 0 0 6px rgba(3,5,10,0.85), 0 0 0 7px rgba(96,165,250,0.35); }
+.portrait-frame img { width:100%; height:100%; object-fit:cover; object-position:50% 22%; filter:grayscale(0.35) brightness(0.94) contrast(1.12) saturate(0.9); }
+/* variante sans photo (personne réelle non fournie) -- cadre en tirets,
+   silhouette générique, pour ne jamais afficher le mauvais visage sous un
+   nom (voir echo-card, Sutton/Barto : leurs vraies photos n'ont pas encore
+   été fournies au 2026-09-17). */
+.portrait-frame.placeholder { border:3px dashed rgba(147,197,253,0.5); box-shadow:none; display:flex; align-items:center; justify-content:center; }
+.portrait-frame.placeholder svg { width:70px; height:70px; opacity:0.5; }
+.portrait-caption { margin-top:14px; font-size:20px; font-weight:700; color:#fff; text-align:center; opacity:0; }
+
+/* ---- LOGO-BADGE — mention isolée d'une institution (Vector, Mila) --------
+   Deux variantes : .logo-badge-mark (initiale stylisée, pour un logo qu'on
+   ne possède pas encore) et .logo-badge-photo (vrai logo fourni, sur puce
+   blanche -- un logo de marque se lit presque toujours sur fond clair, pas
+   sur le bleu nuit du reste du kit). */
+.logo-badge { display:flex; align-items:center; gap:18px; opacity:0; }
+.logo-badge-mark { width:52px; height:52px; border-radius:8px; background:#0b1220; border:2px solid #60a5fa; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#93c5fd; flex-shrink:0; }
+.logo-badge-photo { height:96px; padding:14px 22px; border-radius:12px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 16px 34px rgba(0,0,0,0.5); flex-shrink:0; }
+.logo-badge-photo img { height:100%; width:auto; display:block; }
+.logo-badge-label { font-size:24px; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.04em; }
+
+/* ---- TRIPTYQUE — récapitulatif des trois villes (plein cadre) ------------ */
+#triptych-recap { z-index:32; background:#03050a; }
+#triptych-recap .recap-icon { width:120px; height:120px; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-mmhk" id="chapitre-3" data-composition-id="chapitre-3" data-width="3840" data-height="2160" data-fps="60" data-duration="153.37">
+<div data-hf-id="hf-7cuk" id="scale-2x">
+  <div data-hf-id="hf-ju3c" id="hardcut-black" class="clip" data-start="0" data-duration="153.37"></div>
+
+  <div data-hf-id="hf-bdts" id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="5.8">
+    <div data-hf-id="hf-psio" class="clip-inner" id="chapter-open-inner">
+    <img data-hf-id="hf-dwxm" class="chapter-opening-photo" src="assets/photos/server-room.jpg" alt="">
+    <div data-hf-id="hf-66jr" class="chapter-opening-overlay"></div>
+    <div data-hf-id="hf-8pzc" class="scanlines"></div>
+    <div data-hf-id="hf-z3hm" class="chapter-opening-readout-wrap" id="chapter-open-readout-wrap"><div data-hf-id="hf-68up" class="chapter-opening-readout" id="chapter-open-readout">TORONTO · MONTRÉAL · EDMONTON</div></div>
+    <div data-hf-id="hf-88nl" class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE 3</div>
+    <div data-hf-id="hf-9itj" class="chapter-opening-title" id="chapter-open-title">Les trois écoles canadiennes de l'IA</div>
+    <div data-hf-id="hf-pyuc" class="chapter-opening-rule" id="chapter-open-rule"></div>
+    </div>
+  </div>
+  <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
+    <video data-hf-id="hf-mf0a" id="main-video" class="clip" src="assets/chapitre_3_ecoles.mp4" muted data-start="5.8" data-duration="147.169" data-hf-media-start-basis="local"></video>
+  </div>
+  <audio data-hf-id="hf-ctpv" id="main-audio" src="assets/chapitre_3_ecoles.mp4" data-start="5.8" data-duration="147.169" data-hf-media-start-basis="local"></audio>
+
+  <audio data-hf-id="hf-773u" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="5.8" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-stg5" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="7.8" data-duration="145.17" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
+
+
+  <audio data-hf-id="hf-1hyh" id="whoosh-0" src="assets/whoosh.mp3" data-start="0.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-ww1s" id="whoosh-1" src="assets/whoosh.mp3" data-start="13.48" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-x72x" id="whoosh-2" src="assets/whoosh.mp3" data-start="24.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-27ed" id="whoosh-3" src="assets/whoosh.mp3" data-start="40.36" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-gbno" id="whoosh-4" src="assets/whoosh.mp3" data-start="58.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-2k0z" id="whoosh-5" src="assets/whoosh.mp3" data-start="75.36" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-vv5t" id="whoosh-6" src="assets/whoosh.mp3" data-start="98.18" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-flfd" id="whoosh-7" src="assets/whoosh.mp3" data-start="122.24" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+
+  <div data-hf-id="hf-jswm" id="grade" class="clip" data-start="5.8" data-duration="147.169"></div>
+  <div data-hf-id="hf-96t7" id="vignette" class="clip" data-start="5.8" data-duration="147.169"></div>
+  <div data-hf-id="hf-0q6t" id="grain-overlay" class="clip" data-start="0" data-duration="153.37" style="filter:url(#grain)"></div>
+
+  <svg data-hf-id="hf-8rgt" width="0" height="0" style="position:absolute">
+    <defs data-hf-id="hf-mh0t">
+      <filter data-hf-id="hf-mntt" id="grain">
+        <feturbulence data-hf-id="hf-9on9" type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+        <fecolormatrix data-hf-id="hf-d30s" in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <svg data-hf-id="hf-8pa0" id="p3-particles" class="clip" data-start="0" data-duration="153.37" viewBox="0 0 1920 1080" width="1920" height="1080" style="z-index:20">
+    <circle data-hf-id="hf-unk3" class="particle" id="p3-particle-0" cx="160" cy="140" r="3" />
+    <circle data-hf-id="hf-1der" class="particle" id="p3-particle-1" cx="380" cy="660" r="2.5" />
+    <circle data-hf-id="hf-z4u4" class="particle" id="p3-particle-2" cx="600" cy="260" r="3.5" />
+    <circle data-hf-id="hf-72n1" class="particle" id="p3-particle-3" cx="860" cy="820" r="2" />
+    <circle data-hf-id="hf-zj0j" class="particle" id="p3-particle-4" cx="1120" cy="200" r="3" />
+    <circle data-hf-id="hf-kpmy" class="particle" id="p3-particle-5" cx="1360" cy="680" r="2.5" />
+    <circle data-hf-id="hf-uqyv" class="particle" id="p3-particle-6" cx="1600" cy="340" r="3" />
+    <circle data-hf-id="hf-p48j" class="particle" id="p3-particle-7" cx="1780" cy="900" r="2.5" />
+  </svg>
+
+  <div data-hf-id="hf-yi0u" id="progress-track" class="clip" data-start="0" data-duration="153.37">
+    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
+    <div data-hf-id="hf-th9h" id="progress-label">CHAPITRE 3 / 6</div>
+  </div>
+
+  <div data-hf-id="hf-e9zm" id="map-overview" class="clip" data-start="5.8" data-duration="7.68">
+    <div data-hf-id="hf-q4u8" class="grid-bg"></div>
+    <div data-hf-id="hf-cpne" class="map-scene-title" id="map-overview-title">TROIS PÔLES CANADIENS</div>
+    <div data-hf-id="hf-0xsl" class="map-viewport">
+      <div data-hf-id="hf-is26" class="map-track" id="map-overview-track">
+    <svg data-hf-id="hf-xsmh" viewBox="0 0 900 320" width="1300" height="462" style="position:absolute; top:0; left:0;">
+      <rect data-hf-id="hf-3xhs" class="canada-strip" x="30" y="70" width="840" height="170" rx="85" />
+    <circle data-hf-id="hf-wwcu" class="map-city-ring" id="mov-ring-edmonton" cx="130" cy="190" r="6" />
+    <circle data-hf-id="hf-o9fj" class="map-city-dot" id="mov-dot-edmonton" cx="130" cy="190" r="9" />
+    <circle data-hf-id="hf-wbs3" class="map-city-ring" id="mov-ring-toronto" cx="590" cy="150" r="6" />
+    <circle data-hf-id="hf-25sq" class="map-city-dot" id="mov-dot-toronto" cx="590" cy="150" r="9" />
+    <circle data-hf-id="hf-3b15" class="map-city-ring" id="mov-ring-montreal" cx="810" cy="190" r="6" />
+    <circle data-hf-id="hf-kw06" class="map-city-dot" id="mov-dot-montreal" cx="810" cy="190" r="9" />
+    </svg>
+
+    <div data-hf-id="hf-oizj" class="map-city-label" id="mov-label-edmonton" style="left:187.8px; top:300.3px;">EDMONTON</div>
+    <div data-hf-id="hf-a7ik" class="map-city-label" id="mov-label-toronto" style="left:852.2px; top:242.6px;">TORONTO</div>
+    <div data-hf-id="hf-iq6i" class="map-city-label" id="mov-label-montreal" style="left:1170.0px; top:300.3px;">MONTRÉAL</div>
+
+      </div>
+    </div>
+    <div data-hf-id="hf-m7b2" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-jh7h" id="toronto-photo" class="archive-insert clip" data-start="13.48" data-duration="4.52">
+    <div data-hf-id="hf-mw4a" class="photo-card" id="toronto-photo-card">
+      <img data-hf-id="hf-d9fa" src="assets/photos/toronto-cn-tower.jpg" alt="">
+      <div data-hf-id="hf-safe" class="photo-caption">Toronto</div>
+    </div>
+    <div data-hf-id="hf-3xpz" class="source-tag" id="toronto-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-2ghd" id="schema-card" class="clip" data-start="18.0" data-duration="6.2">
+    <div data-hf-id="hf-wbnc" class="grid-bg"></div>
+    <div data-hf-id="hf-5y4k" class="map-scene-title" id="schema-title">UNIVERSITÉ DE TORONTO</div>
+    <svg data-hf-id="hf-pprc" viewBox="0 0 1040 500" width="1040" height="500">
+      <path data-hf-id="hf-ucl4" class="schema-line" id="schema-line-0" d="M520,250 L240,160" />
+      <path data-hf-id="hf-7pld" class="schema-line" id="schema-line-1" d="M520,250 L420,90" />
+      <path data-hf-id="hf-wylg" class="schema-line" id="schema-line-2" d="M520,250 L620,90" />
+      <path data-hf-id="hf-vkjd" class="schema-line" id="schema-line-3" d="M520,250 L800,160" />
+      <path data-hf-id="hf-dk9i" class="schema-line" id="schema-line-4" d="M520,250 L620,340" />
+      <path data-hf-id="hf-siex" class="schema-line" id="schema-line-5" d="M520,250 L420,340" />
+      <g data-hf-id="hf-dza0" class="schema-lab" id="schema-lab-0" transform="translate(240,160)">
+        <rect data-hf-id="hf-6a3t" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-bkdm" class="schema-lab-label" x="0" y="46">Google Brain</text>
+      </g>
+      <g data-hf-id="hf-u9e1" class="schema-lab" id="schema-lab-1" transform="translate(420,90)">
+        <rect data-hf-id="hf-jxy5" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-ss7t" class="schema-lab-label" x="0" y="46">Vector Institute</text>
+      </g>
+      <g data-hf-id="hf-j7uc" class="schema-lab" id="schema-lab-2" transform="translate(620,90)">
+        <rect data-hf-id="hf-l4v8" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-q3un" class="schema-lab-label" x="0" y="46">OpenAI</text>
+      </g>
+      <g data-hf-id="hf-jyan" class="schema-lab" id="schema-lab-3" transform="translate(800,160)">
+        <rect data-hf-id="hf-kqk7" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-jzuj" class="schema-lab-label" x="0" y="46">DeepMind</text>
+      </g>
+      <g data-hf-id="hf-mxre" class="schema-lab" id="schema-lab-4" transform="translate(620,340)">
+        <rect data-hf-id="hf-lxha" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-u6wa" class="schema-lab-label" x="0" y="46">Meta AI</text>
+      </g>
+      <g data-hf-id="hf-vq2v" class="schema-lab" id="schema-lab-5" transform="translate(420,340)">
+        <rect data-hf-id="hf-lj69" x="-34" y="-24" width="68" height="48" rx="6" fill="#0b1220" stroke="#60a5fa" stroke-width="2" />
+        <text data-hf-id="hf-mtai" class="schema-lab-label" x="0" y="46">NVIDIA</text>
+      </g>
+      <g data-hf-id="hf-s9eb" transform="translate(520,250)">
+        <circle data-hf-id="hf-dhsi" cx="0" cy="0" r="44" fill="none" stroke="#60a5fa" stroke-width="3" />
+        <path data-hf-id="hf-smcc" d="M-30,-6 L0,-22 L30,-6 L0,10 Z" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linejoin="round" />
+        <path data-hf-id="hf-ztyn" d="M-18,0 V16 Q0,26 18,16 V0" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linejoin="round" />
+        <line data-hf-id="hf-g0ip" x1="26" y1="-10" x2="26" y2="6" stroke="#60a5fa" stroke-width="2" />
+      </g>
+
+    </svg>
+    <div data-hf-id="hf-tvfm" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-teem" id="medal-card" class="clip" data-start="24.2" data-duration="16.3">
+    <div data-hf-id="hf-v4q9" class="grid-bg"></div>
+    <div data-hf-id="hf-s86t" class="medal-title" id="medal-title">RECONNAISSANCE INTERNATIONALE</div>
+    <div data-hf-id="hf-anwq" style="display:flex; align-items:flex-start; justify-content:center; gap:48px; margin-top:6px;">
+      <div data-hf-id="hf-ob6r" style="display:flex; flex-direction:column; align-items:center;">
+        <div data-hf-id="hf-3rjb" class="portrait-frame" id="portrait-hinton"><img data-hf-id="hf-flvl" src="assets/photos/hinton.jpg" alt=""></div>
+        <div data-hf-id="hf-kgwy" class="portrait-caption" id="caption-hinton">Geoffrey Hinton</div>
+      </div>
+      <div data-hf-id="hf-j3j9" id="turing-trio-extra" style="display:flex; gap:48px;">
+        <div data-hf-id="hf-1g2r" style="display:flex; flex-direction:column; align-items:center;">
+          <div data-hf-id="hf-brop" class="portrait-frame" id="portrait-bengio"><img data-hf-id="hf-wp0f" src="assets/photos/bengio.jpg" alt=""></div>
+          <div data-hf-id="hf-v7o4" class="portrait-caption" id="caption-bengio">Yoshua Bengio</div>
+        </div>
+        <div data-hf-id="hf-11rq" style="display:flex; flex-direction:column; align-items:center;">
+          <div data-hf-id="hf-gb6o" class="portrait-frame" id="portrait-lecun"><img data-hf-id="hf-61pc" src="assets/photos/lecun.jpg" alt=""></div>
+          <div data-hf-id="hf-ot9n" class="portrait-caption" id="caption-lecun">Yann LeCun</div>
+        </div>
+      </div>
+    </div>
+    <div data-hf-id="hf-g3fl" style="position:relative; width:100%; height:44px; margin-top:20px;">
+      <div data-hf-id="hf-tfnx" class="medal-name" id="medal-name-turing" style="position:absolute; inset:0; margin-top:0;">Prix Turing, 2018</div>
+      <div data-hf-id="hf-ahr5" class="medal-name" id="medal-name-nobel" style="position:absolute; inset:0; margin-top:0;">Prix Nobel de physique, 2024</div>
+    </div>
+    <div data-hf-id="hf-0tbz" class="logo-badge" id="vector-badge" style="margin-top:22px;">
+      <div data-hf-id="hf-q2e4" class="logo-badge-photo"><img data-hf-id="hf-0s14" src="assets/photos/vector-institute-logo.jpg" alt="Vector Institute"></div>
+    </div>
+    <div data-hf-id="hf-9x9v" id="medal-flash"></div>
+    <div data-hf-id="hf-qydr" class="source-tag" style="opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-k26a" id="map-pan-mtl" class="clip" data-start="40.36" data-duration="5.0">
+    <div data-hf-id="hf-vj1a" class="grid-bg"></div>
+    <div data-hf-id="hf-h43r" class="map-scene-title" id="map-pan-mtl-title">MONTRÉAL</div>
+    <div data-hf-id="hf-va6h" class="map-viewport">
+      <div data-hf-id="hf-w4ku" class="map-track" id="map-pan-mtl-track" style="left:107.8px;">
+    <svg data-hf-id="hf-dn31" viewBox="0 0 900 320" width="1300" height="462" style="position:absolute; top:0; left:0;">
+      <rect data-hf-id="hf-n86g" class="canada-strip" x="30" y="70" width="840" height="170" rx="85" />
+    <circle data-hf-id="hf-f004" class="map-city-ring" id="mpm-ring-edmonton" cx="130" cy="190" r="6" />
+    <circle data-hf-id="hf-k4v1" class="map-city-dot" id="mpm-dot-edmonton" cx="130" cy="190" r="9" />
+    <circle data-hf-id="hf-dwnl" class="map-city-ring" id="mpm-ring-toronto" cx="590" cy="150" r="6" />
+    <circle data-hf-id="hf-muxc" class="map-city-dot" id="mpm-dot-toronto" cx="590" cy="150" r="9" />
+    <circle data-hf-id="hf-6t4j" class="map-city-ring" id="mpm-ring-montreal" cx="810" cy="190" r="6" />
+    <circle data-hf-id="hf-8xa0" class="map-city-dot" id="mpm-dot-montreal" cx="810" cy="190" r="9" />
+    </svg>
+
+    <div data-hf-id="hf-44od" class="map-city-label" id="mpm-label-edmonton" style="left:187.8px; top:300.3px;">EDMONTON</div>
+    <div data-hf-id="hf-mc9e" class="map-city-label" id="mpm-label-toronto" style="left:852.2px; top:242.6px;">TORONTO</div>
+    <div data-hf-id="hf-mres" class="map-city-label" id="mpm-label-montreal" style="left:1170.0px; top:300.3px;">MONTRÉAL</div>
+
+      </div>
+    </div>
+    <div data-hf-id="hf-u9qn" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-pxkz" class="name-tag clip" id="tag-bengio" data-start="44.05" data-duration="8.2">
+    Yoshua Bengio<span data-hf-id="hf-70st" class="name-tag-role">fondateur, Mila</span>
+  </div>
+  <div data-hf-id="hf-elgt" id="growth-card" class="clip" data-start="52.2" data-duration="6.2">
+    <div data-hf-id="hf-uc47" class="grid-bg"></div>
+    <div data-hf-id="hf-emln" style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
+      <div data-hf-id="hf-aezh" class="logo-badge-mark" id="mila-logo" style="opacity:0;">M</div>
+      <div data-hf-id="hf-4skq" class="growth-title" id="growth-title" style="margin-bottom:0;">MILA — DEPUIS 1993</div>
+    </div>
+    <svg data-hf-id="hf-8jpy" viewBox="0 0 1000 440" width="1000" height="440">
+      <path data-hf-id="hf-id2l" class="growth-dot" id="growth-line-0" d="M470,200 L269.4,234.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-4gql" class="growth-dot" id="growth-line-2" d="M440,250 L610.6,81.0" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-d010" class="growth-dot" id="growth-line-4" d="M500,240 L288.2,135.0" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-xfu7" class="growth-dot" id="growth-line-6" d="M470,200 L796.1,212.4" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-0ecs" class="growth-dot" id="growth-line-8" d="M440,250 L618.7,337.8" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-igp8" class="growth-dot" id="growth-line-10" d="M500,240 L650.8,80.5" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-n5nr" class="growth-dot" id="growth-line-12" d="M470,200 L325.1,69.9" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-cazz" class="growth-dot" id="growth-line-14" d="M440,250 L692.6,341.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-69ho" class="growth-dot" id="growth-line-16" d="M500,240 L407.6,316.3" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-ta8g" class="growth-dot" id="growth-line-18" d="M470,200 L833.4,91.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-rwq2" class="growth-dot" id="growth-line-20" d="M440,250 L909.6,199.6" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-mo3b" class="growth-dot" id="growth-line-22" d="M500,240 L506.4,183.5" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-zw89" class="growth-dot" id="growth-line-24" d="M470,200 L574.1,349.3" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-ekdb" class="growth-dot" id="growth-line-26" d="M440,250 L813.6,377.1" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-gv1b" class="growth-dot" id="growth-line-28" d="M500,240 L817.4,368.7" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-vxll" class="growth-dot" id="growth-line-30" d="M574.1,349.3 L688.2,127.6" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-v7i4" class="growth-dot" id="growth-line-32" d="M813.6,377.1 L310.8,80.3" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-3t3v" class="growth-dot" id="growth-line-34" d="M817.4,368.7 L137.9,316.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-si9y" class="growth-dot" id="growth-line-36" d="M688.2,127.6 L318.6,306.0" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-pm0z" class="growth-dot" id="growth-line-38" d="M310.8,80.3 L600.8,74.4" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-ouy7" class="growth-dot" id="growth-line-40" d="M137.9,316.2 L835.2,373.8" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-ha2y" class="growth-dot" id="growth-line-42" d="M318.6,306.0 L332.5,84.6" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-etpl" class="growth-dot" id="growth-line-44" d="M600.8,74.4 L233.7,190.5" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-klki" class="growth-dot" id="growth-line-46" d="M835.2,373.8 L97.3,337.7" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-98zz" class="growth-dot" id="growth-line-48" d="M332.5,84.6 L849.1,180.9" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-76as" class="growth-dot" id="growth-line-50" d="M233.7,190.5 L626.6,250.6" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-uisc" class="growth-dot" id="growth-line-52" d="M97.3,337.7 L887.7,222.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-wyvk" class="growth-dot" id="growth-line-54" d="M849.1,180.9 L269.1,156.3" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-apeb" class="growth-dot" id="growth-line-56" d="M626.6,250.6 L542.6,63.7" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-6wq6" class="growth-dot" id="growth-line-58" d="M887.7,222.2 L77.6,257.1" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-uh88" class="growth-dot" id="growth-line-60" d="M269.1,156.3 L612.1,209.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-qo2r" class="growth-dot" id="growth-line-62" d="M542.6,63.7 L682.1,296.2" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-6s4d" class="growth-dot" id="growth-line-64" d="M77.6,257.1 L654.9,368.3" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-vwmi" class="growth-dot" id="growth-line-66" d="M612.1,209.2 L581.6,162.4" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <path data-hf-id="hf-x745" class="growth-dot" id="growth-line-68" d="M682.1,296.2 L384.9,250.6" style="fill:none; stroke:#3b82f6; stroke-width:1;" />
+      <circle data-hf-id="hf-ivjw" class="growth-dot" id="growth-seed-0" cx="470" cy="200" r="7" />
+      <circle data-hf-id="hf-suf9" class="growth-dot" id="growth-seed-1" cx="500" cy="240" r="7" />
+      <circle data-hf-id="hf-910u" class="growth-dot" id="growth-seed-2" cx="440" cy="250" r="7" />
+      <circle data-hf-id="hf-7oal" class="growth-dot" id="growth-dot-0" cx="269.4" cy="234.2" r="3" />
+      <circle data-hf-id="hf-zo37" class="growth-dot" id="growth-dot-1" cx="385.6" cy="253.3" r="3" />
+      <circle data-hf-id="hf-xukh" class="growth-dot" id="growth-dot-2" cx="610.6" cy="81.0" r="3" />
+      <circle data-hf-id="hf-o8b3" class="growth-dot" id="growth-dot-3" cx="71.6" cy="328.0" r="3" />
+      <circle data-hf-id="hf-o72m" class="growth-dot" id="growth-dot-4" cx="288.2" cy="135.0" r="3" />
+      <circle data-hf-id="hf-b84i" class="growth-dot" id="growth-dot-5" cx="936.2" cy="210.5" r="3" />
+      <circle data-hf-id="hf-1dab" class="growth-dot" id="growth-dot-6" cx="796.1" cy="212.4" r="3" />
+      <circle data-hf-id="hf-o6bh" class="growth-dot" id="growth-dot-7" cx="622.4" cy="108.2" r="3" />
+      <circle data-hf-id="hf-v6z4" class="growth-dot" id="growth-dot-8" cx="618.7" cy="337.8" r="3" />
+      <circle data-hf-id="hf-e9k7" class="growth-dot" id="growth-dot-9" cx="520.4" cy="297.2" r="3" />
+      <circle data-hf-id="hf-igeo" class="growth-dot" id="growth-dot-10" cx="650.8" cy="80.5" r="3" />
+      <circle data-hf-id="hf-ee3o" class="growth-dot" id="growth-dot-11" cx="727.2" cy="249.2" r="3" />
+      <circle data-hf-id="hf-estn" class="growth-dot" id="growth-dot-12" cx="325.1" cy="69.9" r="3" />
+      <circle data-hf-id="hf-m8a0" class="growth-dot" id="growth-dot-13" cx="821.7" cy="211.3" r="3" />
+      <circle data-hf-id="hf-ryob" class="growth-dot" id="growth-dot-14" cx="692.6" cy="341.2" r="3" />
+      <circle data-hf-id="hf-o3ml" class="growth-dot" id="growth-dot-15" cx="688.4" cy="354.8" r="3" />
+      <circle data-hf-id="hf-190m" class="growth-dot" id="growth-dot-16" cx="407.6" cy="316.3" r="3" />
+      <circle data-hf-id="hf-zasv" class="growth-dot" id="growth-dot-17" cx="451.3" cy="359.4" r="3" />
+      <circle data-hf-id="hf-9p8a" class="growth-dot" id="growth-dot-18" cx="833.4" cy="91.2" r="3" />
+      <circle data-hf-id="hf-yg7f" class="growth-dot" id="growth-dot-19" cx="179.7" cy="129.4" r="3" />
+      <circle data-hf-id="hf-dexm" class="growth-dot" id="growth-dot-20" cx="909.6" cy="199.6" r="3" />
+      <circle data-hf-id="hf-c9eu" class="growth-dot" id="growth-dot-21" cx="611.5" cy="156.3" r="3" />
+      <circle data-hf-id="hf-omvf" class="growth-dot" id="growth-dot-22" cx="506.4" cy="183.5" r="3" />
+      <circle data-hf-id="hf-2pzo" class="growth-dot" id="growth-dot-23" cx="368.8" cy="247.2" r="3" />
+      <circle data-hf-id="hf-klit" class="growth-dot" id="growth-dot-24" cx="574.1" cy="349.3" r="3" />
+      <circle data-hf-id="hf-lzp3" class="growth-dot" id="growth-dot-25" cx="660.1" cy="357.3" r="3" />
+      <circle data-hf-id="hf-cspf" class="growth-dot" id="growth-dot-26" cx="813.6" cy="377.1" r="3" />
+      <circle data-hf-id="hf-fkg0" class="growth-dot" id="growth-dot-27" cx="650.7" cy="112.2" r="3" />
+      <circle data-hf-id="hf-x5qh" class="growth-dot" id="growth-dot-28" cx="817.4" cy="368.7" r="3" />
+      <circle data-hf-id="hf-mtr5" class="growth-dot" id="growth-dot-29" cx="856.1" cy="242.1" r="3" />
+      <circle data-hf-id="hf-fplq" class="growth-dot" id="growth-dot-30" cx="688.2" cy="127.6" r="3" />
+      <circle data-hf-id="hf-jces" class="growth-dot" id="growth-dot-31" cx="791.8" cy="243.5" r="3" />
+      <circle data-hf-id="hf-oxtx" class="growth-dot" id="growth-dot-32" cx="310.8" cy="80.3" r="3" />
+      <circle data-hf-id="hf-n0i9" class="growth-dot" id="growth-dot-33" cx="811.5" cy="376.7" r="3" />
+      <circle data-hf-id="hf-2yv6" class="growth-dot" id="growth-dot-34" cx="137.9" cy="316.2" r="3" />
+      <circle data-hf-id="hf-ur65" class="growth-dot" id="growth-dot-35" cx="421.2" cy="108.2" r="3" />
+      <circle data-hf-id="hf-qxzn" class="growth-dot" id="growth-dot-36" cx="318.6" cy="306.0" r="3" />
+      <circle data-hf-id="hf-k8w3" class="growth-dot" id="growth-dot-37" cx="828.0" cy="74.1" r="3" />
+      <circle data-hf-id="hf-t6ub" class="growth-dot" id="growth-dot-38" cx="600.8" cy="74.4" r="3" />
+      <circle data-hf-id="hf-9709" class="growth-dot" id="growth-dot-39" cx="692.2" cy="165.9" r="3" />
+      <circle data-hf-id="hf-3i58" class="growth-dot" id="growth-dot-40" cx="835.2" cy="373.8" r="3" />
+      <circle data-hf-id="hf-mff7" class="growth-dot" id="growth-dot-41" cx="504.8" cy="379.5" r="3" />
+      <circle data-hf-id="hf-jbew" class="growth-dot" id="growth-dot-42" cx="332.5" cy="84.6" r="3" />
+      <circle data-hf-id="hf-vxlx" class="growth-dot" id="growth-dot-43" cx="587.8" cy="70.0" r="3" />
+      <circle data-hf-id="hf-uaff" class="growth-dot" id="growth-dot-44" cx="233.7" cy="190.5" r="3" />
+      <circle data-hf-id="hf-l82x" class="growth-dot" id="growth-dot-45" cx="597.2" cy="110.0" r="3" />
+      <circle data-hf-id="hf-rf3i" class="growth-dot" id="growth-dot-46" cx="97.3" cy="337.7" r="3" />
+      <circle data-hf-id="hf-945h" class="growth-dot" id="growth-dot-47" cx="336.2" cy="366.8" r="3" />
+      <circle data-hf-id="hf-1hsl" class="growth-dot" id="growth-dot-48" cx="849.1" cy="180.9" r="3" />
+      <circle data-hf-id="hf-d7h7" class="growth-dot" id="growth-dot-49" cx="465.2" cy="226.4" r="3" />
+      <circle data-hf-id="hf-93jb" class="growth-dot" id="growth-dot-50" cx="626.6" cy="250.6" r="3" />
+      <circle data-hf-id="hf-icop" class="growth-dot" id="growth-dot-51" cx="552.1" cy="258.4" r="3" />
+      <circle data-hf-id="hf-qh40" class="growth-dot" id="growth-dot-52" cx="887.7" cy="222.2" r="3" />
+      <circle data-hf-id="hf-4nwd" class="growth-dot" id="growth-dot-53" cx="439.4" cy="290.5" r="3" />
+      <circle data-hf-id="hf-ipu3" class="growth-dot" id="growth-dot-54" cx="269.1" cy="156.3" r="3" />
+      <circle data-hf-id="hf-r1d3" class="growth-dot" id="growth-dot-55" cx="920.5" cy="226.8" r="3" />
+      <circle data-hf-id="hf-x8vv" class="growth-dot" id="growth-dot-56" cx="542.6" cy="63.7" r="3" />
+      <circle data-hf-id="hf-ne0l" class="growth-dot" id="growth-dot-57" cx="425.4" cy="245.6" r="3" />
+      <circle data-hf-id="hf-nhrj" class="growth-dot" id="growth-dot-58" cx="77.6" cy="257.1" r="3" />
+      <circle data-hf-id="hf-df1f" class="growth-dot" id="growth-dot-59" cx="616.3" cy="79.2" r="3" />
+      <circle data-hf-id="hf-8ca2" class="growth-dot" id="growth-dot-60" cx="612.1" cy="209.2" r="3" />
+      <circle data-hf-id="hf-x9km" class="growth-dot" id="growth-dot-61" cx="657.8" cy="172.8" r="3" />
+      <circle data-hf-id="hf-6n4b" class="growth-dot" id="growth-dot-62" cx="682.1" cy="296.2" r="3" />
+      <circle data-hf-id="hf-ha2l" class="growth-dot" id="growth-dot-63" cx="79.5" cy="79.4" r="3" />
+      <circle data-hf-id="hf-rjc1" class="growth-dot" id="growth-dot-64" cx="654.9" cy="368.3" r="3" />
+      <circle data-hf-id="hf-6589" class="growth-dot" id="growth-dot-65" cx="281.0" cy="206.0" r="3" />
+      <circle data-hf-id="hf-5u7o" class="growth-dot" id="growth-dot-66" cx="581.6" cy="162.4" r="3" />
+      <circle data-hf-id="hf-61bq" class="growth-dot" id="growth-dot-67" cx="380.3" cy="160.1" r="3" />
+      <circle data-hf-id="hf-m0jo" class="growth-dot" id="growth-dot-68" cx="384.9" cy="250.6" r="3" />
+      <circle data-hf-id="hf-jjdx" class="growth-dot" id="growth-dot-69" cx="324.4" cy="180.7" r="3" />
+    </svg>
+    <div data-hf-id="hf-o5ip" class="growth-number" id="growth-number">1300+</div>
+    <div data-hf-id="hf-a8s5" class="growth-caption" id="growth-caption">chercheurs, professeurs, étudiants et partenaires</div>
+    <div data-hf-id="hf-ay4x" class="source-tag" style="opacity:1;">Source : Mila</div>
+  </div>
+
+  <div data-hf-id="hf-82vw" id="montreal-panel-wrap" class="clip" data-start="58.4" data-duration="11.5" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:60px;">
+    <div data-hf-id="hf-td7i" class="map-panel" id="montreal-panel">
+      <div data-hf-id="hf-1g36" class="map-title" style="font-size:26px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:20px;">MONTRÉAL, PÔLE MONDIAL</div>
+      <svg data-hf-id="hf-mieq" viewBox="0 0 1000 440" width="640" height="282" style="overflow:visible;">
+      <path data-hf-id="hf-9hlm" class="plane-track" id="plane-track-0" d="M60,60 L500,220" />
+      <foreignobject data-hf-id="hf-cs6v" class="plane-icon" id="plane-icon-0" x="43" y="43" width="34" height="34"><svg data-hf-id="hf-btdq" viewBox="0 0 40 40" width="34" height="34" fill="#60a5fa"><path data-hf-id="hf-ynon" d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" /></svg></foreignobject>
+      <path data-hf-id="hf-0q94" class="plane-track" id="plane-track-1" d="M940,80 L500,220" />
+      <foreignobject data-hf-id="hf-bir3" class="plane-icon" id="plane-icon-1" x="923" y="63" width="34" height="34"><svg data-hf-id="hf-s02q" viewBox="0 0 40 40" width="34" height="34" fill="#60a5fa"><path data-hf-id="hf-axhj" d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" /></svg></foreignobject>
+      <path data-hf-id="hf-i1c9" class="plane-track" id="plane-track-2" d="M60,380 L500,220" />
+      <foreignobject data-hf-id="hf-5h3s" class="plane-icon" id="plane-icon-2" x="43" y="363" width="34" height="34"><svg data-hf-id="hf-sedr" viewBox="0 0 40 40" width="34" height="34" fill="#60a5fa"><path data-hf-id="hf-aj6i" d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" /></svg></foreignobject>
+      <path data-hf-id="hf-22iv" class="plane-track" id="plane-track-3" d="M940,380 L500,220" />
+      <foreignobject data-hf-id="hf-qso6" class="plane-icon" id="plane-icon-3" x="923" y="363" width="34" height="34"><svg data-hf-id="hf-ssos" viewBox="0 0 40 40" width="34" height="34" fill="#60a5fa"><path data-hf-id="hf-a4vh" d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" /></svg></foreignobject>
+      <path data-hf-id="hf-yat7" class="plane-track" id="plane-track-4" d="M500,20 L500,220" />
+      <foreignobject data-hf-id="hf-ix9d" class="plane-icon" id="plane-icon-4" x="483" y="3" width="34" height="34"><svg data-hf-id="hf-t6zt" viewBox="0 0 40 40" width="34" height="34" fill="#60a5fa"><path data-hf-id="hf-cx0o" d="M20 2 L24 16 L38 20 L24 24 L20 38 L16 24 L2 20 L16 16 Z" /></svg></foreignobject>
+        <circle data-hf-id="hf-411u" cx="500" cy="220" r="12" fill="#facc15" />
+      </svg>
+    </div>
+  </div>
+  <div data-hf-id="hf-nror" id="split2-ethics" class="clip split2 split2--horizontal" data-start="69.86" data-duration="5.44">
+    <div data-hf-id="hf-8nwa" class="split2-panel" id="split2-ethics-a">
+      <div data-hf-id="hf-uqf8" class="grid-bg"></div>
+      <div data-hf-id="hf-ccsx" style="position:relative;"><svg data-hf-id="hf-ixcl" class="net-icon-svg" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="3"><circle data-hf-id="hf-qezf" cx="20" cy="30" r="6" /><circle data-hf-id="hf-ykqf" cx="20" cy="70" r="6" /><circle data-hf-id="hf-dhx5" cx="50" cy="20" r="6" /><circle data-hf-id="hf-3dpg" cx="50" cy="50" r="6" /><circle data-hf-id="hf-wsob" cx="50" cy="80" r="6" /><circle data-hf-id="hf-dglx" cx="80" cy="30" r="6" /><circle data-hf-id="hf-fzqx" cx="80" cy="70" r="6" /><path data-hf-id="hf-3w2y" d="M25 30 L45 20 M25 30 L45 50 M25 70 L45 50 M25 70 L45 80 M55 20 L75 30 M55 50 L75 30 M55 50 L75 70 M55 80 L75 70" stroke-linecap="round" /></svg></div>
+
+      <div data-hf-id="hf-06z8" class="split2-label">Recherche fondamentale</div>
+    </div>
+    <div data-hf-id="hf-3zra" class="split2-divider"></div>
+    <div data-hf-id="hf-4ps9" class="split2-panel" id="split2-ethics-b">
+      <div data-hf-id="hf-tji5" class="grid-bg"></div>
+      <div data-hf-id="hf-3ih1" style="position:relative;"><svg data-hf-id="hf-zmuw" class="balance-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="4"><path data-hf-id="hf-2yif" d="M50 10 V80" stroke-linecap="round" /><path data-hf-id="hf-9nvd" d="M20 88 H80" stroke-linecap="round" /><path data-hf-id="hf-pzn5" d="M12 30 H88" stroke-linecap="round" /><path data-hf-id="hf-edf6" d="M12 30 L4 52 A14 10 0 0 0 20 52 Z" /><path data-hf-id="hf-2e12" d="M88 30 L80 52 A14 10 0 0 0 96 52 Z" /><circle data-hf-id="hf-17yn" cx="50" cy="10" r="5" fill="#93c5fd" stroke="none" /></svg></div>
+
+      <div data-hf-id="hf-w7dt" class="split2-label">Sécurité et droits de la personne</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-56gn" id="map-pan-edm" class="clip" data-start="75.36" data-duration="5.0">
+    <div data-hf-id="hf-txt6" class="grid-bg"></div>
+    <div data-hf-id="hf-kom2" class="map-scene-title" id="map-pan-edm-title">EDMONTON</div>
+    <div data-hf-id="hf-wh3k" class="map-viewport">
+      <div data-hf-id="hf-jju7" class="map-track" id="map-pan-edm-track" style="left:-210.0px;">
+    <svg data-hf-id="hf-eu04" viewBox="0 0 900 320" width="1300" height="462" style="position:absolute; top:0; left:0;">
+      <rect data-hf-id="hf-m19d" class="canada-strip" x="30" y="70" width="840" height="170" rx="85" />
+    <circle data-hf-id="hf-cugc" class="map-city-ring" id="mpe-ring-edmonton" cx="130" cy="190" r="6" />
+    <circle data-hf-id="hf-7e2d" class="map-city-dot" id="mpe-dot-edmonton" cx="130" cy="190" r="9" />
+    <circle data-hf-id="hf-mnix" class="map-city-ring" id="mpe-ring-toronto" cx="590" cy="150" r="6" />
+    <circle data-hf-id="hf-cwg8" class="map-city-dot" id="mpe-dot-toronto" cx="590" cy="150" r="9" />
+    <circle data-hf-id="hf-3biz" class="map-city-ring" id="mpe-ring-montreal" cx="810" cy="190" r="6" />
+    <circle data-hf-id="hf-jiu8" class="map-city-dot" id="mpe-dot-montreal" cx="810" cy="190" r="9" />
+    </svg>
+
+    <div data-hf-id="hf-1gut" class="map-city-label" id="mpe-label-edmonton" style="left:187.8px; top:300.3px;">EDMONTON</div>
+    <div data-hf-id="hf-6a8a" class="map-city-label" id="mpe-label-toronto" style="left:852.2px; top:242.6px;">TORONTO</div>
+    <div data-hf-id="hf-felo" class="map-city-label" id="mpe-label-montreal" style="left:1170.0px; top:300.3px;">MONTRÉAL</div>
+
+      </div>
+    </div>
+    <div data-hf-id="hf-uo1o" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-a4mn" class="name-tag clip" id="tag-sutton" data-start="81.28" data-duration="5.52">
+    Richard Sutton<span data-hf-id="hf-jdox" class="name-tag-role">apprentissage par renforcement</span>
+  </div>
+  <div data-hf-id="hf-b9ny" id="tt-1-wrap" class="clip" data-start="98.18" data-duration="3.49" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px;">
+    <div data-hf-id="hf-278f" class="map-panel" id="tt-1">
+      <svg data-hf-id="hf-qhbt" class="trois-temps-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="4"><circle data-hf-id="hf-rul4" cx="30" cy="70" r="14" transform="rotate(-25 30 70)" /><circle data-hf-id="hf-5rbw" cx="70" cy="80" r="14" transform="rotate(-25 70 80)" /><path data-hf-id="hf-8ts4" d="M30 70 L52 50 L70 80 M52 50 L46 30" stroke-linecap="round" transform="rotate(-25 50 60)" /><circle data-hf-id="hf-merg" cx="46" cy="24" r="8" transform="rotate(-25 50 60)" /></svg>
+      <div data-hf-id="hf-xed5" class="trois-temps-caption">L'IA agit dans un environnement</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-pt6a" id="tt-2-wrap" class="clip" data-start="101.67" data-duration="3.49" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px;">
+    <div data-hf-id="hf-tjck" class="map-panel" id="tt-2">
+      <svg data-hf-id="hf-d1qe" class="trois-temps-icon" viewBox="0 0 100 100" fill="none" stroke="#facc15" stroke-width="4"><circle data-hf-id="hf-09g6" cx="28" cy="72" r="14" /><circle data-hf-id="hf-6il9" cx="72" cy="72" r="14" /><path data-hf-id="hf-sxcl" d="M28 72 L50 50 L72 72 M50 50 L44 26" stroke-linecap="round" /><circle data-hf-id="hf-2ntl" cx="44" cy="18" r="8" /><path data-hf-id="hf-h0uv" d="M78 40 A20 20 0 0 1 60 20" stroke-linecap="round" marker-end="url(#arrowhead)" /></svg><defs data-hf-id="hf-vl9d"><marker data-hf-id="hf-7l8u" id="arrowhead" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path data-hf-id="hf-0guv" d="M0,0 L8,4 L0,8 Z" fill="#facc15"></path></marker></defs>
+      <div data-hf-id="hf-5brh" class="trois-temps-caption">Elle observe et ajuste sa stratégie</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-ivcz" id="tt-3-wrap" class="clip" data-start="105.16" data-duration="3.49" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px;">
+    <div data-hf-id="hf-ub0d" class="map-panel" id="tt-3">
+      <svg data-hf-id="hf-jf8x" class="trois-temps-icon" viewBox="0 0 100 100" fill="none" stroke="#22c55e" stroke-width="4"><circle data-hf-id="hf-efc2" cx="26" cy="74" r="14" /><circle data-hf-id="hf-hrld" cx="74" cy="74" r="14" /><path data-hf-id="hf-lmc9" d="M26 74 L48 50 L74 74 M48 50 L42 24" stroke-linecap="round" /><circle data-hf-id="hf-9205" cx="42" cy="16" r="8" /><path data-hf-id="hf-27b5" d="M74 74 L58 50" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-xyw4" class="trois-temps-caption">Elle s'améliore avec l'expérience</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-dg5s" id="echo-card" class="clip" data-start="116.39" data-duration="5.81">
+    <div data-hf-id="hf-z3sj" class="grid-bg"></div>
+    <div data-hf-id="hf-0p09" class="medal-name" id="echo-name-1" style="opacity:1;">Prix Turing, 2024</div>
+    <div data-hf-id="hf-7t85" style="display:flex; align-items:center; justify-content:center; gap:70px; margin-top:16px;">
+      <div data-hf-id="hf-66lg" class="portrait-frame" id="portrait-sutton"><img data-hf-id="hf-1mf6" src="assets/photos/sutton.jpg" alt=""></div>
+      <div data-hf-id="hf-d7zt" class="portrait-frame" id="portrait-barto"><img data-hf-id="hf-qtrx" src="assets/photos/barto.jpg" alt=""></div>
+    </div>
+    <div data-hf-id="hf-xcoy" style="display:flex; align-items:center; justify-content:center; gap:150px; margin-top:14px;">
+      <div data-hf-id="hf-jxap" class="medal-name" id="echo-name-sutton" style="margin-top:0;">Richard Sutton</div>
+      <div data-hf-id="hf-to1d" class="medal-name" id="echo-name-barto" style="margin-top:0;">Andrew Barto</div>
+    </div>
+    <div data-hf-id="hf-7r8v" class="source-tag" style="opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-7svq" id="triptych-recap" class="clip triptych" data-start="122.24" data-duration="17.96">
+    <div data-hf-id="hf-80os" class="triptych-col" id="triptych-recap-col0">
+      <svg data-hf-id="hf-u608" class="recap-icon" viewBox="0 0 100 100" fill="none" stroke="#93c5fd" stroke-width="3"><circle data-hf-id="hf-tkm3" cx="20" cy="30" r="6" /><circle data-hf-id="hf-npmf" cx="20" cy="70" r="6" /><circle data-hf-id="hf-gc0d" cx="50" cy="20" r="6" /><circle data-hf-id="hf-bkrg" cx="50" cy="50" r="6" /><circle data-hf-id="hf-3bbf" cx="50" cy="80" r="6" /><circle data-hf-id="hf-08ll" cx="80" cy="30" r="6" /><circle data-hf-id="hf-ffd9" cx="80" cy="70" r="6" /><path data-hf-id="hf-j8q6" d="M25 30 L45 20 M25 30 L45 50 M25 70 L45 50 M25 70 L45 80 M55 20 L75 30 M55 50 L75 30 M55 50 L75 70 M55 80 L75 70" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-7dxs" class="triptych-label">Toronto — Reconnaître</div>
+    </div>
+    <div data-hf-id="hf-8scl" class="triptych-col" id="triptych-recap-col1">
+      <svg data-hf-id="hf-kvnj" class="recap-icon" viewBox="0 0 100 100" fill="#60a5fa"><circle data-hf-id="hf-hr3k" cx="20" cy="30" r="5" /><circle data-hf-id="hf-pwuk" cx="20" cy="70" r="5" /><circle data-hf-id="hf-hg16" cx="50" cy="20" r="5" /><circle data-hf-id="hf-c1lb" cx="50" cy="50" r="5" /><circle data-hf-id="hf-o4sg" cx="50" cy="80" r="5" /><circle data-hf-id="hf-hepy" cx="80" cy="30" r="5" /><circle data-hf-id="hf-m5gq" cx="80" cy="70" r="5" /></svg>
+      <div data-hf-id="hf-900d" class="triptych-label">Montréal — Représenter</div>
+    </div>
+    <div data-hf-id="hf-ey2e" class="triptych-col" id="triptych-recap-col2">
+      <svg data-hf-id="hf-x033" class="recap-icon" viewBox="0 0 100 100" fill="none" stroke="#22c55e" stroke-width="4"><circle data-hf-id="hf-sxs6" cx="26" cy="74" r="14" /><circle data-hf-id="hf-u9yd" cx="74" cy="74" r="14" /><path data-hf-id="hf-2ip9" d="M26 74 L48 50 L74 74 M48 50 L42 24" stroke-linecap="round" /><circle data-hf-id="hf-u5rt" cx="42" cy="16" r="8" /><path data-hf-id="hf-b4id" d="M74 74 L58 50" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-nv8c" class="triptych-label">Edmonton — Agir et s'améliorer</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-o9gn" class="hero clip hero--right" id="hero-hw-disproportion" data-start="144.2" data-duration="2.3"><div data-hf-id="hf-m85f" class="hero-text" id="hw-disproportion">INFLUENCE DISPROPORTIONNÉE</div></div>
+  <div data-hf-id="hf-slw4" class="clip hardcut-text" id="hardcut-question" data-start="148.7" data-duration="4.3">Pourquoi les gagnants économiques sont-ils ailleurs?</div>
+  <div data-hf-id="hf-sj94" id="badge" class="clip" data-start="7.8" data-duration="140.9">
+    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
+  </div>
+
+</div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+window.__timelines["chapitre-3"] = gsap.timeline({ paused: true });
+const tl = window.__timelines["chapitre-3"];
+tl.to("#chapter-open-readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
+tl.fromTo("#chapter-open-kicker", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+tl.fromTo("#chapter-open-title", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.65);
+tl.to("#chapter-open-rule", { width: 260, duration: 0.4, ease: "power2.out" }, 1.9);
+tl.to("#chapter-open-inner", { opacity: 0, duration: 0.3 }, 5.5);
+tl.set("#chapter-open-inner", { opacity: 0 }, 5.8);
+tl.fromTo("#chapter-open .chapter-opening-photo", { scale: 1.0 }, { scale: 1.07, duration: 5.8, ease: "none" }, 0);
+tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 147.169, ease: "none" }, 5.8);
+tl.set("#main-video", { x: 0 }, 0);
+tl.to("#p3-particle-0", { x: 24, y: -16, duration: 6.2, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.0);
+tl.to("#p3-particle-1", { x: 34, y: -24, duration: 7.5, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.4);
+tl.to("#p3-particle-2", { x: 44, y: -32, duration: 8.8, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.8);
+tl.to("#p3-particle-3", { x: 24, y: -40, duration: 10.1, ease: "sine.inOut", yoyo: true, repeat: 20 }, 1.2);
+tl.to("#p3-particle-4", { x: 34, y: -16, duration: 11.4, ease: "sine.inOut", yoyo: true, repeat: 20 }, 1.6);
+tl.to("#p3-particle-5", { x: 44, y: -24, duration: 6.2, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.0);
+tl.to("#p3-particle-6", { x: 24, y: -32, duration: 7.5, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.4);
+tl.to("#p3-particle-7", { x: 34, y: -40, duration: 8.8, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.8);
+tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 153.37, ease: "none" }, 0);
+tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
+tl.fromTo("#map-overview-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 5.95);
+tl.fromTo("#mov-ring-toronto", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 7.5);
+tl.fromTo("#mov-dot-toronto", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 7.5);
+tl.fromTo("#mov-label-toronto", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 7.65);
+tl.fromTo("#mov-ring-montreal", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 9.0);
+tl.fromTo("#mov-dot-montreal", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 9.0);
+tl.fromTo("#mov-label-montreal", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 9.15);
+tl.fromTo("#mov-ring-edmonton", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 10.5);
+tl.fromTo("#mov-dot-edmonton", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 10.5);
+tl.fromTo("#mov-label-edmonton", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 10.65);
+tl.to("#map-overview", { opacity: 0, duration: 0.3 }, 13.18);
+tl.fromTo("#toronto-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 13.58);
+tl.to("#toronto-photo-card", { opacity: 0, duration: 0.3 }, 17.7);
+tl.fromTo("#toronto-photo-card img", { scale: 1.0 }, { scale: 1.08, duration: 4.52, ease: "none" }, 13.48);
+tl.fromTo("#schema-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 18.15);
+tl.fromTo("#schema-line-0", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 18.4);
+tl.fromTo("#schema-lab-0", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 18.5);
+tl.fromTo("#schema-line-1", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 18.9);
+tl.fromTo("#schema-lab-1", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 19.0);
+tl.fromTo("#schema-line-2", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 19.4);
+tl.fromTo("#schema-lab-2", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 19.5);
+tl.fromTo("#schema-line-3", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 19.9);
+tl.fromTo("#schema-lab-3", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 20.0);
+tl.fromTo("#schema-line-4", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 20.4);
+tl.fromTo("#schema-lab-4", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 20.5);
+tl.fromTo("#schema-line-5", { opacity: 0 }, { opacity: 0.7, duration: 0.3 }, 20.9);
+tl.fromTo("#schema-lab-5", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 21.0);
+tl.to("#schema-card", { opacity: 0, duration: 0.3 }, 23.9);
+tl.fromTo("#medal-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 24.35);
+tl.fromTo("#portrait-hinton", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 24.4);
+tl.fromTo("#caption-hinton", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 24.65);
+tl.fromTo("#portrait-bengio", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 24.5);
+tl.fromTo("#caption-bengio", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 24.75);
+tl.fromTo("#portrait-lecun", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 24.6);
+tl.fromTo("#caption-lecun", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3 }, 24.85);
+tl.set("#medal-name-nobel", { opacity: 0 }, 24.2);
+tl.fromTo("#medal-name-turing", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 24.95);
+tl.set("#medal-flash", { opacity: 1 }, 33.22);
+tl.set("#medal-name-turing", { opacity: 0 }, 33.27);
+tl.to("#turing-trio-extra", { opacity: 0, duration: 0.3 }, 33.27);
+tl.set("#turing-trio-extra", { display: "none" }, 33.62);
+tl.to("#medal-flash", { opacity: 0, duration: 0.4 }, 33.27);
+tl.fromTo("#medal-name-nobel", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 33.57);
+tl.fromTo("#vector-badge", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35 }, 36.93);
+tl.to("#medal-card", { opacity: 0, duration: 0.3 }, 40.2);
+tl.fromTo("#map-pan-mtl-title", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 40.46);
+tl.set("#mpm-dot-toronto", { opacity: 1 }, 40.36);
+tl.set("#mpm-label-toronto", { opacity: 1 }, 40.36);
+tl.to("#map-pan-mtl-track", { left: -210.0, duration: 4.0, ease: "power1.inOut" }, 40.96);
+tl.fromTo("#mpm-ring-montreal", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 42.96);
+tl.fromTo("#mpm-dot-montreal", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 42.96);
+tl.fromTo("#mpm-label-montreal", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 43.16);
+tl.to("#map-pan-mtl", { opacity: 0, duration: 0.3 }, 45.06);
+tl.fromTo("#tag-bengio", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 44.15);
+tl.to("#tag-bengio", { opacity: 0, duration: 0.25 }, 51.95);
+tl.fromTo("#mila-logo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 52.3);
+tl.fromTo("#growth-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 52.3);
+tl.set("#growth-seed-0", { opacity: 1 }, 52.5);
+tl.set("#growth-seed-1", { opacity: 1 }, 52.5);
+tl.set("#growth-seed-2", { opacity: 1 }, 52.5);
+tl.to("#growth-dot-0", { opacity: 0.85, duration: 0.15 }, 53.2);
+tl.to("#growth-line-0", { opacity: 0.35, duration: 0.15 }, 53.2);
+tl.to("#growth-dot-1", { opacity: 0.85, duration: 0.15 }, 53.257);
+tl.to("#growth-dot-2", { opacity: 0.85, duration: 0.15 }, 53.314);
+tl.to("#growth-line-2", { opacity: 0.35, duration: 0.15 }, 53.314);
+tl.to("#growth-dot-3", { opacity: 0.85, duration: 0.15 }, 53.371);
+tl.to("#growth-dot-4", { opacity: 0.85, duration: 0.15 }, 53.429);
+tl.to("#growth-line-4", { opacity: 0.35, duration: 0.15 }, 53.429);
+tl.to("#growth-dot-5", { opacity: 0.85, duration: 0.15 }, 53.486);
+tl.to("#growth-dot-6", { opacity: 0.85, duration: 0.15 }, 53.543);
+tl.to("#growth-line-6", { opacity: 0.35, duration: 0.15 }, 53.543);
+tl.to("#growth-dot-7", { opacity: 0.85, duration: 0.15 }, 53.6);
+tl.to("#growth-dot-8", { opacity: 0.85, duration: 0.15 }, 53.657);
+tl.to("#growth-line-8", { opacity: 0.35, duration: 0.15 }, 53.657);
+tl.to("#growth-dot-9", { opacity: 0.85, duration: 0.15 }, 53.714);
+tl.to("#growth-dot-10", { opacity: 0.85, duration: 0.15 }, 53.771);
+tl.to("#growth-line-10", { opacity: 0.35, duration: 0.15 }, 53.771);
+tl.to("#growth-dot-11", { opacity: 0.85, duration: 0.15 }, 53.829);
+tl.to("#growth-dot-12", { opacity: 0.85, duration: 0.15 }, 53.886);
+tl.to("#growth-line-12", { opacity: 0.35, duration: 0.15 }, 53.886);
+tl.to("#growth-dot-13", { opacity: 0.85, duration: 0.15 }, 53.943);
+tl.to("#growth-dot-14", { opacity: 0.85, duration: 0.15 }, 54.0);
+tl.to("#growth-line-14", { opacity: 0.35, duration: 0.15 }, 54.0);
+tl.to("#growth-dot-15", { opacity: 0.85, duration: 0.15 }, 54.057);
+tl.to("#growth-dot-16", { opacity: 0.85, duration: 0.15 }, 54.114);
+tl.to("#growth-line-16", { opacity: 0.35, duration: 0.15 }, 54.114);
+tl.to("#growth-dot-17", { opacity: 0.85, duration: 0.15 }, 54.171);
+tl.to("#growth-dot-18", { opacity: 0.85, duration: 0.15 }, 54.229);
+tl.to("#growth-line-18", { opacity: 0.35, duration: 0.15 }, 54.229);
+tl.to("#growth-dot-19", { opacity: 0.85, duration: 0.15 }, 54.286);
+tl.to("#growth-dot-20", { opacity: 0.85, duration: 0.15 }, 54.343);
+tl.to("#growth-line-20", { opacity: 0.35, duration: 0.15 }, 54.343);
+tl.to("#growth-dot-21", { opacity: 0.85, duration: 0.15 }, 54.4);
+tl.to("#growth-dot-22", { opacity: 0.85, duration: 0.15 }, 54.457);
+tl.to("#growth-line-22", { opacity: 0.35, duration: 0.15 }, 54.457);
+tl.to("#growth-dot-23", { opacity: 0.85, duration: 0.15 }, 54.514);
+tl.to("#growth-dot-24", { opacity: 0.85, duration: 0.15 }, 54.571);
+tl.to("#growth-line-24", { opacity: 0.35, duration: 0.15 }, 54.571);
+tl.to("#growth-dot-25", { opacity: 0.85, duration: 0.15 }, 54.629);
+tl.to("#growth-dot-26", { opacity: 0.85, duration: 0.15 }, 54.686);
+tl.to("#growth-line-26", { opacity: 0.35, duration: 0.15 }, 54.686);
+tl.to("#growth-dot-27", { opacity: 0.85, duration: 0.15 }, 54.743);
+tl.to("#growth-dot-28", { opacity: 0.85, duration: 0.15 }, 54.8);
+tl.to("#growth-line-28", { opacity: 0.35, duration: 0.15 }, 54.8);
+tl.to("#growth-dot-29", { opacity: 0.85, duration: 0.15 }, 54.857);
+tl.to("#growth-dot-30", { opacity: 0.85, duration: 0.15 }, 54.914);
+tl.to("#growth-line-30", { opacity: 0.35, duration: 0.15 }, 54.914);
+tl.to("#growth-dot-31", { opacity: 0.85, duration: 0.15 }, 54.971);
+tl.to("#growth-dot-32", { opacity: 0.85, duration: 0.15 }, 55.029);
+tl.to("#growth-line-32", { opacity: 0.35, duration: 0.15 }, 55.029);
+tl.to("#growth-dot-33", { opacity: 0.85, duration: 0.15 }, 55.086);
+tl.to("#growth-dot-34", { opacity: 0.85, duration: 0.15 }, 55.143);
+tl.to("#growth-line-34", { opacity: 0.35, duration: 0.15 }, 55.143);
+tl.to("#growth-dot-35", { opacity: 0.85, duration: 0.15 }, 55.2);
+tl.to("#growth-dot-36", { opacity: 0.85, duration: 0.15 }, 55.257);
+tl.to("#growth-line-36", { opacity: 0.35, duration: 0.15 }, 55.257);
+tl.to("#growth-dot-37", { opacity: 0.85, duration: 0.15 }, 55.314);
+tl.to("#growth-dot-38", { opacity: 0.85, duration: 0.15 }, 55.371);
+tl.to("#growth-line-38", { opacity: 0.35, duration: 0.15 }, 55.371);
+tl.to("#growth-dot-39", { opacity: 0.85, duration: 0.15 }, 55.429);
+tl.to("#growth-dot-40", { opacity: 0.85, duration: 0.15 }, 55.486);
+tl.to("#growth-line-40", { opacity: 0.35, duration: 0.15 }, 55.486);
+tl.to("#growth-dot-41", { opacity: 0.85, duration: 0.15 }, 55.543);
+tl.to("#growth-dot-42", { opacity: 0.85, duration: 0.15 }, 55.6);
+tl.to("#growth-line-42", { opacity: 0.35, duration: 0.15 }, 55.6);
+tl.to("#growth-dot-43", { opacity: 0.85, duration: 0.15 }, 55.657);
+tl.to("#growth-dot-44", { opacity: 0.85, duration: 0.15 }, 55.714);
+tl.to("#growth-line-44", { opacity: 0.35, duration: 0.15 }, 55.714);
+tl.to("#growth-dot-45", { opacity: 0.85, duration: 0.15 }, 55.771);
+tl.to("#growth-dot-46", { opacity: 0.85, duration: 0.15 }, 55.829);
+tl.to("#growth-line-46", { opacity: 0.35, duration: 0.15 }, 55.829);
+tl.to("#growth-dot-47", { opacity: 0.85, duration: 0.15 }, 55.886);
+tl.to("#growth-dot-48", { opacity: 0.85, duration: 0.15 }, 55.943);
+tl.to("#growth-line-48", { opacity: 0.35, duration: 0.15 }, 55.943);
+tl.to("#growth-dot-49", { opacity: 0.85, duration: 0.15 }, 56.0);
+tl.to("#growth-dot-50", { opacity: 0.85, duration: 0.15 }, 56.057);
+tl.to("#growth-line-50", { opacity: 0.35, duration: 0.15 }, 56.057);
+tl.to("#growth-dot-51", { opacity: 0.85, duration: 0.15 }, 56.114);
+tl.to("#growth-dot-52", { opacity: 0.85, duration: 0.15 }, 56.171);
+tl.to("#growth-line-52", { opacity: 0.35, duration: 0.15 }, 56.171);
+tl.to("#growth-dot-53", { opacity: 0.85, duration: 0.15 }, 56.229);
+tl.to("#growth-dot-54", { opacity: 0.85, duration: 0.15 }, 56.286);
+tl.to("#growth-line-54", { opacity: 0.35, duration: 0.15 }, 56.286);
+tl.to("#growth-dot-55", { opacity: 0.85, duration: 0.15 }, 56.343);
+tl.to("#growth-dot-56", { opacity: 0.85, duration: 0.15 }, 56.4);
+tl.to("#growth-line-56", { opacity: 0.35, duration: 0.15 }, 56.4);
+tl.to("#growth-dot-57", { opacity: 0.85, duration: 0.15 }, 56.457);
+tl.to("#growth-dot-58", { opacity: 0.85, duration: 0.15 }, 56.514);
+tl.to("#growth-line-58", { opacity: 0.35, duration: 0.15 }, 56.514);
+tl.to("#growth-dot-59", { opacity: 0.85, duration: 0.15 }, 56.571);
+tl.to("#growth-dot-60", { opacity: 0.85, duration: 0.15 }, 56.629);
+tl.to("#growth-line-60", { opacity: 0.35, duration: 0.15 }, 56.629);
+tl.to("#growth-dot-61", { opacity: 0.85, duration: 0.15 }, 56.686);
+tl.to("#growth-dot-62", { opacity: 0.85, duration: 0.15 }, 56.743);
+tl.to("#growth-line-62", { opacity: 0.35, duration: 0.15 }, 56.743);
+tl.to("#growth-dot-63", { opacity: 0.85, duration: 0.15 }, 56.8);
+tl.to("#growth-dot-64", { opacity: 0.85, duration: 0.15 }, 56.857);
+tl.to("#growth-line-64", { opacity: 0.35, duration: 0.15 }, 56.857);
+tl.to("#growth-dot-65", { opacity: 0.85, duration: 0.15 }, 56.914);
+tl.to("#growth-dot-66", { opacity: 0.85, duration: 0.15 }, 56.971);
+tl.to("#growth-line-66", { opacity: 0.35, duration: 0.15 }, 56.971);
+tl.to("#growth-dot-67", { opacity: 0.85, duration: 0.15 }, 57.029);
+tl.to("#growth-dot-68", { opacity: 0.85, duration: 0.15 }, 57.086);
+tl.to("#growth-line-68", { opacity: 0.35, duration: 0.15 }, 57.086);
+tl.to("#growth-dot-69", { opacity: 0.85, duration: 0.15 }, 57.143);
+tl.fromTo("#growth-number", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 57.0);
+tl.fromTo("#growth-caption", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 57.4);
+tl.to("#growth-card", { opacity: 0, duration: 0.3 }, 58.1);
+tl.fromTo("#montreal-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 58.45);
+tl.fromTo("#plane-track-0", { opacity: 0 }, { opacity: 0.6, duration: 0.3 }, 58.8);
+tl.fromTo("#plane-icon-0", { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: 0.2 }, 58.8);
+tl.to("#plane-icon-0", { x: 440, y: 160, duration: 1.6, ease: "power1.in" }, 58.8);
+tl.to("#plane-icon-0", { opacity: 0, duration: 0.3 }, 60.2);
+tl.fromTo("#plane-track-1", { opacity: 0 }, { opacity: 0.6, duration: 0.3 }, 59.35);
+tl.fromTo("#plane-icon-1", { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: 0.2 }, 59.35);
+tl.to("#plane-icon-1", { x: -440, y: 140, duration: 1.6, ease: "power1.in" }, 59.35);
+tl.to("#plane-icon-1", { opacity: 0, duration: 0.3 }, 60.75);
+tl.fromTo("#plane-track-2", { opacity: 0 }, { opacity: 0.6, duration: 0.3 }, 59.9);
+tl.fromTo("#plane-icon-2", { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: 0.2 }, 59.9);
+tl.to("#plane-icon-2", { x: 440, y: -160, duration: 1.6, ease: "power1.in" }, 59.9);
+tl.to("#plane-icon-2", { opacity: 0, duration: 0.3 }, 61.3);
+tl.fromTo("#plane-track-3", { opacity: 0 }, { opacity: 0.6, duration: 0.3 }, 60.45);
+tl.fromTo("#plane-icon-3", { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: 0.2 }, 60.45);
+tl.to("#plane-icon-3", { x: -440, y: -160, duration: 1.6, ease: "power1.in" }, 60.45);
+tl.to("#plane-icon-3", { opacity: 0, duration: 0.3 }, 61.85);
+tl.fromTo("#plane-track-4", { opacity: 0 }, { opacity: 0.6, duration: 0.3 }, 61.0);
+tl.fromTo("#plane-icon-4", { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: 0.2 }, 61.0);
+tl.to("#plane-icon-4", { x: 0, y: 200, duration: 1.6, ease: "power1.in" }, 61.0);
+tl.to("#plane-icon-4", { opacity: 0, duration: 0.3 }, 62.4);
+tl.to("#montreal-panel", { opacity: 0, duration: 0.3 }, 69.6);
+tl.fromTo("#split2-ethics-a", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 69.91);
+tl.fromTo("#split2-ethics-b", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 70.01);
+tl.fromTo("#split2-ethics .split2-label", { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.1 }, 70.26);
+tl.to(".net-icon-svg circle", { opacity: 0.4, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 4 }, 70.36);
+tl.to(".balance-icon", { rotation: 2, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 4, transformOrigin: "50% 10%" }, 70.36);
+tl.fromTo("#map-pan-edm-title", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 75.46);
+tl.set("#mpe-dot-montreal", { opacity: 1 }, 75.36);
+tl.set("#mpe-label-montreal", { opacity: 1 }, 75.36);
+tl.to("#map-pan-edm-track", { left: 772.2, duration: 2.75, ease: "power2.in" }, 75.76);
+tl.to("#map-pan-edm-track", { filter: "blur(6px)", duration: 1.0, ease: "none", yoyo: true, repeat: 1 }, 75.76);
+tl.fromTo("#mpe-ring-edmonton", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 78.86);
+tl.fromTo("#mpe-dot-edmonton", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 78.86);
+tl.fromTo("#mpe-label-edmonton", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 79.11);
+tl.to("#map-pan-edm", { opacity: 0, duration: 0.3 }, 80.06);
+tl.fromTo("#tag-sutton", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 81.38);
+tl.to("#tag-sutton", { opacity: 0, duration: 0.25 }, 86.5);
+tl.fromTo("#tt-1", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 98.23);
+tl.to("#tt-1", { opacity: 0, duration: 0.25 }, 101.37);
+tl.fromTo("#tt-2", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 101.72);
+tl.to("#tt-2", { opacity: 0, duration: 0.25 }, 104.86);
+tl.fromTo("#tt-3", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 105.21);
+tl.to("#tt-3", { opacity: 0, duration: 0.25 }, 108.35);
+tl.fromTo("#portrait-sutton", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 116.59);
+tl.fromTo("#portrait-barto", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 116.74);
+tl.fromTo("#echo-name-sutton", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35 }, 116.99);
+tl.fromTo("#echo-name-barto", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35 }, 117.14);
+tl.to("#echo-card", { opacity: 0, duration: 0.3 }, 121.9);
+tl.to("#triptych-recap-col0", { opacity: 1, duration: 0.3 }, 123.2);
+tl.to("#triptych-recap-col1", { opacity: 1, duration: 0.3 }, 127.06);
+tl.to("#triptych-recap-col2", { opacity: 1, duration: 0.3 }, 131.6);
+tl.to("#triptych-recap", { opacity: 0, duration: 0.3 }, 139.9);
+tl.fromTo("#hw-disproportion", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 144.2);
+tl.to("#hw-disproportion", { opacity: 0, duration: 0.18 }, 146.25);
+tl.set("#hardcut-black", { opacity: 1 }, 148.7);
+tl.fromTo("#hardcut-question", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 148.8);
+tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 7.8);
+tl.to("#badge-inner", { opacity: 0, duration: 0.3 }, 148.4);
+</script>
+</body>
+</html>

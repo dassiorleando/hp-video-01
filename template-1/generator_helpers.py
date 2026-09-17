@@ -276,9 +276,20 @@ def hardcut_block(hid: str, text: str, start: float, duration: float,
     Retourne (html_snippet, js_timeline_lines). Le html_snippet ne contient
     QUE le texte — ajouter <div id="hardcut-black" class="clip"></div> une
     seule fois dans la composition, en dehors de cette fonction.
+
+    FIX (2026-09-17, chapitre 3 -- première utilisation réelle de cette
+    fonction dans une vraie composition, gen_starter.py mis à part) :
+    l'élément ne portait pas class="clip" (seulement "hardcut-text"), ce que
+    le runtime tolère (il cache quand même l'élément hors de sa fenêtre
+    data-start/data-duration) mais que `hyperframes check` signale
+    (timed_element_missing_clip_class) car Studio et les règles GSAP de
+    "clip ownership" s'appuient sur cette classe pour reconnaître un clip.
+    .hardcut-text définit déjà elle-même position:absolute;inset:0 (voir
+    style-kit.css), donc ajouter .clip ici est sans effet visuel -- juste la
+    classe manquante pour que l'outillage reconnaisse l'élément.
     """
     html_snippet = (
-        f'  <div class="hardcut-text" id="{hid}" data-start="{start}" '
+        f'  <div class="clip hardcut-text" id="{hid}" data-start="{start}" '
         f'data-duration="{round(duration,2)}">{esc(text)}</div>\n'
     )
     js_lines = [
