@@ -99,6 +99,17 @@ html,body { margin:0; padding:0; background:#000; }
 /* variante compacte pour un texte à 2 mots (ex. "Financement refusé") :
    ajouter style="font-size:70px; padding:12px 34px;" en inline sur l'instance */
 
+/* Conteneur générique pour stamp_block() (generator_helpers.py). Même patron
+   que #impasse-stamp de chapitre-1 : display:flex DIRECTEMENT sur le même
+   élément .clip qui porte .stamp-text (pas de wrapper intermédiaire sans
+   centrage). .clip = position:absolute, donc un élément .clip n'est PAS
+   traité comme flex-item par un parent flex externe — le centrage doit
+   obligatoirement vivre ici, sur le .clip lui-même. Fix 2026-09-17 : avant
+   ce correctif, stamp_block() ne posait aucun display sur son "-wrap", ce
+   qui l'étirait plein cadre (inset:0) et donnait un bandeau diagonal pleine
+   largeur au lieu du bloc compact pivoté attendu. */
+.stamp-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
 /* ---- mots-héros (hero words) -------------------------------------------
    Par-dessus la vidéo en direct uniquement (jamais sur une carte plein
    cadre). Deux variantes : information (droite, sans boîte) et verdict
@@ -134,8 +145,15 @@ html,body { margin:0; padding:0; background:#000; }
    COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
    CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
    présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
-   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin. */
-.split2 { position:absolute; inset:0; display:flex; }
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin.
+   FIX 2026-09-17 (retour utilisateur "pas premium", visage du présentateur
+   visible/encombré derrière le split) : .split2 n'avait jamais de fond
+   opaque, donc malgré ce commentaire ("le présentateur n'est pas visible"),
+   la vidéo en direct restait visible en transparence derrière tout le split
+   -- texte et icônes flottaient par-dessus le visage/torse au lieu d'un
+   vrai plein cadre. Même fond que les autres CAPSULE-DONNÉE plein cadre de
+   chapitre-1 (#hinton-card, etc.) : #03050a. */
+.split2 { position:absolute; inset:0; display:flex; background:#03050a; }
 .split2.split2--horizontal { flex-direction:column; }
 .split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
 .split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
@@ -242,6 +260,24 @@ html,body { margin:0; padding:0; background:#000; }
 /* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT) */
 .kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
 .kinetic-swap .kinetic-swap-word { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; }
+
+/* ---- SURIMPRESSION LISTE (voile + liste qui s'accumule) -----------------
+   Ajouté 2026-09-17 (demande utilisateur, chapitre 2 : "plus de données,
+   plus de calcul, des réseaux de plus en plus profonds, et des modèles qui
+   apprennent leurs propres représentations"). Voile plein cadre SEMI-
+   TRANSPARENT par-dessus la vidéo en direct -- contrairement à
+   #hardcut-black (noir total, opaque), le présentateur reste visible,
+   assombri, en arrière-plan. Chaque ligne de la liste s'ajoute une à une,
+   au rythme de la parole, et reste affichée (la liste s'accumule) jusqu'à
+   la fin de la surimpression entière -- voir
+   generator_helpers.py:list_overlay_block(). Ne PAS mettre position/inset
+   directement sur .list-overlay : laisser .clip gérer entièrement le
+   plein cadre (voir le bug du 2026-09-17 sur .name-tag/.split2 -- une
+   règle qui ne redéfinit qu'une partie des 4 côtés d'un .clip entre en
+   conflit avec son inset:0). */
+.list-overlay { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:38px; padding:0 180px; background:rgba(3,5,10,0.74); opacity:0; pointer-events:none; }
+.list-overlay-item { display:flex; align-items:center; gap:28px; max-width:1560px; font-size:52px; font-weight:800; line-height:1.25; color:#fff; opacity:0; }
+.list-overlay-item::before { content:""; width:16px; height:16px; border-radius:50%; background:#3b82f6; flex:none; }
 
 /* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
    Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,

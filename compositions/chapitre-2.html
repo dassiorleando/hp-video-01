@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+/* =========================================================================
+   STYLE KIT — vidéos "documentaire face caméra" (style Automathing)
+   Extrait de compositions/chapitre-1.html. Voir ../../STYLE_GUIDE.md pour le
+   vocabulaire du script et la logique derrière chaque classe.
+
+   Usage : copier les blocs pertinents dans le bloc style d'un nouveau
+   générateur de composition (ou lire ce fichier directement et l'insérer
+   tel quel entre des balises style — voir compositions/gen_cold_open.py
+   pour cet usage). Ce fichier n'est PAS mounté par HyperFrames (ce n'est
+   pas une sous-composition) — c'est une bibliothèque de référence.
+   ATTENTION : n'écris jamais le texte litéral d'une balise style ouvrante
+   ou fermante dans un commentaire de ce fichier, même en exemple — un
+   générateur qui insère ce fichier tel quel dans du HTML transformerait ce
+   texte en vraie balise et casserait le bloc de style qui l'englobe (bug
+   réel trouvé le 2026-09-16 dans compositions/cold-open.html).
+   ========================================================================= */
+
+/* ---- base + vrai 4K (voir STYLE_GUIDE §5) -----------------------------
+   Tout le contenu ci-dessous est authoré en 1920x1080 ; #scale-2x agrandit
+   uniformément 2x pour remplir un canevas 3840x2160/60fps. Zéro valeur de
+   pixel à recalculer à la main. */
+html,body { margin:0; padding:0; background:#000; }
+#scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
+.clip { position:absolute; inset:0; }
+
+/* ---- .clip-inner : sortie GSAP correcte pour une scène plein-cadre -----
+   Le framework HyperFrames gère déjà la visibilité de tout élément
+   `class="clip"` (montage/démontage automatique à data-start/data-duration).
+   Si un fondu de sortie GSAP anime l'opacité du `.clip` LUI-MÊME (au lieu
+   d'un enfant) et que ce fondu se termine pile à la frontière data-duration,
+   `hyperframes check` lève une vraie erreur (gsap_exit_missing_hard_kill) :
+   un seek non-linéaire (rendu par workers parallèles, scrubbing) peut
+   retomber juste après le fondu sans qu'un état final "dur" ait été posé.
+   Convention : le contenu visuel d'une scène plein-cadre avec fondu de
+   sortie va dans un <div class="clip-inner"> imbriqué dans le `.clip`, et
+   c'est CET enfant (jamais le `.clip` parent) qui reçoit le tween de sortie
+   + un tl.set(...) de verrouillage dur pile à data-duration. Bug réel
+   trouvé le 2026-09-16 sur #chapter-card (chapitre-1.html ET
+   chapter_opening_card_block() dans generator_helpers.py). */
+.clip-inner { position:absolute; inset:0; }
+
+/* ---- vidéo présentateur -------------------------------------------------
+   OBLIGATOIRE sur tout <video id="main-video"> : sans cette règle, le
+   <video> se rend à sa résolution intrinsèque (ex. 3840x2160) à l'intérieur
+   du canevas d'authoring 1920x1080, au lieu de remplir son conteneur .clip —
+   résultat : la vidéo apparaît cadrée/zoomée sur son coin supérieur gauche,
+   le présentateur n'étant plus centré (bug réel trouvé le 2026-09-16 dans
+   compositions/cold-open.html, absent de chapitre-1.html qui définissait
+   cette règle localement dans son propre générateur plutôt qu'ici). */
+#main-video { width:100%; height:100%; object-fit:cover; }
+
+/* ---- ambiance globale (grade / vignette / grain) ----------------------
+   À placer en overlay plein cadre, par-dessus la vidéo en direct, pour un
+   rendu cohérent d'une vidéo à l'autre. */
+#grade { background:linear-gradient(180deg, rgba(10,20,40,0.18), rgba(10,20,40,0.32)); mix-blend-mode:multiply; z-index:15; }
+#vignette { box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.55); z-index:16; }
+#grain-overlay { z-index:57; mix-blend-mode:overlay; opacity:0.5; pointer-events:none; }
+/* filtre SVG associé à #grain-overlay (à mettre dans un <svg><defs>) :
+   <filter id="grain">
+     <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+     <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/>
+   </filter> */
+
+/* ---- fond "carte de données" : quadrillage bleu nuit --------------------
+   Fond standard de toute CAPSULE-DONNÉE. Le masque radial adoucit les bords
+   pour ne pas créer une grille dure jusqu'au coin de l'écran. */
+.grid-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(96,165,250,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96,165,250,0.09) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+}
+
+/* ---- panneau de lisibilité ("map-panel") -------------------------------
+   Backdrop semi-transparent à coins arrondis derrière un bloc de
+   texte/illustration en incrustation sur la vidéo en direct, pour que le
+   contenu reste lisible même sur un t-shirt à motif. Réutilisé pour toute
+   CARTE-CITATION / CAPSULE-DONNÉE en mode "incrustation". */
+.map-panel {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(4,8,16,0.6); border-radius:20px; padding:32px 44px 26px; opacity:0;
+}
+
+/* ---- tampon administratif ("style IMPASSE") ----------------------------
+   Le patron pour tout verdict court et tranchant (voir STYLE_GUIDE §2).
+   Animation GSAP associée (à coller dans le timeline builder) :
+     tl.fromTo("#ID", { opacity:0, scale:1.4 }, { opacity:1, scale:1, duration:0.18, ease:"power4.out" }, START);
+     tl.to("#ID", { opacity:0, duration:0.25 }, START + DURATION - 0.3);
+   Le conteneur parent doit centrer horizontalement/verticalement
+   (display:flex; align-items:center; justify-content:center). */
+.stamp-text {
+  font-size:104px; font-weight:900; letter-spacing:0.05em; text-transform:uppercase;
+  color:#ef4444; border:7px solid #ef4444; padding:16px 50px;
+  transform:rotate(-7deg) scale(1.4); opacity:0;
+}
+/* variante compacte pour un texte à 2 mots (ex. "Financement refusé") :
+   ajouter style="font-size:70px; padding:12px 34px;" en inline sur l'instance */
+
+/* Conteneur générique pour stamp_block() (generator_helpers.py). Même patron
+   que #impasse-stamp de chapitre-1 : display:flex DIRECTEMENT sur le même
+   élément .clip qui porte .stamp-text (pas de wrapper intermédiaire sans
+   centrage). .clip = position:absolute, donc un élément .clip n'est PAS
+   traité comme flex-item par un parent flex externe — le centrage doit
+   obligatoirement vivre ici, sur le .clip lui-même. Fix 2026-09-17 : avant
+   ce correctif, stamp_block() ne posait aucun display sur son "-wrap", ce
+   qui l'étirait plein cadre (inset:0) et donnait un bandeau diagonal pleine
+   largeur au lieu du bloc compact pivoté attendu. */
+.stamp-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
+/* ---- mots-héros (hero words) -------------------------------------------
+   Par-dessus la vidéo en direct uniquement (jamais sur une carte plein
+   cadre). Deux variantes : information (droite, sans boîte) et verdict
+   (tampon, centré — réutiliser .stamp-text par-dessus .hero-text). */
+.hero { z-index:30; display:flex; align-items:flex-start; justify-content:center; padding-top:150px; pointer-events:none; }
+.hero-text {
+  max-width:1500px; font-size:74px; font-weight:900; text-transform:uppercase;
+  color:#60a5fa; line-height:1.05; text-align:center; text-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0;
+}
+/* variante "information" — alignée à droite, hors du visage centré */
+.hero--right { justify-content:flex-end; padding-right:130px; }
+.hero--right .hero-text { max-width:820px; text-align:right; }
+/* variante "verdict" — combiner avec .stamp-text sur le même élément */
+.hero--stamp { align-items:center; padding-top:0; }
+.hero--stamp .hero-text { font-size:104px; color:#ef4444; border:7px solid #ef4444; padding:16px 50px; text-shadow:none; transform:rotate(-7deg) scale(1.4); }
+
+/* ---- SPLIT-SCREEN, VARIANTE 1 : face-safe (photo gauche 50% / vidéo droite 50%) ----
+   Le présentateur reste visible à droite pendant qu'une photo occupe la
+   gauche. Voir STYLE_GUIDE §2. Le recentrage de la vidéo (#main-video { x })
+   se fait via GSAP, pas en CSS — voir generator_helpers.py:split_screen_block().
+   ATTENTION : ne pas confondre avec la variante 2 ci-dessous — les notes
+   "SPLIT SCREEN VERTICAL/HORIZONTAL/COMPARATIF" du script ne décrivent PAS
+   cette variante, voir plus bas. */
+.split-photo-panel { position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; box-shadow:10px 0 40px rgba(0,0,0,0.55); opacity:0; }
+.split-photo-panel img { width:100%; height:100%; object-fit:cover; filter:grayscale(0.35) brightness(0.68) contrast(1.06); }
+.split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
+.split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
+.split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
+.split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
+
+/* ---- SPLIT-SCREEN, VARIANTE 2 : deux panneaux graphiques côte à côte ----
+   C'est CE patron que décrivent "SPLIT SCREEN VERTICAL/HORIZONTAL/
+   COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
+   CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
+   présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin.
+   FIX 2026-09-17 (retour utilisateur "pas premium", visage du présentateur
+   visible/encombré derrière le split) : .split2 n'avait jamais de fond
+   opaque, donc malgré ce commentaire ("le présentateur n'est pas visible"),
+   la vidéo en direct restait visible en transparence derrière tout le split
+   -- texte et icônes flottaient par-dessus le visage/torse au lieu d'un
+   vrai plein cadre. Même fond que les autres CAPSULE-DONNÉE plein cadre de
+   chapitre-1 (#hinton-card, etc.) : #03050a. */
+.split2 { position:absolute; inset:0; display:flex; background:#03050a; }
+.split2.split2--horizontal { flex-direction:column; }
+.split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
+.split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
+.split2:not(.split2--horizontal) .split2-divider { top:0; left:50%; width:2px; height:100%; transform:translateX(-1px); }
+.split2--horizontal .split2-divider { left:0; top:50%; width:100%; height:2px; transform:translateY(-1px); }
+.split2-label { position:absolute; bottom:24px; font-size:18px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; opacity:0; }
+
+/* ---- mentions "Source" / badges de date / surlignage jaune ------------- */
+.source-tag {
+  position:absolute; right:22px; bottom:18px; font-size:16px; font-style:italic;
+  color:rgba(203,213,225,0.55); letter-spacing:0.02em; opacity:0; z-index:5;
+}
+.date-badge {
+  position:absolute; top:16px; left:16px; font-size:15px; font-weight:700; letter-spacing:0.1em;
+  color:#e2e8f0; background:rgba(4,7,12,0.72); border:1px solid rgba(255,255,255,0.18);
+  padding:6px 14px; border-radius:3px; text-transform:uppercase; opacity:0; z-index:5;
+}
+.hl { background:#facc15; color:#1a1408; padding:0 3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+/* ---- CADRE-TÉLÉ : photo d'archive encadrée (coin, non plein-cadre) ----- */
+.photo-card { width:380px; opacity:0; border:2px solid rgba(96,165,250,0.55); border-radius:6px; overflow:hidden; box-shadow:0 20px 44px rgba(0,0,0,0.5); background:#03050a; }
+.photo-card img { display:block; width:100%; height:220px; object-fit:cover; filter:grayscale(0.25) brightness(0.85) contrast(1.05); }
+.photo-card .photo-caption { padding:10px 16px; font-size:16px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; background:rgba(10,14,24,0.9); }
+
+/* ---- coupure de presse (archive papier) --------------------------------- */
+.clipping-card { width:360px; padding:24px 28px; background:#efe6d2; color:#1a1408; transform:rotate(3deg); box-shadow:0 18px 40px rgba(0,0,0,0.45); opacity:0; }
+.clipping-card .headline { font-family:Georgia, "Times New Roman", serif; font-weight:900; font-size:25px; line-height:1.16; text-transform:uppercase; }
+.clipping-card .dateline { margin-top:12px; font-family:Georgia, serif; font-size:15px; font-style:italic; color:#4a3f2a; border-top:1px solid rgba(26,20,8,0.25); padding-top:9px; }
+
+/* ---- fiche dossier (portrait archive avec coins de cadre) --------------- */
+.dossier-frame { position:relative; padding:64px 96px; border:1px solid rgba(96,165,250,0.35); border-radius:6px; opacity:0; display:flex; align-items:center; gap:56px; }
+.dossier-frame .corner { position:absolute; width:26px; height:26px; border:2px solid #60a5fa; opacity:0.8; }
+.dossier-frame .corner.tl { top:-1px; left:-1px; border-right:none; border-bottom:none; }
+.dossier-frame .corner.tr { top:-1px; right:-1px; border-left:none; border-bottom:none; }
+.dossier-frame .corner.bl { bottom:-1px; left:-1px; border-right:none; border-top:none; }
+.dossier-frame .corner.br { bottom:-1px; right:-1px; border-left:none; border-top:none; }
+.dossier-avatar { width:150px; height:150px; flex:none; }
+.dossier-text { text-align:left; }
+.dossier-label { font-size:20px; font-weight:700; letter-spacing:0.22em; color:#60a5fa; }
+.dossier-name { margin-top:10px; font-size:50px; font-weight:800; color:#fff; }
+.dossier-sub { margin-top:14px; font-size:27px; color:#cbd5e1; }
+.epoch-tag { position:absolute; top:-32px; left:6px; font-size:16px; font-weight:700; letter-spacing:0.1em; color:#93c5fd; background:rgba(59,130,246,0.14); border:1px solid rgba(96,165,250,0.4); padding:7px 16px; border-radius:4px; transform:rotate(-2deg); opacity:0; white-space:nowrap; }
+
+/* ---- sous-titres brûlés (si activés) ------------------------------------ */
+.caption { position:absolute; left:0; right:0; bottom:105px; display:flex; justify-content:center; z-index:60; pointer-events:none; }
+.caption-inner {
+  max-width:1540px; padding:16px 34px 16px 26px; background:rgba(4,7,12,0.78);
+  border-left:5px solid #3b82f6; border-radius:10px;
+  font-size:33px; font-weight:600; line-height:1.32; color:#f8fafc; text-align:center;
+  box-shadow:0 14px 32px rgba(0,0,0,0.35); opacity:0;
+}
+
+/* ---- barre de progression (carton de chapitre) -------------------------- */
+#progress-track { z-index:65; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); }
+#progress-fill { position:absolute; top:0; left:0; height:100%; width:0; background:#3b82f6; }
+#progress-label { position:absolute; top:10px; left:24px; font-size:15px; font-weight:700; letter-spacing:0.14em; color:rgba(147,197,253,0.6); text-transform:uppercase; opacity:0; z-index:66; }
+
+/* ---- particules ambiantes (drift subtil, persistant) --------------------- */
+.particle { fill:#3b82f6; opacity:0.22; }
+
+/* =========================================================================
+   Patrons ajoutés lors de l'audit d'alignement complet du script (les 6
+   chapitres + cold open + conclusion) — ces catégories sont fréquentes
+   dans le script mais n'avaient encore jamais été construites en HTML.
+   ========================================================================= */
+
+/* ---- MONTAGE ICÔNES / MONTAGE RAFALE ------------------------------------
+   Séquence rapide de plans très courts (0.3-1s chacun), un seul visible à
+   la fois — icône ou photo, avec une étiquette jaune qui s'accroche
+   brièvement. En jump cut sec (pas de fondu) pour "MONTAGE RAFALE", léger
+   fondu pour "MONTAGE ICÔNES". Un seul conteneur, un enfant .montage-item
+   par plan, visibilité pilotée par le timeline JS (voir
+   generator_helpers.py:montage_block()). */
+.montage-rafale { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.montage-item { position:absolute; display:flex; flex-direction:column; align-items:center; gap:18px; opacity:0; }
+.montage-item .montage-icon { width:140px; height:140px; }
+.montage-item .montage-label {
+  padding:8px 20px; background:#facc15; color:#1a1408; font-size:20px; font-weight:800;
+  letter-spacing:0.03em; border-radius:4px; white-space:nowrap;
+}
+
+/* ---- coupure au noir + texte massif -------------------------------------
+   Pour les moments les plus dramatiques (question rhétorique, révélation) :
+   cut sec (pas de fondu) vers un écran noir total, puis un texte blanc
+   massif apparaît en fondu rapide, centré, police austère. Différent du
+   tampon administratif (.stamp-text) : pas de rouge, pas de rotation, pas
+   de bordure — la gravité vient du noir total et de l'échelle du texte, pas
+   d'un style "verdict tamponné". */
+#hardcut-black { z-index:90; background:#000; opacity:0; pointer-events:none; }
+.hardcut-text {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding:0 160px; font-size:96px; font-weight:900; text-align:center; text-transform:uppercase;
+  color:#fff; line-height:1.15; letter-spacing:0.01em; opacity:0; z-index:91;
+}
+
+/* ---- TEXTE KINÉTIQUE -----------------------------------------------------
+   Mots qui s'écrivent un à un (write-on) ou un mot qui se substitue à un
+   autre (swap) — toujours en jaune, même famille visuelle que .hl (le
+   surlignage en ligne). Container positionnable en incrustation à côté du
+   visage (voir script : "à côté du visage du présentateur qui reste net")
+   ou plein cadre. */
+.kinetic-text { display:flex; flex-wrap:wrap; gap:0.35em; font-size:52px; font-weight:800; color:#facc15; }
+.kinetic-word { opacity:0; }
+/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT) */
+.kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
+.kinetic-swap .kinetic-swap-word { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; }
+
+/* ---- SURIMPRESSION LISTE (voile + liste qui s'accumule) -----------------
+   Ajouté 2026-09-17 (demande utilisateur, chapitre 2 : "plus de données,
+   plus de calcul, des réseaux de plus en plus profonds, et des modèles qui
+   apprennent leurs propres représentations"). Voile plein cadre SEMI-
+   TRANSPARENT par-dessus la vidéo en direct -- contrairement à
+   #hardcut-black (noir total, opaque), le présentateur reste visible,
+   assombri, en arrière-plan. Chaque ligne de la liste s'ajoute une à une,
+   au rythme de la parole, et reste affichée (la liste s'accumule) jusqu'à
+   la fin de la surimpression entière -- voir
+   generator_helpers.py:list_overlay_block(). Ne PAS mettre position/inset
+   directement sur .list-overlay : laisser .clip gérer entièrement le
+   plein cadre (voir le bug du 2026-09-17 sur .name-tag/.split2 -- une
+   règle qui ne redéfinit qu'une partie des 4 côtés d'un .clip entre en
+   conflit avec son inset:0). */
+.list-overlay { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:38px; padding:0 180px; background:rgba(3,5,10,0.74); opacity:0; pointer-events:none; }
+.list-overlay-item { display:flex; align-items:center; gap:28px; max-width:1560px; font-size:52px; font-weight:800; line-height:1.25; color:#fff; opacity:0; }
+.list-overlay-item::before { content:""; width:16px; height:16px; border-radius:50%; background:#3b82f6; flex:none; }
+
+/* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
+   Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,
+   qui s'allument une à une au rythme de la narration (ex. les trois villes
+   du chapitre 3, les trois batailles du chapitre 6). Cascade : une liste
+   qui s'empile verticalement, un élément à la fois (ex. les quatre secteurs
+   du chapitre 5). */
+.triptych { position:absolute; inset:0; display:flex; }
+.triptych-col { flex:1 1 33.333%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; opacity:0.35; }
+.triptych-col.active { opacity:1; }
+.triptych-col .triptych-icon { width:120px; height:120px; }
+.triptych-col .triptych-label { font-size:24px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:#fff; text-align:center; max-width:80%; }
+.cascade-list { position:absolute; inset:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:22px; padding-left:200px; }
+.cascade-item { display:flex; align-items:center; gap:20px; opacity:0; transform:translateY(14px); }
+.cascade-item .cascade-icon { width:56px; height:56px; flex:none; }
+.cascade-item .cascade-label { font-size:32px; font-weight:700; color:#e2e8f0; }
+
+/* ---- INSERT INTERFACE (mock d'UI, ex. zone de commentaire YouTube) ------
+   Faux élément d'interface sobre et crédible, en incrustation coin d'écran
+   — jamais un vrai logo/UI officiel, une reconstitution générique. */
+.interface-mock {
+  position:absolute; left:48px; bottom:48px; width:520px; padding:14px 18px;
+  background:#fff; border-radius:24px; box-shadow:0 18px 40px rgba(0,0,0,0.4);
+  display:flex; align-items:center; gap:12px; opacity:0;
+}
+.interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
+.interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
+.interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }
+
+/* ---- CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) --------
+   Version élevée, plein cadre, du "CARTON DE CHAPITRE" du script — jouée
+   une fois au tout début de chaque chapitre, avant que la vidéo en direct
+   ne démarre (voir STYLE_GUIDE §2bis). Photo + grain + halo + une ligne de
+   "lecture système" qui s'écrit en machine à écrire, puis kicker + titre +
+   trait. NE remplace PAS la barre de progression persistante
+   (#progress-track/#progress-label ci-dessus) — les deux coexistent.
+   Valeurs de titre calibrées le 2026-09-16 (v25 de chapitre-1.html) : tenue
+   >= ~5s pour laisser le titre respirer, police généreuse pour rester
+   lisible même sur un titre de chapitre à deux lignes. */
+.chapter-opening-card {
+  background:#030509;
+  z-index:50;
+}
+/* Le centrage vit sur .clip-inner (l'enfant réel de la scène), PAS sur
+   .chapter-opening-card lui-même : depuis l'introduction de .clip-inner
+   (sortie GSAP, voir plus haut), le .clip-inner enfant a position:absolute;
+   inset:0, ce qui remplit tout le cadre et annule tout centrage flex posé
+   sur son parent — le texte se retrouvait épinglé en haut-gauche au lieu
+   d'être centré. Régression réelle trouvée le 2026-09-16 (signalée par
+   l'utilisateur sur le carton "TORONTO, 2012" de cold-open.html, qui suit
+   exactement ce même patron). */
+.chapter-opening-card .clip-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.chapter-opening-card .chapter-opening-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-overlay {
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(59,130,246,0.06) 0px, rgba(59,130,246,0.06) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse at 50% 40%, rgba(30,58,95,0.45) 0%, rgba(2,4,8,0.93) 74%);
+}
+.chapter-opening-card .scanlines {
+  position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay; opacity:0.55;
+}
+.chapter-opening-card .chapter-opening-readout-wrap { overflow:hidden; width:0; }
+.chapter-opening-card .chapter-opening-readout {
+  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
+  color:#93c5fd; opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
+.chapter-opening-card .chapter-opening-title {
+  margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
+  line-height:1.2; opacity:0;
+}
+.chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
+
+html,body { margin:0; padding:0; background:#000; }
+
+/* ---- carton d'ouverture "TORONTO, 2012" — écho exact du cold-open --------
+   Le script demande explicitement "même traitement typographique qu'au cold
+   open" pour créer un effet de reconnaissance immédiate. Patron repris tel
+   quel de compositions/gen_cold_open.py (#intro-card). */
+#intro-card { background:#000; z-index:50; }
+#intro-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#intro-card .intro-readout-wrap { overflow:hidden; width:0; }
+#intro-card .intro-readout { font-family:"Courier New", monospace; font-size:46px; letter-spacing:0.16em; white-space:nowrap; color:#fff; font-weight:700; }
+#intro-card .intro-rule { margin-top:22px; width:0; height:3px; background:#3b82f6; }
+
+/* ---- badge Automathing (identique aux autres compositions) ---- */
+#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
+#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
+
+/* ---- fiche dossier à DEUX portraits (Krizhevsky / Sutskever) -------------
+   Réutilise .dossier-frame/.dossier-avatar/.dossier-label/.dossier-name du
+   kit (patron de #hinton-card, chapitre 1) — "même traitement que le
+   portrait de Hinton au chapitre précédent" (note du script). Plein cadre :
+   remplace la vidéo en direct le temps de la carte, comme pour Hinton. */
+#duo-card { z-index:32; background:#03050a; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+#duo-card .duo-row { display:flex; gap:70px; }
+#duo-card .dossier-frame { padding:48px 60px; gap:28px; flex-direction:column; text-align:center; }
+#duo-card .dossier-text { text-align:center; }
+#duo-card .dossier-avatar { width:120px; height:120px; }
+
+/* ---- CAPSULE-DONNÉE — mosaïque ImageNet (plein cadre) --------------------
+   Remplissage de grille simple, rangée par rangée (pas de dolly-zoom). */
+#imagenet-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#imagenet-card .imagenet-title { font-size:30px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:26px; }
+#imagenet-card .mosaic-grid { display:grid; grid-template-columns:repeat(16, 44px); grid-template-rows:repeat(9, 44px); gap:4px; }
+#imagenet-card .mosaic-tile { width:44px; height:44px; border-radius:3px; background:#1e3a5f; opacity:0; }
+#imagenet-card .imagenet-caption { margin-top:26px; font-size:26px; color:#cbd5e1; }
+
+/* ---- TRIPTYQUE "schéma en couches" (plein cadre) -------------------------
+   .triptych du kit n'a pas de fond opaque par défaut (conçu pour une
+   incrustation) ; ce chapitre le veut plein cadre, voir le script. */
+#layers-card { z-index:32; background:#03050a; }
+#layers-card .layers-title { position:absolute; top:120px; left:0; right:0; text-align:center; font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.08em; opacity:0; }
+.layer-icon { width:110px; height:110px; }
+
+/* ---- CADRE-TÉLÉ générique (photo archive encadrée + Ken Burns) ---------- */
+.archive-insert { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
+.archive-insert.bottom-left { align-items:flex-end; justify-content:flex-start; padding:0 0 130px 120px; }
+
+/* ---- CAPSULE-DONNÉE fondu croisé GPU -> réseau (incrustation) ----------- */
+.gpu-fade-icon { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; }
+.gpu-fade-title { font-size:26px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:18px; text-align:center; }
+
+/* ---- CAPSULE-DONNÉE — barres taux d'erreur (plein cadre) ---------------- */
+#bars-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#bars-card .bars-title { font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:34px; opacity:0; }
+.bar-col { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; width:180px; height:340px; }
+.bar-rect { width:120px; border-radius:6px 6px 0 0; }
+.bar-label { margin-top:16px; font-size:24px; font-weight:700; color:#fff; text-align:center; opacity:0; }
+
+/* ---- petits badges nominatifs (Fei-Fei Li / Yann LeCun) -----------------
+   FIX 2026-09-17 (retour utilisateur "l'endroit où on affiche les noms est
+   mal fait, pas premium") : cet élément porte class="name-tag clip". .clip
+   pose inset:0 (top/right/bottom/left = 0 d'un coup) ; cette règle-ci ne
+   redéfinit QUE left/bottom, donc top:0 et right:0 restaient hérités de
+   .clip -- résultat, la "badge" n'était pas une petite pastille compacte
+   mais une boîte géante (quasi tout l'écran, ancrée à gauche/bas) avec le
+   texte qui partait donc du coin haut-gauche par défaut du flux normal,
+   recouvrant "CHAPITRE X / Y". top:auto + right:auto redonnent à l'élément
+   une taille intrinsèque (contenu + padding) au lieu de s'étirer plein
+   cadre. */
+.name-tag { position:absolute; left:64px; bottom:64px; top:auto; right:auto; font-size:20px; font-weight:700; letter-spacing:0.04em; color:#e2e8f0; background:rgba(4,7,12,0.72); border:1px solid rgba(255,255,255,0.18); padding:10px 20px; border-radius:4px; opacity:0; z-index:35; pointer-events:none; }
+.name-tag .name-tag-role { display:block; margin-top:2px; font-size:14px; font-weight:400; font-style:italic; color:rgba(226,232,240,0.7); }
+
+/* ---- CAPSULE-DONNÉE "carte plate" (Toronto -> le monde) — plein cadre --- */
+#spread-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+#spread-card .spread-title { font-size:28px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:20px; opacity:0; }
+.spread-ring { fill:none; stroke:#3b82f6; opacity:0; }
+.spread-dot { fill:#60a5fa; opacity:0; }
+.spread-origin { fill:#facc15; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-m936" id="chapitre-2" data-composition-id="chapitre-2" data-width="3840" data-height="2160" data-fps="60" data-duration="196.32">
+<div data-hf-id="hf-7cuk" id="scale-2x">
+  <div data-hf-id="hf-t3gj" id="intro-card" class="clip" data-start="0" data-duration="2.2">
+    <div data-hf-id="hf-66fd" class="clip-inner" id="intro-card-inner">
+    <div data-hf-id="hf-r3fe" class="intro-readout-wrap" id="intro-readout-wrap"><div data-hf-id="hf-5mds" class="intro-readout" id="intro-readout">TORONTO, 2012</div></div>
+    <div data-hf-id="hf-7zoi" class="intro-rule" id="intro-rule"></div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
+    <video data-hf-id="hf-zwxd" id="main-video" class="clip" src="assets/chapitre_2_alexnet.mp4" muted data-start="2.2" data-duration="193.725" data-hf-media-start-basis="local"></video>
+  </div>
+  <audio data-hf-id="hf-phtm" id="main-audio" src="assets/chapitre_2_alexnet.mp4" data-start="2.2" data-duration="193.725" data-hf-media-start-basis="local"></audio>
+
+  <audio data-hf-id="hf-5y69" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="2.2" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-6zpw" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="4.2" data-duration="191.72" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
+
+  <div data-hf-id="hf-mmx0" id="grade" class="clip" data-start="2.2" data-duration="193.725"></div>
+  <div data-hf-id="hf-djs1" id="vignette" class="clip" data-start="2.2" data-duration="193.725"></div>
+  <div data-hf-id="hf-cw1v" id="grain-overlay" class="clip" data-start="0" data-duration="196.32" style="filter:url(#grain)"></div>
+
+  <svg data-hf-id="hf-8rgt" width="0" height="0" style="position:absolute">
+    <defs data-hf-id="hf-mh0t">
+      <filter data-hf-id="hf-mntt" id="grain">
+        <feturbulence data-hf-id="hf-9on9" type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+        <fecolormatrix data-hf-id="hf-d30s" in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <svg data-hf-id="hf-30jj" id="p2-particles" class="clip" data-start="0" data-duration="196.32" viewBox="0 0 1920 1080" width="1920" height="1080" style="z-index:20">
+    <circle data-hf-id="hf-v88g" class="particle" id="p2-particle-0" cx="120" cy="180" r="3" />
+    <circle data-hf-id="hf-z124" class="particle" id="p2-particle-1" cx="340" cy="620" r="2.5" />
+    <circle data-hf-id="hf-rn4f" class="particle" id="p2-particle-2" cx="560" cy="300" r="3.5" />
+    <circle data-hf-id="hf-ig1h" class="particle" id="p2-particle-3" cx="820" cy="780" r="2" />
+    <circle data-hf-id="hf-dmxp" class="particle" id="p2-particle-4" cx="1080" cy="220" r="3" />
+    <circle data-hf-id="hf-g0qp" class="particle" id="p2-particle-5" cx="1320" cy="640" r="2.5" />
+    <circle data-hf-id="hf-hxep" class="particle" id="p2-particle-6" cx="1560" cy="380" r="3" />
+    <circle data-hf-id="hf-j5le" class="particle" id="p2-particle-7" cx="1750" cy="860" r="2.5" />
+  </svg>
+
+  <div data-hf-id="hf-ztm4" id="progress-track" class="clip" data-start="0" data-duration="196.32">
+    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
+    <div data-hf-id="hf-r8le" id="progress-label">CHAPITRE 2 / 6</div>
+  </div>
+
+  <div data-hf-id="hf-auq9" id="duo-card" class="clip" data-start="6.4" data-duration="4.0">
+    <div data-hf-id="hf-zg8z" class="duo-row">
+      <div data-hf-id="hf-ab3l" class="dossier-frame" id="duo-frame-1">
+        <div data-hf-id="hf-9co5" class="corner tl"></div><div data-hf-id="hf-lrp7" class="corner tr"></div><div data-hf-id="hf-2cxv" class="corner bl"></div><div data-hf-id="hf-34pp" class="corner br"></div>
+        <svg data-hf-id="hf-wmg7" class="dossier-avatar" viewBox="0 0 150 150">
+          <circle data-hf-id="hf-idd6" cx="75" cy="52" r="34" fill="none" stroke="#60a5fa" stroke-width="3" />
+          <path data-hf-id="hf-k73y" d="M20 140 C20 95, 130 95, 130 140" fill="none" stroke="#60a5fa" stroke-width="3" />
+        </svg>
+        <div data-hf-id="hf-mo9x" class="dossier-text">
+          <div data-hf-id="hf-lz0y" class="dossier-label">ÉTUDIANT-CHERCHEUR</div>
+          <div data-hf-id="hf-1mn9" class="dossier-name">Alex Krizhevsky</div>
+          <div data-hf-id="hf-zudc" class="dossier-sub">Université de Toronto</div>
+        </div>
+      </div>
+      <div data-hf-id="hf-e97m" class="dossier-frame" id="duo-frame-2">
+        <div data-hf-id="hf-bfll" class="corner tl"></div><div data-hf-id="hf-hagr" class="corner tr"></div><div data-hf-id="hf-gwar" class="corner bl"></div><div data-hf-id="hf-ong1" class="corner br"></div>
+        <svg data-hf-id="hf-vhaf" class="dossier-avatar" viewBox="0 0 150 150">
+          <circle data-hf-id="hf-bkku" cx="75" cy="52" r="34" fill="none" stroke="#60a5fa" stroke-width="3" />
+          <path data-hf-id="hf-u9ya" d="M20 140 C20 95, 130 95, 130 140" fill="none" stroke="#60a5fa" stroke-width="3" />
+        </svg>
+        <div data-hf-id="hf-mrp5" class="dossier-text">
+          <div data-hf-id="hf-10wm" class="dossier-label">ÉTUDIANT-CHERCHEUR</div>
+          <div data-hf-id="hf-r31o" class="dossier-name">Ilya Sutskever</div>
+          <div data-hf-id="hf-cvi0" class="dossier-sub">Université de Toronto</div>
+        </div>
+      </div>
+    </div>
+    <div data-hf-id="hf-qydr" class="source-tag" style="opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-7pwv" id="imagenet-card" class="clip" data-start="15.4" data-duration="10.25">
+    <div data-hf-id="hf-q4u8" class="grid-bg"></div>
+    <div data-hf-id="hf-5m7u" class="imagenet-title" id="imagenet-title">IMAGENET</div>
+    <div data-hf-id="hf-uo0p" class="mosaic-grid">
+      <div data-hf-id="hf-ch3c" class="mosaic-tile" id="imn-tile-0" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-3ozq" class="mosaic-tile" id="imn-tile-1" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-f145" class="mosaic-tile" id="imn-tile-2" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-drm9" class="mosaic-tile" id="imn-tile-3" style="background:#24406a;"></div>
+      <div data-hf-id="hf-zrus" class="mosaic-tile" id="imn-tile-4" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-z4vm" class="mosaic-tile" id="imn-tile-5" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-pfwx" class="mosaic-tile" id="imn-tile-6" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-0vrx" class="mosaic-tile" id="imn-tile-7" style="background:#24406a;"></div>
+      <div data-hf-id="hf-31gg" class="mosaic-tile" id="imn-tile-8" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-0ja6" class="mosaic-tile" id="imn-tile-9" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-ybni" class="mosaic-tile" id="imn-tile-10" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-gyu6" class="mosaic-tile" id="imn-tile-11" style="background:#24406a;"></div>
+      <div data-hf-id="hf-pb1v" class="mosaic-tile" id="imn-tile-12" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-vhjd" class="mosaic-tile" id="imn-tile-13" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-ryga" class="mosaic-tile" id="imn-tile-14" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-i07u" class="mosaic-tile" id="imn-tile-15" style="background:#24406a;"></div>
+      <div data-hf-id="hf-e7t4" class="mosaic-tile" id="imn-tile-16" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-r4ax" class="mosaic-tile" id="imn-tile-17" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-hj2j" class="mosaic-tile" id="imn-tile-18" style="background:#24406a;"></div>
+      <div data-hf-id="hf-8diw" class="mosaic-tile" id="imn-tile-19" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-d5t7" class="mosaic-tile" id="imn-tile-20" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-rjl2" class="mosaic-tile" id="imn-tile-21" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-51pg" class="mosaic-tile" id="imn-tile-22" style="background:#24406a;"></div>
+      <div data-hf-id="hf-i10r" class="mosaic-tile" id="imn-tile-23" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-305z" class="mosaic-tile" id="imn-tile-24" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-eviq" class="mosaic-tile" id="imn-tile-25" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-vbcw" class="mosaic-tile" id="imn-tile-26" style="background:#24406a;"></div>
+      <div data-hf-id="hf-j81j" class="mosaic-tile" id="imn-tile-27" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-c37n" class="mosaic-tile" id="imn-tile-28" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-q4y6" class="mosaic-tile" id="imn-tile-29" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-nqlp" class="mosaic-tile" id="imn-tile-30" style="background:#24406a;"></div>
+      <div data-hf-id="hf-xdmq" class="mosaic-tile" id="imn-tile-31" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-faxu" class="mosaic-tile" id="imn-tile-32" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-u38i" class="mosaic-tile" id="imn-tile-33" style="background:#24406a;"></div>
+      <div data-hf-id="hf-39az" class="mosaic-tile" id="imn-tile-34" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-cff5" class="mosaic-tile" id="imn-tile-35" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-mxbq" class="mosaic-tile" id="imn-tile-36" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-8rom" class="mosaic-tile" id="imn-tile-37" style="background:#24406a;"></div>
+      <div data-hf-id="hf-0zj3" class="mosaic-tile" id="imn-tile-38" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-6ted" class="mosaic-tile" id="imn-tile-39" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-vrxd" class="mosaic-tile" id="imn-tile-40" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-3ix9" class="mosaic-tile" id="imn-tile-41" style="background:#24406a;"></div>
+      <div data-hf-id="hf-4hh0" class="mosaic-tile" id="imn-tile-42" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-t8oy" class="mosaic-tile" id="imn-tile-43" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-50fp" class="mosaic-tile" id="imn-tile-44" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-gbcx" class="mosaic-tile" id="imn-tile-45" style="background:#24406a;"></div>
+      <div data-hf-id="hf-44e0" class="mosaic-tile" id="imn-tile-46" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-2046" class="mosaic-tile" id="imn-tile-47" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-nwyw" class="mosaic-tile" id="imn-tile-48" style="background:#24406a;"></div>
+      <div data-hf-id="hf-g8lb" class="mosaic-tile" id="imn-tile-49" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-dv6a" class="mosaic-tile" id="imn-tile-50" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-8jlj" class="mosaic-tile" id="imn-tile-51" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-t5dp" class="mosaic-tile" id="imn-tile-52" style="background:#24406a;"></div>
+      <div data-hf-id="hf-u24y" class="mosaic-tile" id="imn-tile-53" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-e38m" class="mosaic-tile" id="imn-tile-54" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-p1ln" class="mosaic-tile" id="imn-tile-55" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-4fjl" class="mosaic-tile" id="imn-tile-56" style="background:#24406a;"></div>
+      <div data-hf-id="hf-vkja" class="mosaic-tile" id="imn-tile-57" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-7kru" class="mosaic-tile" id="imn-tile-58" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-nypr" class="mosaic-tile" id="imn-tile-59" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-l39m" class="mosaic-tile" id="imn-tile-60" style="background:#24406a;"></div>
+      <div data-hf-id="hf-8rwp" class="mosaic-tile" id="imn-tile-61" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-6gqt" class="mosaic-tile" id="imn-tile-62" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-pit0" class="mosaic-tile" id="imn-tile-63" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-arr4" class="mosaic-tile" id="imn-tile-64" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-kbge" class="mosaic-tile" id="imn-tile-65" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-snf1" class="mosaic-tile" id="imn-tile-66" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-d0ax" class="mosaic-tile" id="imn-tile-67" style="background:#24406a;"></div>
+      <div data-hf-id="hf-4t2c" class="mosaic-tile" id="imn-tile-68" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-c53m" class="mosaic-tile" id="imn-tile-69" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-2wa8" class="mosaic-tile" id="imn-tile-70" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-qcck" class="mosaic-tile" id="imn-tile-71" style="background:#24406a;"></div>
+      <div data-hf-id="hf-21np" class="mosaic-tile" id="imn-tile-72" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-j26j" class="mosaic-tile" id="imn-tile-73" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-nd64" class="mosaic-tile" id="imn-tile-74" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-e4f4" class="mosaic-tile" id="imn-tile-75" style="background:#24406a;"></div>
+      <div data-hf-id="hf-kis1" class="mosaic-tile" id="imn-tile-76" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-yj7b" class="mosaic-tile" id="imn-tile-77" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-i7y0" class="mosaic-tile" id="imn-tile-78" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-1y64" class="mosaic-tile" id="imn-tile-79" style="background:#24406a;"></div>
+      <div data-hf-id="hf-z8ht" class="mosaic-tile" id="imn-tile-80" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-3x8w" class="mosaic-tile" id="imn-tile-81" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-mlkm" class="mosaic-tile" id="imn-tile-82" style="background:#24406a;"></div>
+      <div data-hf-id="hf-wf0l" class="mosaic-tile" id="imn-tile-83" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-s8gd" class="mosaic-tile" id="imn-tile-84" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-vojw" class="mosaic-tile" id="imn-tile-85" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-xu0i" class="mosaic-tile" id="imn-tile-86" style="background:#24406a;"></div>
+      <div data-hf-id="hf-glkh" class="mosaic-tile" id="imn-tile-87" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-vo49" class="mosaic-tile" id="imn-tile-88" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-hx08" class="mosaic-tile" id="imn-tile-89" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-1vvv" class="mosaic-tile" id="imn-tile-90" style="background:#24406a;"></div>
+      <div data-hf-id="hf-rbrs" class="mosaic-tile" id="imn-tile-91" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-2pdg" class="mosaic-tile" id="imn-tile-92" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-h2qd" class="mosaic-tile" id="imn-tile-93" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-ay9z" class="mosaic-tile" id="imn-tile-94" style="background:#24406a;"></div>
+      <div data-hf-id="hf-25n8" class="mosaic-tile" id="imn-tile-95" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-vjh8" class="mosaic-tile" id="imn-tile-96" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-dws0" class="mosaic-tile" id="imn-tile-97" style="background:#24406a;"></div>
+      <div data-hf-id="hf-ou0d" class="mosaic-tile" id="imn-tile-98" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-7g43" class="mosaic-tile" id="imn-tile-99" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-ypqe" class="mosaic-tile" id="imn-tile-100" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-3oly" class="mosaic-tile" id="imn-tile-101" style="background:#24406a;"></div>
+      <div data-hf-id="hf-1gnf" class="mosaic-tile" id="imn-tile-102" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-p1wh" class="mosaic-tile" id="imn-tile-103" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-b69e" class="mosaic-tile" id="imn-tile-104" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-b102" class="mosaic-tile" id="imn-tile-105" style="background:#24406a;"></div>
+      <div data-hf-id="hf-pl5j" class="mosaic-tile" id="imn-tile-106" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-57ql" class="mosaic-tile" id="imn-tile-107" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-o966" class="mosaic-tile" id="imn-tile-108" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-6z5a" class="mosaic-tile" id="imn-tile-109" style="background:#24406a;"></div>
+      <div data-hf-id="hf-csrq" class="mosaic-tile" id="imn-tile-110" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-khf8" class="mosaic-tile" id="imn-tile-111" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-23za" class="mosaic-tile" id="imn-tile-112" style="background:#24406a;"></div>
+      <div data-hf-id="hf-wmnp" class="mosaic-tile" id="imn-tile-113" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-lyl9" class="mosaic-tile" id="imn-tile-114" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-gpss" class="mosaic-tile" id="imn-tile-115" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-nfj6" class="mosaic-tile" id="imn-tile-116" style="background:#24406a;"></div>
+      <div data-hf-id="hf-lech" class="mosaic-tile" id="imn-tile-117" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-jqcp" class="mosaic-tile" id="imn-tile-118" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-48dk" class="mosaic-tile" id="imn-tile-119" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-1pt1" class="mosaic-tile" id="imn-tile-120" style="background:#24406a;"></div>
+      <div data-hf-id="hf-rhiy" class="mosaic-tile" id="imn-tile-121" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-uc7u" class="mosaic-tile" id="imn-tile-122" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-qi7j" class="mosaic-tile" id="imn-tile-123" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-f655" class="mosaic-tile" id="imn-tile-124" style="background:#24406a;"></div>
+      <div data-hf-id="hf-eowu" class="mosaic-tile" id="imn-tile-125" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-l3am" class="mosaic-tile" id="imn-tile-126" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-droz" class="mosaic-tile" id="imn-tile-127" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-zjgn" class="mosaic-tile" id="imn-tile-128" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-b5rx" class="mosaic-tile" id="imn-tile-129" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-cu3n" class="mosaic-tile" id="imn-tile-130" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-9j3n" class="mosaic-tile" id="imn-tile-131" style="background:#24406a;"></div>
+      <div data-hf-id="hf-swj2" class="mosaic-tile" id="imn-tile-132" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-tql8" class="mosaic-tile" id="imn-tile-133" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-mgpr" class="mosaic-tile" id="imn-tile-134" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-k5cf" class="mosaic-tile" id="imn-tile-135" style="background:#24406a;"></div>
+      <div data-hf-id="hf-0xsa" class="mosaic-tile" id="imn-tile-136" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-9vjs" class="mosaic-tile" id="imn-tile-137" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-wltn" class="mosaic-tile" id="imn-tile-138" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-ciu3" class="mosaic-tile" id="imn-tile-139" style="background:#24406a;"></div>
+      <div data-hf-id="hf-gh49" class="mosaic-tile" id="imn-tile-140" style="background:#1e3a5f;"></div>
+      <div data-hf-id="hf-pvtb" class="mosaic-tile" id="imn-tile-141" style="background:#2a4a75;"></div>
+      <div data-hf-id="hf-sfys" class="mosaic-tile" id="imn-tile-142" style="background:#1e293b;"></div>
+      <div data-hf-id="hf-o9dk" class="mosaic-tile" id="imn-tile-143" style="background:#24406a;"></div>
+    </div>
+    <div data-hf-id="hf-wt06" class="imagenet-caption" id="imagenet-caption">1000 catégories · des millions d’images</div>
+    <div data-hf-id="hf-wv8o" class="source-tag" style="opacity:1;">Source : ImageNet</div>
+  </div>
+
+  <div data-hf-id="hf-4ck3" id="icon-montage" class="clip montage-rafale" data-start="25.7" data-duration="5.7" style="justify-content:flex-end; padding-right:150px;">
+    <div data-hf-id="hf-md6v" class="montage-item" id="icon-montage-0">
+      <svg data-hf-id="hf-t7ei" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><ellipse data-hf-id="hf-3eo3" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-vw59" cx="34" cy="38" r="14" /><path data-hf-id="hf-e7kc" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-00vn" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-zpcs" class="montage-label">1 catégorie parmi 1000</div>
+    </div>
+    <div data-hf-id="hf-g7h2" class="montage-item" id="icon-montage-1">
+      <svg data-hf-id="hf-53ry" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><path data-hf-id="hf-0dc7" d="M14 62 L22 40 Q26 32 36 32 L64 32 Q74 32 78 40 L86 62" stroke-linecap="round" stroke-linejoin="round" /><rect data-hf-id="hf-ee0b" x="10" y="62" width="80" height="16" rx="4" /><circle data-hf-id="hf-msng" cx="28" cy="80" r="8" fill="#03050a" /><circle data-hf-id="hf-m77v" cx="72" cy="80" r="8" fill="#03050a" /></svg>
+      <div data-hf-id="hf-z5lg" class="montage-label">1 catégorie parmi 1000</div>
+    </div>
+    <div data-hf-id="hf-c9d1" class="montage-item" id="icon-montage-2">
+      <svg data-hf-id="hf-5i2z" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><ellipse data-hf-id="hf-tu4t" cx="40" cy="72" rx="18" ry="12" /><path data-hf-id="hf-skq3" d="M52 68 L74 20" stroke-linecap="round" /><path data-hf-id="hf-l6ld" d="M74 20 L86 16" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-xyod" class="montage-label">1 catégorie parmi 1000</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-c1bm" id="split2-approches" class="clip split2" data-start="34.7" data-duration="31.2">
+    <div data-hf-id="hf-qhun" class="split2-panel" id="split2-approches-a">
+      <div data-hf-id="hf-wbnc" class="grid-bg"></div>
+      <div data-hf-id="hf-veop" style="position:relative; margin-bottom:70px;"><svg data-hf-id="hf-5we0" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><ellipse data-hf-id="hf-u4xv" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-g49d" cx="34" cy="38" r="14" /><path data-hf-id="hf-quhw" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gtlf" cx="30" cy="36" r="2" fill="#93c5fd" /></svg></div>
+      <div data-hf-id="hf-c3t9" style="position:relative; font-size:26px; font-weight:700; color:#fff; text-align:center; max-width:70%; margin-bottom:60px;">Caractéristiques définies à la main</div>
+      <div data-hf-id="hf-8inj" class="split2-label">Approche traditionnelle</div>
+    </div>
+    <div data-hf-id="hf-3zra" class="split2-divider"></div>
+    <div data-hf-id="hf-htys" class="split2-panel" id="split2-approches-b">
+      <div data-hf-id="hf-v4q9" class="grid-bg"></div>
+      <div data-hf-id="hf-xw94" style="position:relative; font-size:26px; font-weight:700; color:#fff; text-align:center; max-width:70%; margin-bottom:60px;">Le réseau apprend ses propres caractéristiques</div>
+      <div data-hf-id="hf-jtq7" class="split2-label">Approche de Toronto (2012)</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;" data-hidden="">
+    <div data-hf-id="hf-7jpw" class="montage-item" id="dog-montage-0">
+      <svg data-hf-id="hf-rtoe" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:none; transform:none;"><ellipse data-hf-id="hf-tqmu" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-hb6g" cx="34" cy="38" r="14" /><path data-hf-id="hf-pnkt" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gfae" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-i5dq" class="montage-label">de face</div>
+    </div>
+    <div data-hf-id="hf-8bdp" class="montage-item" id="dog-montage-1">
+      <svg data-hf-id="hf-8z0r" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:none; transform:scaleX(-1);"><ellipse data-hf-id="hf-tcbt" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-gwvf" cx="34" cy="38" r="14" /><path data-hf-id="hf-q1vu" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-g0zd" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-f83x" class="montage-label">de profil</div>
+    </div>
+    <div data-hf-id="hf-eh3i" class="montage-item" id="dog-montage-2">
+      <svg data-hf-id="hf-0ssq" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:brightness(0.4); transform:none;"><ellipse data-hf-id="hf-sy0s" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-exca" cx="34" cy="38" r="14" /><path data-hf-id="hf-s1ez" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-fmoc" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-tr9m" class="montage-label">dans l'ombre</div>
+    </div>
+    <div data-hf-id="hf-if7j" class="montage-item" id="dog-montage-3">
+      <svg data-hf-id="hf-b3rj" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:opacity(0.5); transform:none;"><ellipse data-hf-id="hf-sjpr" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-ej19" cx="34" cy="38" r="14" /><path data-hf-id="hf-sfq0" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-f8db" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-p5m6" class="montage-label">partiellement caché</div>
+    </div>
+    <div data-hf-id="hf-mdbk" class="montage-item" id="dog-montage-4">
+      <svg data-hf-id="hf-2q22" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:brightness(1.4) saturate(0.3); transform:none;"><ellipse data-hf-id="hf-s5eq" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-fpyc" cx="34" cy="38" r="14" /><path data-hf-id="hf-r8sx" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-eu2a" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
+      <div data-hf-id="hf-6nxx" class="montage-label">dans la neige</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-b1i5" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+  <div data-hf-id="hf-1pl5" id="stamp-impossible-wrap" class="clip stamp-wrap" data-start="53.1" data-duration="1.7">
+    <div data-hf-id="hf-0dzl" class="stamp-text" id="stamp-impossible" style="font-size:88px; padding:12px 34px;">Impossible.</div>
+  </div>
+  </div>
+  <div data-hf-id="hf-ouzd" class="hero clip hero--right" id="hero-hw-apprend" data-start="63.2" data-duration="1.6"><div data-hf-id="hf-3m4e" class="hero-text" id="hw-apprend">APPREND LUI-MÊME</div></div>
+  <div data-hf-id="hf-m0bv" id="layers-card" class="clip" data-start="65.8" data-duration="7.2">
+    <div data-hf-id="hf-vj1a" class="grid-bg"></div>
+    <div data-hf-id="hf-x448" class="layers-title" id="layers-title">APPRENTISSAGE PROFOND — PLUSIEURS COUCHES</div>
+  <div data-hf-id="hf-bvqr" id="layers-triptych" class="clip triptych" data-start="65.8" data-duration="7.2">
+    <div data-hf-id="hf-eq6r" class="triptych-col" id="layers-triptych-col0">
+      <svg data-hf-id="hf-d0mz" class="layer-icon" viewBox="0 0 100 100" width="110" height="110" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-izrx" d="M10 30 L90 30 M10 50 L90 50 M10 70 L90 70" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-rt67" class="triptych-label">Lignes et contrastes</div>
+    </div>
+    <div data-hf-id="hf-as2q" class="triptych-col" id="layers-triptych-col1">
+      <svg data-hf-id="hf-uvy3" class="layer-icon" viewBox="0 0 100 100" width="110" height="110" fill="none" stroke="#93c5fd" stroke-width="5"><rect data-hf-id="hf-c6g6" x="12" y="12" width="30" height="30" /><circle data-hf-id="hf-n52s" cx="72" cy="28" r="16" /><path data-hf-id="hf-o0oz" d="M20 60 L50 90 L80 60 Z" /></svg>
+      <div data-hf-id="hf-yjca" class="triptych-label">Formes</div>
+    </div>
+    <div data-hf-id="hf-6typ" class="triptych-col" id="layers-triptych-col2">
+      <svg data-hf-id="hf-5fme" class="layer-icon" viewBox="0 0 100 100" width="110" height="110" fill="none" stroke="#22c55e" stroke-width="4"><ellipse data-hf-id="hf-rr3p" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-fbnb" cx="34" cy="38" r="14" /><path data-hf-id="hf-rn3y" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-hcrv" cx="30" cy="36" r="2" fill="#22c55e" /></svg>
+      <div data-hf-id="hf-zqj4" class="triptych-label">Objet complet</div>
+    </div>
+  </div>
+    <div data-hf-id="hf-m7b2" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-unhy" id="gpu-photo" class="archive-insert clip" data-start="82.9" data-duration="11.8">
+    <div data-hf-id="hf-nbut" class="photo-card" id="gpu-photo-card">
+      <img data-hf-id="hf-hqsp" src="assets/photos/vintage-computer.jpg" alt="">
+      <div data-hf-id="hf-8yzb" class="photo-caption">Calcul à l’époque</div>
+    </div>
+    <div data-hf-id="hf-of96" class="source-tag" id="gpu-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-oxs8" id="gpu-fade-wrap" class="clip" data-start="94.8" data-duration="8.0" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:74px;">
+    <div data-hf-id="hf-3vyl" class="map-panel" id="gpu-fade-panel">
+      <div data-hf-id="hf-hdyd" class="gpu-fade-title">Des GPU de jeu vidéo… aux réseaux de neurones</div>
+      <div data-hf-id="hf-mtrc" style="position:relative; width:190px; height:190px;">
+        <div data-hf-id="hf-gn4n" class="gpu-fade-icon" id="gpu-fade-a" style="opacity:1;"><svg data-hf-id="hf-ee2w" viewBox="0 0 100 100" width="170" height="170" fill="none" stroke="#93c5fd" stroke-width="4"><rect data-hf-id="hf-12st" x="14" y="24" width="72" height="46" rx="4" /><path data-hf-id="hf-uh88" d="M22 70 V80 M34 70 V80 M46 70 V80 M58 70 V80 M70 70 V80 M78 70 V80" stroke-linecap="round" /><rect data-hf-id="hf-sg23" x="24" y="34" width="52" height="26" rx="2" /></svg></div>
+        <div data-hf-id="hf-oys7" class="gpu-fade-icon" id="gpu-fade-b"><svg data-hf-id="hf-virn" viewBox="0 0 100 100" width="170" height="170" fill="none" stroke="#93c5fd" stroke-width="3"><circle data-hf-id="hf-qezf" cx="20" cy="30" r="6" /><circle data-hf-id="hf-ykqf" cx="20" cy="70" r="6" /><circle data-hf-id="hf-dhx5" cx="50" cy="20" r="6" /><circle data-hf-id="hf-3dpg" cx="50" cy="50" r="6" /><circle data-hf-id="hf-wsob" cx="50" cy="80" r="6" /><circle data-hf-id="hf-dglx" cx="80" cy="30" r="6" /><circle data-hf-id="hf-fzqx" cx="80" cy="70" r="6" /><path data-hf-id="hf-3w2y" d="M25 30 L45 20 M25 30 L45 50 M25 70 L45 50 M25 70 L45 80 M55 20 L75 30 M55 50 L75 30 M55 50 L75 70 M55 80 L75 70" stroke-linecap="round" /></svg></div>
+      </div>
+    </div>
+  </div>
+  <div data-hf-id="hf-ct6b" id="nvidia-photo" class="archive-insert bottom-left clip" data-start="107.5" data-duration="2.7">
+    <div data-hf-id="hf-xn56" class="photo-card" id="nvidia-photo-card">
+      <img data-hf-id="hf-9rsv" src="assets/photos/circuit-board.jpg" alt="">
+      <div data-hf-id="hf-aqhz" class="photo-caption">Deux cartes graphiques NVIDIA</div>
+    </div>
+    <div data-hf-id="hf-9fh5" class="source-tag" id="nvidia-photo-source" style="opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-owa9" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+  <div data-hf-id="hf-c5gg" id="rupture-text-wrap" class="clip stamp-wrap" data-start="124.8" data-duration="1.8">
+    <div data-hf-id="hf-52u5" class="stamp-text" id="rupture-text">Rupture</div>
+  </div>
+  </div>
+  <div data-hf-id="hf-js07" id="bars-card" class="clip" data-start="111.6" data-duration="8.9">
+    <div data-hf-id="hf-uc47" class="grid-bg"></div>
+    <div data-hf-id="hf-aevg" class="bars-title" id="bars-title">TAUX D’ERREUR (TOP-5, ILSVRC 2012)</div>
+    <div data-hf-id="hf-8h2k" style="display:flex; align-items:flex-end; gap:80px;">
+      <div data-hf-id="hf-coo6" class="bar-col">
+        <div data-hf-id="hf-ipqo" class="bar-rect" id="bar-alexnet" style="height:0px; background:#ef4444;"></div>
+        <div data-hf-id="hf-my6j" class="bar-label" id="bar-alexnet-label">AlexNet<br data-hf-id="hf-x5px">15,3&#160;%</div>
+      </div>
+      <div data-hf-id="hf-pkru" class="bar-col">
+        <div data-hf-id="hf-iaj1" class="bar-rect" id="bar-second" style="height:0px; background:#3b82f6;"></div>
+        <div data-hf-id="hf-5mct" class="bar-label" id="bar-second-label">2<sup data-hf-id="hf-z32m">e</sup> équipe<br data-hf-id="hf-rsrt">26,2&#160;%</div>
+      </div>
+    </div>
+    <div data-hf-id="hf-glf0" class="source-tag" style="opacity:1;">Source : ILSVRC 2012</div>
+  </div>
+
+  <div data-hf-id="hf-9ohz" class="name-tag clip" id="tag-feifeili" data-start="133.8" data-duration="2.0">
+    Fei-Fei Li<span data-hf-id="hf-01es" class="name-tag-role">ImageNet</span>
+  </div>
+  <div data-hf-id="hf-6nip" class="name-tag clip" id="tag-lecun" data-start="135.8" data-duration="3.8">
+    Yann LeCun<span data-hf-id="hf-2ze1" class="name-tag-role">réseaux convolutifs</span>
+  </div>
+  <div data-hf-id="hf-q37c" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+  <div data-hf-id="hf-8kpt" id="stamp-fonctionne-wrap" class="clip stamp-wrap" data-start="147.9" data-duration="2.0">
+    <div data-hf-id="hf-xdfp" class="stamp-text" id="stamp-fonctionne" style="font-size:80px; padding:12px 34px;">Ça fonctionne.</div>
+  </div>
+  </div>
+  <div data-hf-id="hf-5bvo" class="hero clip hero--right" id="hero-hw-gpu" data-start="152.6" data-duration="1.8"><div data-hf-id="hf-zlsl" class="hero-text" id="hw-gpu">PUISSANCE DES GPU</div></div>
+  <div data-hf-id="hf-tr1w" id="spread-card" class="clip" data-start="160.2" data-duration="3.4">
+    <div data-hf-id="hf-uqf8" class="grid-bg"></div>
+    <div data-hf-id="hf-t1l0" class="spread-title" id="spread-title">L’INDUSTRIE INVESTIT MASSIVEMENT</div>
+    <svg data-hf-id="hf-dhve" viewBox="0 0 700 340" width="700" height="340">
+      <circle data-hf-id="hf-n40a" class="spread-ring" id="spread-ring-0" cx="350" cy="170" r="4" />
+      <circle data-hf-id="hf-umrj" class="spread-ring" id="spread-ring-1" cx="350" cy="170" r="4" />
+      <circle data-hf-id="hf-v9zw" class="spread-ring" id="spread-ring-2" cx="350" cy="170" r="4" />
+      <circle data-hf-id="hf-tift" class="spread-ring" id="spread-ring-3" cx="350" cy="170" r="4" />
+      <circle data-hf-id="hf-bjqy" class="spread-origin" cx="350" cy="170" r="9" />
+        <circle data-hf-id="hf-1qdc" class="spread-dot" id="spread-dot-0" cx="150" cy="90" r="7" />
+        <circle data-hf-id="hf-irga" class="spread-dot" id="spread-dot-1" cx="620" cy="60" r="7" />
+        <circle data-hf-id="hf-lmcz" class="spread-dot" id="spread-dot-2" cx="60" cy="260" r="7" />
+        <circle data-hf-id="hf-v31e" class="spread-dot" id="spread-dot-3" cx="560" cy="300" r="7" />
+        <circle data-hf-id="hf-oy6b" class="spread-dot" id="spread-dot-4" cx="330" cy="40" r="7" />
+        <circle data-hf-id="hf-mghn" class="spread-dot" id="spread-dot-5" cx="400" cy="320" r="7" />
+        <circle data-hf-id="hf-xnmm" class="spread-dot" id="spread-dot-6" cx="520" cy="200" r="7" />
+        <circle data-hf-id="hf-lx0o" class="spread-dot" id="spread-dot-7" cx="120" cy="180" r="7" />
+    </svg>
+    <div data-hf-id="hf-tvfm" class="source-tag" style="opacity:1;">Source : illustration</div>
+  </div>
+
+  <div data-hf-id="hf-97lz" id="explose-montage" class="clip montage-rafale" data-start="163.6" data-duration="14.8" style="justify-content:flex-end; padding-right:150px;">
+    <div data-hf-id="hf-i14k" class="montage-item" id="explose-montage-0">
+      <svg data-hf-id="hf-seyz" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-k65y" d="M10 50 L25 50 L32 25 L42 75 L52 35 L60 65 L68 50 L90 50" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div data-hf-id="hf-rezk" class="montage-label">Voix</div>
+    </div>
+    <div data-hf-id="hf-issd" class="montage-item" id="explose-montage-1">
+      <svg data-hf-id="hf-u42z" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-rab0" d="M8 50 Q50 15 92 50 Q50 85 8 50 Z" /><circle data-hf-id="hf-7ykd" cx="50" cy="50" r="14" /></svg>
+      <div data-hf-id="hf-fu96" class="montage-label">Vision</div>
+    </div>
+    <div data-hf-id="hf-mqwe" class="montage-item" id="explose-montage-2">
+      <svg data-hf-id="hf-348t" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><rect data-hf-id="hf-h60m" x="15" y="20" width="30" height="20" rx="2" /><rect data-hf-id="hf-tql2" x="55" y="60" width="30" height="20" rx="2" /><path data-hf-id="hf-2ac2" d="M30 40 V80 M70 20 V60" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-qtgb" class="montage-label">Traduction</div>
+    </div>
+    <div data-hf-id="hf-qp0f" class="montage-item" id="explose-montage-3">
+      <svg data-hf-id="hf-pnsu" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-nwyp" d="M35 25 L15 50 L35 75 M65 25 L85 50 L65 75" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div data-hf-id="hf-reef" class="montage-label">Code</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-3ego" class="hero clip hero--right" id="hero-hw-recette" data-start="182.9" data-duration="1.6"><div data-hf-id="hf-ce49" class="hero-text" id="hw-recette">LA RECETTE</div></div>
+  <div data-hf-id="hf-8g8j" id="recipe-list" class="clip list-overlay" data-start="185.9" data-duration="7.7">
+    <div data-hf-id="hf-d4wd" class="list-overlay-item" id="recipe-list-item0">Plus de données</div>
+    <div data-hf-id="hf-5suf" class="list-overlay-item" id="recipe-list-item1">Plus de calculs</div>
+    <div data-hf-id="hf-yp78" class="list-overlay-item" id="recipe-list-item2">Des réseaux de plus en plus profonds</div>
+    <div data-hf-id="hf-3pcj" class="list-overlay-item" id="recipe-list-item3">Des modèles qui apprennent leurs propres représentations</div>
+  </div>
+  <div data-hf-id="hf-jmgp" id="badge" class="clip" data-start="4.2" data-duration="191.72">
+    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
+  </div>
+  <div data-hf-id="hf-q3cg" id="fade-out" class="clip" data-start="195.57" data-duration="0.75"></div>
+
+</div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+window.__timelines["chapitre-2"] = gsap.timeline({ paused: true });
+const tl = window.__timelines["chapitre-2"];
+tl.to("#intro-readout-wrap", { width: 500, duration: 0.6, ease: "steps(13)" }, 0.1);
+tl.to("#intro-rule", { width: 300, duration: 0.35, ease: "power2.out" }, 0.75);
+tl.to("#intro-card-inner", { opacity: 0, duration: 0.25 }, 1.9);
+tl.set("#intro-card-inner", { opacity: 0 }, 2.2);
+tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 193.725, ease: "none" }, 2.2);
+tl.set("#main-video", { x: 0 }, 0);
+tl.to("#p2-particle-0", { x: 26, y: -18, duration: 6.0, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.0);
+tl.to("#p2-particle-1", { x: 36, y: -26, duration: 7.3, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.4);
+tl.to("#p2-particle-2", { x: 46, y: -34, duration: 8.6, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.8);
+tl.to("#p2-particle-3", { x: 26, y: -42, duration: 9.9, ease: "sine.inOut", yoyo: true, repeat: 20 }, 1.2);
+tl.to("#p2-particle-4", { x: 36, y: -18, duration: 11.2, ease: "sine.inOut", yoyo: true, repeat: 20 }, 1.6);
+tl.to("#p2-particle-5", { x: 46, y: -26, duration: 6.0, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.0);
+tl.to("#p2-particle-6", { x: 26, y: -34, duration: 7.3, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.4);
+tl.to("#p2-particle-7", { x: 36, y: -42, duration: 8.6, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.8);
+tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 196.32, ease: "none" }, 0);
+tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
+tl.fromTo("#duo-frame-1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 6.5);
+tl.fromTo("#duo-frame-2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 6.75);
+tl.to("#duo-card", { opacity: 0, duration: 0.3 }, 10.1);
+tl.fromTo("#imn-tile-0", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.6);
+tl.fromTo("#imn-tile-1", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.612);
+tl.fromTo("#imn-tile-2", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.624);
+tl.fromTo("#imn-tile-3", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.636);
+tl.fromTo("#imn-tile-4", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.648);
+tl.fromTo("#imn-tile-5", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.66);
+tl.fromTo("#imn-tile-6", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.672);
+tl.fromTo("#imn-tile-7", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.684);
+tl.fromTo("#imn-tile-8", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.696);
+tl.fromTo("#imn-tile-9", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.708);
+tl.fromTo("#imn-tile-10", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.72);
+tl.fromTo("#imn-tile-11", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.732);
+tl.fromTo("#imn-tile-12", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.744);
+tl.fromTo("#imn-tile-13", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.756);
+tl.fromTo("#imn-tile-14", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.768);
+tl.fromTo("#imn-tile-15", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.78);
+tl.fromTo("#imn-tile-16", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.227);
+tl.fromTo("#imn-tile-17", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.239);
+tl.fromTo("#imn-tile-18", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.251);
+tl.fromTo("#imn-tile-19", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.263);
+tl.fromTo("#imn-tile-20", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.275);
+tl.fromTo("#imn-tile-21", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.287);
+tl.fromTo("#imn-tile-22", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.299);
+tl.fromTo("#imn-tile-23", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.311);
+tl.fromTo("#imn-tile-24", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.323);
+tl.fromTo("#imn-tile-25", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.335);
+tl.fromTo("#imn-tile-26", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.347);
+tl.fromTo("#imn-tile-27", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.359);
+tl.fromTo("#imn-tile-28", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.371);
+tl.fromTo("#imn-tile-29", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.383);
+tl.fromTo("#imn-tile-30", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.395);
+tl.fromTo("#imn-tile-31", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.407);
+tl.fromTo("#imn-tile-32", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.853);
+tl.fromTo("#imn-tile-33", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.865);
+tl.fromTo("#imn-tile-34", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.877);
+tl.fromTo("#imn-tile-35", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.889);
+tl.fromTo("#imn-tile-36", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.901);
+tl.fromTo("#imn-tile-37", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.913);
+tl.fromTo("#imn-tile-38", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.925);
+tl.fromTo("#imn-tile-39", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.937);
+tl.fromTo("#imn-tile-40", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.949);
+tl.fromTo("#imn-tile-41", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.961);
+tl.fromTo("#imn-tile-42", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.973);
+tl.fromTo("#imn-tile-43", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.985);
+tl.fromTo("#imn-tile-44", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.997);
+tl.fromTo("#imn-tile-45", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.009);
+tl.fromTo("#imn-tile-46", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.021);
+tl.fromTo("#imn-tile-47", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.033);
+tl.fromTo("#imn-tile-48", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.48);
+tl.fromTo("#imn-tile-49", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.492);
+tl.fromTo("#imn-tile-50", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.504);
+tl.fromTo("#imn-tile-51", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.516);
+tl.fromTo("#imn-tile-52", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.528);
+tl.fromTo("#imn-tile-53", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.54);
+tl.fromTo("#imn-tile-54", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.552);
+tl.fromTo("#imn-tile-55", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.564);
+tl.fromTo("#imn-tile-56", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.576);
+tl.fromTo("#imn-tile-57", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.588);
+tl.fromTo("#imn-tile-58", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.6);
+tl.fromTo("#imn-tile-59", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.612);
+tl.fromTo("#imn-tile-60", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.624);
+tl.fromTo("#imn-tile-61", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.636);
+tl.fromTo("#imn-tile-62", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.648);
+tl.fromTo("#imn-tile-63", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.66);
+tl.fromTo("#imn-tile-64", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.107);
+tl.fromTo("#imn-tile-65", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.119);
+tl.fromTo("#imn-tile-66", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.131);
+tl.fromTo("#imn-tile-67", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.143);
+tl.fromTo("#imn-tile-68", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.155);
+tl.fromTo("#imn-tile-69", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.167);
+tl.fromTo("#imn-tile-70", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.179);
+tl.fromTo("#imn-tile-71", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.191);
+tl.fromTo("#imn-tile-72", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.203);
+tl.fromTo("#imn-tile-73", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.215);
+tl.fromTo("#imn-tile-74", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.227);
+tl.fromTo("#imn-tile-75", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.239);
+tl.fromTo("#imn-tile-76", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.251);
+tl.fromTo("#imn-tile-77", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.263);
+tl.fromTo("#imn-tile-78", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.275);
+tl.fromTo("#imn-tile-79", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.287);
+tl.fromTo("#imn-tile-80", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.733);
+tl.fromTo("#imn-tile-81", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.745);
+tl.fromTo("#imn-tile-82", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.757);
+tl.fromTo("#imn-tile-83", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.769);
+tl.fromTo("#imn-tile-84", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.781);
+tl.fromTo("#imn-tile-85", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.793);
+tl.fromTo("#imn-tile-86", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.805);
+tl.fromTo("#imn-tile-87", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.817);
+tl.fromTo("#imn-tile-88", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.829);
+tl.fromTo("#imn-tile-89", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.841);
+tl.fromTo("#imn-tile-90", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.853);
+tl.fromTo("#imn-tile-91", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.865);
+tl.fromTo("#imn-tile-92", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.877);
+tl.fromTo("#imn-tile-93", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.889);
+tl.fromTo("#imn-tile-94", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.901);
+tl.fromTo("#imn-tile-95", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.913);
+tl.fromTo("#imn-tile-96", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.36);
+tl.fromTo("#imn-tile-97", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.372);
+tl.fromTo("#imn-tile-98", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.384);
+tl.fromTo("#imn-tile-99", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.396);
+tl.fromTo("#imn-tile-100", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.408);
+tl.fromTo("#imn-tile-101", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.42);
+tl.fromTo("#imn-tile-102", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.432);
+tl.fromTo("#imn-tile-103", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.444);
+tl.fromTo("#imn-tile-104", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.456);
+tl.fromTo("#imn-tile-105", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.468);
+tl.fromTo("#imn-tile-106", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.48);
+tl.fromTo("#imn-tile-107", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.492);
+tl.fromTo("#imn-tile-108", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.504);
+tl.fromTo("#imn-tile-109", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.516);
+tl.fromTo("#imn-tile-110", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.528);
+tl.fromTo("#imn-tile-111", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.54);
+tl.fromTo("#imn-tile-112", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.987);
+tl.fromTo("#imn-tile-113", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.999);
+tl.fromTo("#imn-tile-114", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.011);
+tl.fromTo("#imn-tile-115", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.023);
+tl.fromTo("#imn-tile-116", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.035);
+tl.fromTo("#imn-tile-117", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.047);
+tl.fromTo("#imn-tile-118", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.059);
+tl.fromTo("#imn-tile-119", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.071);
+tl.fromTo("#imn-tile-120", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.083);
+tl.fromTo("#imn-tile-121", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.095);
+tl.fromTo("#imn-tile-122", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.107);
+tl.fromTo("#imn-tile-123", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.119);
+tl.fromTo("#imn-tile-124", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.131);
+tl.fromTo("#imn-tile-125", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.143);
+tl.fromTo("#imn-tile-126", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.155);
+tl.fromTo("#imn-tile-127", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.167);
+tl.fromTo("#imn-tile-128", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.613);
+tl.fromTo("#imn-tile-129", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.625);
+tl.fromTo("#imn-tile-130", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.637);
+tl.fromTo("#imn-tile-131", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.649);
+tl.fromTo("#imn-tile-132", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.661);
+tl.fromTo("#imn-tile-133", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.673);
+tl.fromTo("#imn-tile-134", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.685);
+tl.fromTo("#imn-tile-135", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.697);
+tl.fromTo("#imn-tile-136", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.709);
+tl.fromTo("#imn-tile-137", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.721);
+tl.fromTo("#imn-tile-138", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.733);
+tl.fromTo("#imn-tile-139", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.745);
+tl.fromTo("#imn-tile-140", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.757);
+tl.fromTo("#imn-tile-141", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.769);
+tl.fromTo("#imn-tile-142", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.781);
+tl.fromTo("#imn-tile-143", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.793);
+tl.fromTo("#imagenet-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 15.5);
+tl.fromTo("#imagenet-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 21.44);
+tl.to("#imagenet-card", { opacity: 0, duration: 0.3 }, 25.35);
+tl.set("#icon-montage-0", { opacity: 1 }, 25.7);
+tl.set("#icon-montage-0", { opacity: 0 }, 27.6);
+tl.set("#icon-montage-1", { opacity: 1 }, 27.6);
+tl.set("#icon-montage-1", { opacity: 0 }, 29.5);
+tl.set("#icon-montage-2", { opacity: 1 }, 29.5);
+tl.set("#icon-montage-2", { opacity: 0 }, 31.4);
+tl.fromTo("#split2-approches-a", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 34.75);
+tl.fromTo("#split2-approches-b", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 34.85);
+tl.fromTo("#split2-approches .split2-label", { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.1 }, 35.1);
+tl.set("#dog-montage-0", { opacity: 1 }, 46.2);
+tl.set("#dog-montage-0", { opacity: 0 }, 47.12);
+tl.set("#dog-montage-1", { opacity: 1 }, 47.12);
+tl.set("#dog-montage-1", { opacity: 0 }, 48.04);
+tl.set("#dog-montage-2", { opacity: 1 }, 48.04);
+tl.set("#dog-montage-2", { opacity: 0 }, 48.96);
+tl.set("#dog-montage-3", { opacity: 1 }, 48.96);
+tl.set("#dog-montage-3", { opacity: 0 }, 49.88);
+tl.set("#dog-montage-4", { opacity: 1 }, 49.88);
+tl.set("#dog-montage-4", { opacity: 0 }, 50.8);
+tl.fromTo("#stamp-impossible", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 53.1);
+tl.to("#stamp-impossible", { opacity: 0, duration: 0.25 }, 54.5);
+tl.fromTo("#hw-apprend", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 63.2);
+tl.to("#hw-apprend", { opacity: 0, duration: 0.18 }, 64.55);
+tl.to("#layers-triptych-col0", { opacity: 1, duration: 0.3 }, 67.5);
+tl.to("#layers-triptych-col1", { opacity: 1, duration: 0.3 }, 70.2);
+tl.to("#layers-triptych-col2", { opacity: 1, duration: 0.3 }, 72.2);
+tl.fromTo("#layers-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 66.0);
+tl.to("#layers-card", { opacity: 0, duration: 0.3 }, 72.7);
+tl.fromTo("#gpu-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 83.0);
+tl.to("#gpu-photo-card", { opacity: 0, duration: 0.3 }, 94.35);
+tl.fromTo("#gpu-photo-card img", { scale: 1.0 }, { scale: 1.08, duration: 11.8, ease: "none" }, 82.9);
+tl.fromTo("#gpu-fade-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 94.85);
+tl.to("#gpu-fade-a", { opacity: 0, duration: 0.5 }, 98.8);
+tl.fromTo("#gpu-fade-b", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 98.8);
+tl.fromTo("#nvidia-photo-card", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 107.6);
+tl.to("#nvidia-photo-card", { opacity: 0, duration: 0.3 }, 109.9);
+tl.fromTo("#nvidia-photo-card img", { scale: 1.0 }, { scale: 1.1, duration: 2.7, ease: "none" }, 107.5);
+tl.fromTo("#rupture-text", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 124.8);
+tl.to("#rupture-text", { opacity: 0, duration: 0.25 }, 126.3);
+tl.fromTo("#bars-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 111.7);
+tl.to("#bar-alexnet", { height: 175.2, duration: 0.8, ease: "power2.out" }, 112.2);
+tl.fromTo("#bar-alexnet-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 112.7);
+tl.to("#bar-second", { height: 300, duration: 0.8, ease: "power2.out" }, 112.5);
+tl.fromTo("#bar-second-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 113.0);
+tl.to("#bars-card", { opacity: 0, duration: 0.3 }, 120.2);
+tl.fromTo("#tag-feifeili", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 133.9);
+tl.to("#tag-feifeili", { opacity: 0, duration: 0.25 }, 135.5);
+tl.fromTo("#tag-lecun", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 135.9);
+tl.to("#tag-lecun", { opacity: 0, duration: 0.25 }, 139.3);
+tl.fromTo("#stamp-fonctionne", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 147.9);
+tl.to("#stamp-fonctionne", { opacity: 0, duration: 0.25 }, 149.6);
+tl.fromTo("#hw-gpu", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 152.6);
+tl.to("#hw-gpu", { opacity: 0, duration: 0.18 }, 154.15);
+tl.fromTo("#spread-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 160.35);
+tl.fromTo("#spread-ring-0", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 40 }, duration: 2.2, ease: "power1.out" }, 160.8);
+tl.fromTo("#spread-ring-1", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 90 }, duration: 2.2, ease: "power1.out" }, 161.3);
+tl.fromTo("#spread-ring-2", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 140 }, duration: 2.2, ease: "power1.out" }, 161.8);
+tl.fromTo("#spread-ring-3", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 190 }, duration: 2.2, ease: "power1.out" }, 162.3);
+tl.fromTo("#spread-dot-0", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.0);
+tl.fromTo("#spread-dot-1", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.35);
+tl.fromTo("#spread-dot-2", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 161.7);
+tl.fromTo("#spread-dot-3", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.05);
+tl.fromTo("#spread-dot-4", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.4);
+tl.fromTo("#spread-dot-5", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 162.75);
+tl.fromTo("#spread-dot-6", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 163.1);
+tl.fromTo("#spread-dot-7", { opacity: 0, r: 2 }, { opacity: 1, r: 7, duration: 0.35, ease: "back.out(2)" }, 163.45);
+tl.to("#spread-card", { opacity: 0, duration: 0.3 }, 163.3);
+tl.set("#explose-montage-0", { opacity: 1 }, 163.6);
+tl.set("#explose-montage-0", { opacity: 0 }, 167.3);
+tl.set("#explose-montage-1", { opacity: 1 }, 167.3);
+tl.set("#explose-montage-1", { opacity: 0 }, 171.0);
+tl.set("#explose-montage-2", { opacity: 1 }, 171.0);
+tl.set("#explose-montage-2", { opacity: 0 }, 174.7);
+tl.set("#explose-montage-3", { opacity: 1 }, 174.7);
+tl.set("#explose-montage-3", { opacity: 0 }, 178.4);
+tl.fromTo("#hw-recette", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 182.9);
+tl.to("#hw-recette", { opacity: 0, duration: 0.18 }, 184.25);
+tl.fromTo("#recipe-list", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 185.9);
+tl.fromTo("#recipe-list-item0", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 186.08);
+tl.fromTo("#recipe-list-item1", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 187.1);
+tl.fromTo("#recipe-list-item2", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 188.38);
+tl.fromTo("#recipe-list-item3", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 190.17);
+tl.to("#recipe-list", { opacity: 0, duration: 0.4 }, 193.2);
+tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 4.2);
+tl.to("#fade-out", { opacity: 1, duration: 0.75 }, 195.57);
+</script>
+</body>
+</html>

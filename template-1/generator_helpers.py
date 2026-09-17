@@ -60,8 +60,19 @@ def stamp_block(elem_id: str, text: str, start: float, duration: float,
     Retourne (html_snippet, js_timeline_lines).
     """
     extra_style = "" if font_size == 104 else f' style="font-size:{font_size}px; padding:12px 34px;"'
+    # NOTE (2026-09-17 fix): display:flex must be on THIS SAME .clip element
+    # (the wrap), exactly like chapitre-1's hand-rolled #impasse-stamp (which
+    # sets display:flex directly in its own #id CSS rule, not inline). .clip
+    # is position:absolute, which removes it from normal flow -- so it is
+    # NOT treated as a flex item by any external centering ancestor. Before
+    # this fix, the wrap had no display set at all, so it stretched full-
+    # screen (inset:0) and .stamp-text defaulted to full block width inside
+    # it, producing a full-width diagonal banner instead of chapitre-1's
+    # compact rotated box. Uses the .stamp-wrap CSS class (style-kit.css)
+    # rather than an inline style, so it survives test harnesses / tooling
+    # that reset elements' inline style.display for scene isolation.
     html_snippet = (
-        f'  <div id="{elem_id}-wrap" class="clip" data-start="{start}" '
+        f'  <div id="{elem_id}-wrap" class="clip stamp-wrap" data-start="{start}" '
         f'data-duration="{round(duration, 2)}">\n'
         f'    <div class="stamp-text" id="{elem_id}"{extra_style}>{esc(text)}</div>\n'
         f'  </div>\n'
@@ -311,6 +322,44 @@ def kinetic_swap_block(kid: str, word_a: str, word_b: str, start: float, swap_at
         f'tl.fromTo("#{kid}-b", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(swap_at+0.1,3)});',
     ]
     return html_snippet, js_lines
+
+
+def list_overlay_block(lid: str, items, item_starts, start: float, end: float):
+    """SURIMPRESSION LISTE — voile plein cadre SEMI-TRANSPARENT (le
+    présentateur reste visible, assombri en arrière-plan -- PAS un noir
+    total comme hardcut_block()), avec une liste de points-clés en gros
+    caractères qui s'ajoutent un par un au rythme de la parole et restent
+    affichés (la liste s'accumule) jusqu'à la fin de la surimpression.
+    Ajouté 2026-09-17 pour la récapitulation "plus de données, plus de
+    calcul, des réseaux de plus en plus profonds, des modèles qui
+    apprennent leurs propres représentations" (chapitre 2), mais générique
+    -- réutilisable pour toute liste de 2 à 5 points calée sur le script.
+
+    items = liste de chaînes (le texte de chaque ligne).
+    item_starts = liste de temps ABSOLUS, même longueur que items — le
+    moment où chaque ligne apparaît (typiquement le timestamp du premier
+    mot de la phrase correspondante dans le transcript).
+    start = temps ABSOLU où le voile commence à apparaître (généralement
+    juste avant item_starts[0], pour laisser le fondu du voile devancer
+    légèrement la première ligne).
+    end = temps ABSOLU où tout (voile + lignes) se referme.
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    assert len(items) == len(item_starts), "items et item_starts doivent avoir la même longueur"
+    dur = round(end - start, 2)
+    html_parts = [f'  <div id="{lid}" class="clip list-overlay" data-start="{start}" data-duration="{dur}">\n']
+    for i, text in enumerate(items):
+        html_parts.append(f'    <div class="list-overlay-item" id="{lid}-item{i}">{esc(text)}</div>\n')
+    html_parts.append('  </div>\n')
+    js_lines = [f'tl.fromTo("#{lid}", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.35 }}, {start});']
+    for i, item_start in enumerate(item_starts):
+        js_lines.append(
+            f'tl.fromTo("#{lid}-item{i}", {{ opacity: 0, x: -36 }}, '
+            f'{{ opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }}, {item_start});'
+        )
+    js_lines.append(f'tl.to("#{lid}", {{ opacity: 0, duration: 0.4 }}, {round(end-0.4, 3)});')
+    return ''.join(html_parts), js_lines
 
 
 def triptych_block(tid: str, cols, start: float, duration: float, activate_times):
