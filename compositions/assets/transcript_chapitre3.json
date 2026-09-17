@@ -1,0 +1,2162 @@
+[
+  {
+    "text": "L'histoire",
+    "start": 0.05,
+    "end": 0.52,
+    "id": "w0"
+  },
+  {
+    "text": "canadienne",
+    "start": 0.57,
+    "end": 1.11,
+    "id": "w1"
+  },
+  {
+    "text": "de",
+    "start": 1.11,
+    "end": 1.22,
+    "id": "w2"
+  },
+  {
+    "text": "l'IA",
+    "start": 1.22,
+    "end": 1.43,
+    "id": "w3"
+  },
+  {
+    "text": "repose",
+    "start": 1.43,
+    "end": 1.77,
+    "id": "w4"
+  },
+  {
+    "text": "sur",
+    "start": 1.77,
+    "end": 1.94,
+    "id": "w5"
+  },
+  {
+    "text": "trois",
+    "start": 1.94,
+    "end": 2.22,
+    "id": "w6"
+  },
+  {
+    "text": "pôles,",
+    "start": 2.22,
+    "end": 2.73,
+    "id": "w7"
+  },
+  {
+    "text": "trois",
+    "start": 2.74,
+    "end": 3.09,
+    "id": "w8"
+  },
+  {
+    "text": "villes,",
+    "start": 3.19,
+    "end": 3.71,
+    "id": "w9"
+  },
+  {
+    "text": "trois",
+    "start": 3.71,
+    "end": 4.4,
+    "id": "w10"
+  },
+  {
+    "text": "contributions",
+    "start": 4.4,
+    "end": 4.97,
+    "id": "w11"
+  },
+  {
+    "text": "complémentaires.",
+    "start": 5.08,
+    "end": 5.99,
+    "id": "w12"
+  },
+  {
+    "text": "D'un",
+    "start": 5.99,
+    "end": 6.52,
+    "id": "w13"
+  },
+  {
+    "text": "côté,",
+    "start": 6.52,
+    "end": 6.62,
+    "id": "w14"
+  },
+  {
+    "text": "nous",
+    "start": 6.62,
+    "end": 6.83,
+    "id": "w15"
+  },
+  {
+    "text": "avons",
+    "start": 6.83,
+    "end": 7.1,
+    "id": "w16"
+  },
+  {
+    "text": "Toronto.",
+    "start": 7.1,
+    "end": 7.68,
+    "id": "w17"
+  },
+  {
+    "text": "Toronto,",
+    "start": 7.68,
+    "end": 8.36,
+    "id": "w18"
+  },
+  {
+    "text": "c'est",
+    "start": 8.36,
+    "end": 8.74,
+    "id": "w19"
+  },
+  {
+    "text": "Inton,",
+    "start": 8.74,
+    "end": 9.17,
+    "id": "w20"
+  },
+  {
+    "text": "les",
+    "start": 9.43,
+    "end": 9.44,
+    "id": "w21"
+  },
+  {
+    "text": "réseaux",
+    "start": 9.61,
+    "end": 10.09,
+    "id": "w22"
+  },
+  {
+    "text": "neuronaux",
+    "start": 10.09,
+    "end": 10.82,
+    "id": "w23"
+  },
+  {
+    "text": "et",
+    "start": 10.82,
+    "end": 10.97,
+    "id": "w24"
+  },
+  {
+    "text": "AlexNet.",
+    "start": 10.97,
+    "end": 11.83,
+    "id": "w25"
+  },
+  {
+    "text": "L'Université",
+    "start": 12.24,
+    "end": 12.64,
+    "id": "w26"
+  },
+  {
+    "text": "de",
+    "start": 12.64,
+    "end": 12.76,
+    "id": "w27"
+  },
+  {
+    "text": "Toronto",
+    "start": 12.76,
+    "end": 13.19,
+    "id": "w28"
+  },
+  {
+    "text": "forme",
+    "start": 13.19,
+    "end": 13.5,
+    "id": "w29"
+  },
+  {
+    "text": "des",
+    "start": 13.5,
+    "end": 13.68,
+    "id": "w30"
+  },
+  {
+    "text": "chercheurs",
+    "start": 13.68,
+    "end": 14.29,
+    "id": "w31"
+  },
+  {
+    "text": "qui",
+    "start": 14.29,
+    "end": 14.47,
+    "id": "w32"
+  },
+  {
+    "text": "joueront",
+    "start": 14.47,
+    "end": 14.95,
+    "id": "w33"
+  },
+  {
+    "text": "ensuite",
+    "start": 14.95,
+    "end": 15.39,
+    "id": "w34"
+  },
+  {
+    "text": "des",
+    "start": 15.43,
+    "end": 15.57,
+    "id": "w35"
+  },
+  {
+    "text": "rôles",
+    "start": 15.57,
+    "end": 15.91,
+    "id": "w36"
+  },
+  {
+    "text": "clés",
+    "start": 15.92,
+    "end": 16.36,
+    "id": "w37"
+  },
+  {
+    "text": "dans",
+    "start": 16.46,
+    "end": 16.55,
+    "id": "w38"
+  },
+  {
+    "text": "les",
+    "start": 16.56,
+    "end": 16.69,
+    "id": "w39"
+  },
+  {
+    "text": "plus",
+    "start": 16.69,
+    "end": 16.88,
+    "id": "w40"
+  },
+  {
+    "text": "grands",
+    "start": 16.88,
+    "end": 17.17,
+    "id": "w41"
+  },
+  {
+    "text": "laboratoires",
+    "start": 17.17,
+    "end": 17.74,
+    "id": "w42"
+  },
+  {
+    "text": "d'IA",
+    "start": 17.74,
+    "end": 17.91,
+    "id": "w43"
+  },
+  {
+    "text": "du",
+    "start": 17.91,
+    "end": 18,
+    "id": "w44"
+  },
+  {
+    "text": "monde.",
+    "start": 18,
+    "end": 18.28,
+    "id": "w45"
+  },
+  {
+    "text": "En",
+    "start": 18.28,
+    "end": 19.28,
+    "id": "w46"
+  },
+  {
+    "text": "2018,",
+    "start": 19.28,
+    "end": 19.66,
+    "id": "w47"
+  },
+  {
+    "text": "Inton,",
+    "start": 19.72,
+    "end": 20.26,
+    "id": "w48"
+  },
+  {
+    "text": "BGO",
+    "start": 20.26,
+    "end": 20.49,
+    "id": "w49"
+  },
+  {
+    "text": "et",
+    "start": 20.49,
+    "end": 20.61,
+    "id": "w50"
+  },
+  {
+    "text": "Lacoon",
+    "start": 20.67,
+    "end": 21.1,
+    "id": "w51"
+  },
+  {
+    "text": "reçoivent",
+    "start": 21.11,
+    "end": 21.87,
+    "id": "w52"
+  },
+  {
+    "text": "ensemble",
+    "start": 22.27,
+    "end": 22.53,
+    "id": "w53"
+  },
+  {
+    "text": "le",
+    "start": 22.53,
+    "end": 22.68,
+    "id": "w54"
+  },
+  {
+    "text": "prix",
+    "start": 22.68,
+    "end": 22.87,
+    "id": "w55"
+  },
+  {
+    "text": "Turing,",
+    "start": 23.05,
+    "end": 23.63,
+    "id": "w56"
+  },
+  {
+    "text": "la",
+    "start": 23.63,
+    "end": 23.79,
+    "id": "w57"
+  },
+  {
+    "text": "plus",
+    "start": 23.79,
+    "end": 24.11,
+    "id": "w58"
+  },
+  {
+    "text": "prestigieuse",
+    "start": 24.11,
+    "end": 25.04,
+    "id": "w59"
+  },
+  {
+    "text": "récompense",
+    "start": 25.04,
+    "end": 25.9,
+    "id": "w60"
+  },
+  {
+    "text": "en",
+    "start": 25.9,
+    "end": 26.06,
+    "id": "w61"
+  },
+  {
+    "text": "informatique.",
+    "start": 26.06,
+    "end": 27.42,
+    "id": "w62"
+  },
+  {
+    "text": "En",
+    "start": 27.42,
+    "end": 27.56,
+    "id": "w63"
+  },
+  {
+    "text": "2024,",
+    "start": 27.56,
+    "end": 28.56,
+    "id": "w64"
+  },
+  {
+    "text": "Inton",
+    "start": 28.56,
+    "end": 28.89,
+    "id": "w65"
+  },
+  {
+    "text": "partage",
+    "start": 28.95,
+    "end": 29.38,
+    "id": "w66"
+  },
+  {
+    "text": "le",
+    "start": 29.38,
+    "end": 29.54,
+    "id": "w67"
+  },
+  {
+    "text": "prix",
+    "start": 29.54,
+    "end": 29.8,
+    "id": "w68"
+  },
+  {
+    "text": "Nobel",
+    "start": 29.92,
+    "end": 30.15,
+    "id": "w69"
+  },
+  {
+    "text": "de",
+    "start": 30.15,
+    "end": 30.59,
+    "id": "w70"
+  },
+  {
+    "text": "physique.",
+    "start": 30.59,
+    "end": 31.13,
+    "id": "w71"
+  },
+  {
+    "text": "Autour",
+    "start": 31.13,
+    "end": 31.45,
+    "id": "w72"
+  },
+  {
+    "text": "de",
+    "start": 31.64,
+    "end": 31.69,
+    "id": "w73"
+  },
+  {
+    "text": "cet",
+    "start": 31.71,
+    "end": 31.88,
+    "id": "w74"
+  },
+  {
+    "text": "héritage",
+    "start": 31.88,
+    "end": 32.44,
+    "id": "w75"
+  },
+  {
+    "text": "se",
+    "start": 32.46,
+    "end": 32.58,
+    "id": "w76"
+  },
+  {
+    "text": "développe",
+    "start": 32.58,
+    "end": 33.21,
+    "id": "w77"
+  },
+  {
+    "text": "le",
+    "start": 33.21,
+    "end": 33.34,
+    "id": "w78"
+  },
+  {
+    "text": "Vector",
+    "start": 33.34,
+    "end": 33.45,
+    "id": "w79"
+  },
+  {
+    "text": "Institute.",
+    "start": 33.81,
+    "end": 34.56,
+    "id": "w80"
+  },
+  {
+    "text": "De",
+    "start": 34.56,
+    "end": 35.12,
+    "id": "w81"
+  },
+  {
+    "text": "l'autre",
+    "start": 35.12,
+    "end": 35.19,
+    "id": "w82"
+  },
+  {
+    "text": "côté,",
+    "start": 35.26,
+    "end": 35.75,
+    "id": "w83"
+  },
+  {
+    "text": "nous",
+    "start": 35.75,
+    "end": 36.03,
+    "id": "w84"
+  },
+  {
+    "text": "avons",
+    "start": 36.03,
+    "end": 36.38,
+    "id": "w85"
+  },
+  {
+    "text": "Montréal.",
+    "start": 36.38,
+    "end": 37.2,
+    "id": "w86"
+  },
+  {
+    "text": "À",
+    "start": 37.24,
+    "end": 37.36,
+    "id": "w87"
+  },
+  {
+    "text": "Montréal,",
+    "start": 37.36,
+    "end": 38.13,
+    "id": "w88"
+  },
+  {
+    "text": "Yoshua",
+    "start": 38.25,
+    "end": 38.55,
+    "id": "w89"
+  },
+  {
+    "text": "Bengio,",
+    "start": 38.55,
+    "end": 39.11,
+    "id": "w90"
+  },
+  {
+    "text": "bâti",
+    "start": 39.11,
+    "end": 39.44,
+    "id": "w91"
+  },
+  {
+    "text": "pendant",
+    "start": 39.46,
+    "end": 39.95,
+    "id": "w92"
+  },
+  {
+    "text": "des",
+    "start": 39.95,
+    "end": 40.14,
+    "id": "w93"
+  },
+  {
+    "text": "décennies.",
+    "start": 40.16,
+    "end": 41.06,
+    "id": "w94"
+  },
+  {
+    "text": "En",
+    "start": 41.06,
+    "end": 41.82,
+    "id": "w95"
+  },
+  {
+    "text": "1993,",
+    "start": 41.82,
+    "end": 42.63,
+    "id": "w96"
+  },
+  {
+    "text": "il",
+    "start": 42.63,
+    "end": 42.82,
+    "id": "w97"
+  },
+  {
+    "text": "fonde",
+    "start": 42.82,
+    "end": 43.29,
+    "id": "w98"
+  },
+  {
+    "text": "un",
+    "start": 43.29,
+    "end": 43.48,
+    "id": "w99"
+  },
+  {
+    "text": "laboratoire",
+    "start": 43.48,
+    "end": 44.41,
+    "id": "w100"
+  },
+  {
+    "text": "qui",
+    "start": 44.69,
+    "end": 44.82,
+    "id": "w101"
+  },
+  {
+    "text": "deviendra",
+    "start": 44.87,
+    "end": 45.68,
+    "id": "w102"
+  },
+  {
+    "text": "MILA.",
+    "start": 45.9,
+    "end": 46.4,
+    "id": "w103"
+  },
+  {
+    "text": "Aujourd'hui,",
+    "start": 46.4,
+    "end": 47.21,
+    "id": "w104"
+  },
+  {
+    "text": "c'est",
+    "start": 47.21,
+    "end": 47.43,
+    "id": "w105"
+  },
+  {
+    "text": "une",
+    "start": 47.43,
+    "end": 47.6,
+    "id": "w106"
+  },
+  {
+    "text": "communauté",
+    "start": 47.6,
+    "end": 48.24,
+    "id": "w107"
+  },
+  {
+    "text": "de",
+    "start": 48.24,
+    "end": 48.35,
+    "id": "w108"
+  },
+  {
+    "text": "plus",
+    "start": 48.35,
+    "end": 48.58,
+    "id": "w109"
+  },
+  {
+    "text": "de",
+    "start": 48.58,
+    "end": 48.67,
+    "id": "w110"
+  },
+  {
+    "text": "1300",
+    "start": 48.73,
+    "end": 49.32,
+    "id": "w111"
+  },
+  {
+    "text": "chercheurs,",
+    "start": 49.41,
+    "end": 50.08,
+    "id": "w112"
+  },
+  {
+    "text": "professeurs,",
+    "start": 50.21,
+    "end": 50.82,
+    "id": "w113"
+  },
+  {
+    "text": "étudiants",
+    "start": 50.82,
+    "end": 51.39,
+    "id": "w114"
+  },
+  {
+    "text": "et",
+    "start": 51.42,
+    "end": 51.5,
+    "id": "w115"
+  },
+  {
+    "text": "partenaires.",
+    "start": 51.52,
+    "end": 52.43,
+    "id": "w116"
+  },
+  {
+    "text": "Autour",
+    "start": 52.6,
+    "end": 52.71,
+    "id": "w117"
+  },
+  {
+    "text": "d'un",
+    "start": 52.82,
+    "end": 52.98,
+    "id": "w118"
+  },
+  {
+    "text": "seul",
+    "start": 53.04,
+    "end": 53.21,
+    "id": "w119"
+  },
+  {
+    "text": "sujet,",
+    "start": 53.21,
+    "end": 53.6,
+    "id": "w120"
+  },
+  {
+    "text": "l'intelligence",
+    "start": 53.6,
+    "end": 54.36,
+    "id": "w121"
+  },
+  {
+    "text": "artificielle.",
+    "start": 54.36,
+    "end": 55.19,
+    "id": "w122"
+  },
+  {
+    "text": "Montréal",
+    "start": 55.66,
+    "end": 55.8,
+    "id": "w123"
+  },
+  {
+    "text": "devient",
+    "start": 55.8,
+    "end": 56.18,
+    "id": "w124"
+  },
+  {
+    "text": "un",
+    "start": 56.24,
+    "end": 56.32,
+    "id": "w125"
+  },
+  {
+    "text": "pôle",
+    "start": 56.32,
+    "end": 56.6,
+    "id": "w126"
+  },
+  {
+    "text": "mondial.",
+    "start": 56.6,
+    "end": 57.23,
+    "id": "w127"
+  },
+  {
+    "text": "Il",
+    "start": 57.23,
+    "end": 57.56,
+    "id": "w128"
+  },
+  {
+    "text": "attire",
+    "start": 57.56,
+    "end": 57.79,
+    "id": "w129"
+  },
+  {
+    "text": "les",
+    "start": 57.79,
+    "end": 57.93,
+    "id": "w130"
+  },
+  {
+    "text": "étudiants,",
+    "start": 57.93,
+    "end": 58.54,
+    "id": "w131"
+  },
+  {
+    "text": "les",
+    "start": 58.54,
+    "end": 58.74,
+    "id": "w132"
+  },
+  {
+    "text": "chercheurs",
+    "start": 58.74,
+    "end": 59.41,
+    "id": "w133"
+  },
+  {
+    "text": "et",
+    "start": 59.41,
+    "end": 59.5,
+    "id": "w134"
+  },
+  {
+    "text": "les",
+    "start": 59.54,
+    "end": 59.64,
+    "id": "w135"
+  },
+  {
+    "text": "investissements",
+    "start": 59.64,
+    "end": 60.15,
+    "id": "w136"
+  },
+  {
+    "text": "étrangers.",
+    "start": 60.43,
+    "end": 60.9,
+    "id": "w137"
+  },
+  {
+    "text": "Et",
+    "start": 60.9,
+    "end": 61.12,
+    "id": "w138"
+  },
+  {
+    "text": "MILA",
+    "start": 61.12,
+    "end": 61.34,
+    "id": "w139"
+  },
+  {
+    "text": "ne",
+    "start": 61.34,
+    "end": 61.56,
+    "id": "w140"
+  },
+  {
+    "text": "fait",
+    "start": 61.56,
+    "end": 61.78,
+    "id": "w141"
+  },
+  {
+    "text": "pas",
+    "start": 61.78,
+    "end": 61.8,
+    "id": "w142"
+  },
+  {
+    "text": "que",
+    "start": 61.8,
+    "end": 61.98,
+    "id": "w143"
+  },
+  {
+    "text": "des",
+    "start": 62,
+    "end": 62.16,
+    "id": "w144"
+  },
+  {
+    "text": "modèles",
+    "start": 62.16,
+    "end": 62.64,
+    "id": "w145"
+  },
+  {
+    "text": "plus",
+    "start": 62.64,
+    "end": 62.88,
+    "id": "w146"
+  },
+  {
+    "text": "performants.",
+    "start": 62.88,
+    "end": 63.76,
+    "id": "w147"
+  },
+  {
+    "text": "L'Institut",
+    "start": 64.06,
+    "end": 64.31,
+    "id": "w148"
+  },
+  {
+    "text": "travaille",
+    "start": 64.42,
+    "end": 64.85,
+    "id": "w149"
+  },
+  {
+    "text": "aussi",
+    "start": 64.85,
+    "end": 65.13,
+    "id": "w150"
+  },
+  {
+    "text": "sur",
+    "start": 65.13,
+    "end": 65.3,
+    "id": "w151"
+  },
+  {
+    "text": "la",
+    "start": 65.3,
+    "end": 65.41,
+    "id": "w152"
+  },
+  {
+    "text": "sécurité",
+    "start": 65.41,
+    "end": 65.98,
+    "id": "w153"
+  },
+  {
+    "text": "des",
+    "start": 65.98,
+    "end": 66.14,
+    "id": "w154"
+  },
+  {
+    "text": "systèmes,",
+    "start": 66.18,
+    "end": 66.75,
+    "id": "w155"
+  },
+  {
+    "text": "les",
+    "start": 66.75,
+    "end": 66.81,
+    "id": "w156"
+  },
+  {
+    "text": "droits",
+    "start": 67.07,
+    "end": 67.27,
+    "id": "w157"
+  },
+  {
+    "text": "de",
+    "start": 67.27,
+    "end": 67.38,
+    "id": "w158"
+  },
+  {
+    "text": "la",
+    "start": 67.38,
+    "end": 67.49,
+    "id": "w159"
+  },
+  {
+    "text": "personne",
+    "start": 67.49,
+    "end": 67.78,
+    "id": "w160"
+  },
+  {
+    "text": "et",
+    "start": 67.94,
+    "end": 68.04,
+    "id": "w161"
+  },
+  {
+    "text": "l'IA",
+    "start": 68.05,
+    "end": 68.25,
+    "id": "w162"
+  },
+  {
+    "text": "responsable.",
+    "start": 68.28,
+    "end": 69.2,
+    "id": "w163"
+  },
+  {
+    "text": "Enfin,",
+    "start": 69.56,
+    "end": 69.67,
+    "id": "w164"
+  },
+  {
+    "text": "nous",
+    "start": 69.7,
+    "end": 69.94,
+    "id": "w165"
+  },
+  {
+    "text": "avons",
+    "start": 69.94,
+    "end": 70.28,
+    "id": "w166"
+  },
+  {
+    "text": "Edmonton.",
+    "start": 70.28,
+    "end": 71.03,
+    "id": "w167"
+  },
+  {
+    "text": "Le",
+    "start": 71.03,
+    "end": 71.36,
+    "id": "w168"
+  },
+  {
+    "text": "troisième",
+    "start": 71.36,
+    "end": 71.68,
+    "id": "w169"
+  },
+  {
+    "text": "pôle",
+    "start": 71.68,
+    "end": 71.94,
+    "id": "w170"
+  },
+  {
+    "text": "est",
+    "start": 71.94,
+    "end": 72.1,
+    "id": "w171"
+  },
+  {
+    "text": "moins",
+    "start": 72.1,
+    "end": 72.37,
+    "id": "w172"
+  },
+  {
+    "text": "connu",
+    "start": 72.37,
+    "end": 72.63,
+    "id": "w173"
+  },
+  {
+    "text": "du",
+    "start": 72.63,
+    "end": 72.7,
+    "id": "w174"
+  },
+  {
+    "text": "grand",
+    "start": 72.75,
+    "end": 73,
+    "id": "w175"
+  },
+  {
+    "text": "public",
+    "start": 73,
+    "end": 73.3,
+    "id": "w176"
+  },
+  {
+    "text": "et",
+    "start": 73.3,
+    "end": 73.43,
+    "id": "w177"
+  },
+  {
+    "text": "c'est",
+    "start": 73.43,
+    "end": 73.59,
+    "id": "w178"
+  },
+  {
+    "text": "peut-être",
+    "start": 73.72,
+    "end": 73.97,
+    "id": "w179"
+  },
+  {
+    "text": "le",
+    "start": 74.23,
+    "end": 74.31,
+    "id": "w180"
+  },
+  {
+    "text": "plus",
+    "start": 74.41,
+    "end": 74.52,
+    "id": "w181"
+  },
+  {
+    "text": "sous-estimé.",
+    "start": 74.52,
+    "end": 75.48,
+    "id": "w182"
+  },
+  {
+    "text": "À",
+    "start": 75.48,
+    "end": 75.95,
+    "id": "w183"
+  },
+  {
+    "text": "Edmonton,",
+    "start": 75.95,
+    "end": 76.42,
+    "id": "w184"
+  },
+  {
+    "text": "Richard",
+    "start": 76.42,
+    "end": 76.74,
+    "id": "w185"
+  },
+  {
+    "text": "Sutton",
+    "start": 76.74,
+    "end": 77.14,
+    "id": "w186"
+  },
+  {
+    "text": "établit",
+    "start": 77.14,
+    "end": 77.67,
+    "id": "w187"
+  },
+  {
+    "text": "les",
+    "start": 77.67,
+    "end": 77.86,
+    "id": "w188"
+  },
+  {
+    "text": "fondements",
+    "start": 77.86,
+    "end": 78.54,
+    "id": "w189"
+  },
+  {
+    "text": "de",
+    "start": 78.54,
+    "end": 78.66,
+    "id": "w190"
+  },
+  {
+    "text": "l'apprentissage",
+    "start": 78.73,
+    "end": 79.66,
+    "id": "w191"
+  },
+  {
+    "text": "par",
+    "start": 79.66,
+    "end": 79.85,
+    "id": "w192"
+  },
+  {
+    "text": "renforcement.",
+    "start": 79.85,
+    "end": 80.98,
+    "id": "w193"
+  },
+  {
+    "text": "Imaginez",
+    "start": 80.98,
+    "end": 81.32,
+    "id": "w194"
+  },
+  {
+    "text": "un",
+    "start": 81.32,
+    "end": 81.66,
+    "id": "w195"
+  },
+  {
+    "text": "enfant",
+    "start": 81.66,
+    "end": 81.88,
+    "id": "w196"
+  },
+  {
+    "text": "qui",
+    "start": 81.88,
+    "end": 82.04,
+    "id": "w197"
+  },
+  {
+    "text": "apprend",
+    "start": 82.1,
+    "end": 82.45,
+    "id": "w198"
+  },
+  {
+    "text": "à",
+    "start": 82.45,
+    "end": 82.56,
+    "id": "w199"
+  },
+  {
+    "text": "faire",
+    "start": 82.56,
+    "end": 82.85,
+    "id": "w200"
+  },
+  {
+    "text": "du",
+    "start": 82.85,
+    "end": 82.96,
+    "id": "w201"
+  },
+  {
+    "text": "vélo.",
+    "start": 82.96,
+    "end": 83.48,
+    "id": "w202"
+  },
+  {
+    "text": "Personne",
+    "start": 83.48,
+    "end": 83.773,
+    "id": "w203"
+  },
+  {
+    "text": "ne",
+    "start": 83.773,
+    "end": 84.067,
+    "id": "w204"
+  },
+  {
+    "text": "lui",
+    "start": 84.067,
+    "end": 84.36,
+    "id": "w205"
+  },
+  {
+    "text": "donne",
+    "start": 84.36,
+    "end": 84.69,
+    "id": "w206"
+  },
+  {
+    "text": "une",
+    "start": 84.69,
+    "end": 84.89,
+    "id": "w207"
+  },
+  {
+    "text": "formule",
+    "start": 84.89,
+    "end": 85.36,
+    "id": "w208"
+  },
+  {
+    "text": "lui",
+    "start": 85.36,
+    "end": 85.56,
+    "id": "w209"
+  },
+  {
+    "text": "décrivant",
+    "start": 85.56,
+    "end": 86.21,
+    "id": "w210"
+  },
+  {
+    "text": "la",
+    "start": 86.23,
+    "end": 86.34,
+    "id": "w211"
+  },
+  {
+    "text": "position.",
+    "start": 86.43,
+    "end": 86.97,
+    "id": "w212"
+  },
+  {
+    "text": "Et",
+    "start": 86.97,
+    "end": 87.56,
+    "id": "w213"
+  },
+  {
+    "text": "les",
+    "start": 87.56,
+    "end": 87.59,
+    "id": "w214"
+  },
+  {
+    "text": "mouvements",
+    "start": 87.59,
+    "end": 87.93,
+    "id": "w215"
+  },
+  {
+    "text": "des",
+    "start": 87.93,
+    "end": 88.03,
+    "id": "w216"
+  },
+  {
+    "text": "muscles.",
+    "start": 88.03,
+    "end": 88.42,
+    "id": "w217"
+  },
+  {
+    "text": "Il",
+    "start": 88.42,
+    "end": 89.1,
+    "id": "w218"
+  },
+  {
+    "text": "essaye,",
+    "start": 89.1,
+    "end": 89.76,
+    "id": "w219"
+  },
+  {
+    "text": "il",
+    "start": 89.76,
+    "end": 89.91,
+    "id": "w220"
+  },
+  {
+    "text": "tombe,",
+    "start": 89.91,
+    "end": 90.41,
+    "id": "w221"
+  },
+  {
+    "text": "il",
+    "start": 90.41,
+    "end": 90.56,
+    "id": "w222"
+  },
+  {
+    "text": "corrige",
+    "start": 90.56,
+    "end": 91.04,
+    "id": "w223"
+  },
+  {
+    "text": "et",
+    "start": 91.08,
+    "end": 91.22,
+    "id": "w224"
+  },
+  {
+    "text": "il",
+    "start": 91.22,
+    "end": 91.34,
+    "id": "w225"
+  },
+  {
+    "text": "recommence.",
+    "start": 91.46,
+    "end": 92.38,
+    "id": "w226"
+  },
+  {
+    "text": "En",
+    "start": 92.38,
+    "end": 93.02,
+    "id": "w227"
+  },
+  {
+    "text": "apprentissage",
+    "start": 93.02,
+    "end": 93.44,
+    "id": "w228"
+  },
+  {
+    "text": "par",
+    "start": 93.44,
+    "end": 93.65,
+    "id": "w229"
+  },
+  {
+    "text": "renforcement,",
+    "start": 93.65,
+    "end": 94.69,
+    "id": "w230"
+  },
+  {
+    "text": "une",
+    "start": 94.69,
+    "end": 94.88,
+    "id": "w231"
+  },
+  {
+    "text": "IA",
+    "start": 94.88,
+    "end": 95,
+    "id": "w232"
+  },
+  {
+    "text": "agit",
+    "start": 95.04,
+    "end": 95.27,
+    "id": "w233"
+  },
+  {
+    "text": "dans",
+    "start": 95.27,
+    "end": 95.53,
+    "id": "w234"
+  },
+  {
+    "text": "un",
+    "start": 95.53,
+    "end": 95.65,
+    "id": "w235"
+  },
+  {
+    "text": "environnement,",
+    "start": 96,
+    "end": 96.68,
+    "id": "w236"
+  },
+  {
+    "text": "observe",
+    "start": 96.68,
+    "end": 97.14,
+    "id": "w237"
+  },
+  {
+    "text": "les",
+    "start": 97.14,
+    "end": 97.3,
+    "id": "w238"
+  },
+  {
+    "text": "conséquences,",
+    "start": 97.3,
+    "end": 98.22,
+    "id": "w239"
+  },
+  {
+    "text": "reçoit",
+    "start": 98.22,
+    "end": 98.64,
+    "id": "w240"
+  },
+  {
+    "text": "une",
+    "start": 98.64,
+    "end": 98.84,
+    "id": "w241"
+  },
+  {
+    "text": "récompense",
+    "start": 98.84,
+    "end": 99.54,
+    "id": "w242"
+  },
+  {
+    "text": "ou",
+    "start": 99.59,
+    "end": 99.67,
+    "id": "w243"
+  },
+  {
+    "text": "une",
+    "start": 99.67,
+    "end": 99.83,
+    "id": "w244"
+  },
+  {
+    "text": "pénalité.",
+    "start": 99.83,
+    "end": 100.56,
+    "id": "w245"
+  },
+  {
+    "text": "Et",
+    "start": 100.56,
+    "end": 100.76,
+    "id": "w246"
+  },
+  {
+    "text": "par",
+    "start": 100.76,
+    "end": 100.96,
+    "id": "w247"
+  },
+  {
+    "text": "la",
+    "start": 100.96,
+    "end": 100.99,
+    "id": "w248"
+  },
+  {
+    "text": "suite,",
+    "start": 100.99,
+    "end": 101.43,
+    "id": "w249"
+  },
+  {
+    "text": "ajuste",
+    "start": 101.43,
+    "end": 101.8,
+    "id": "w250"
+  },
+  {
+    "text": "sa",
+    "start": 101.81,
+    "end": 101.93,
+    "id": "w251"
+  },
+  {
+    "text": "stratégie.",
+    "start": 101.93,
+    "end": 102.81,
+    "id": "w252"
+  },
+  {
+    "text": "C'est",
+    "start": 102.81,
+    "end": 103.38,
+    "id": "w253"
+  },
+  {
+    "text": "l'approche",
+    "start": 103.38,
+    "end": 103.58,
+    "id": "w254"
+  },
+  {
+    "text": "derrière",
+    "start": 103.58,
+    "end": 104.05,
+    "id": "w255"
+  },
+  {
+    "text": "les",
+    "start": 104.05,
+    "end": 104.2,
+    "id": "w256"
+  },
+  {
+    "text": "systèmes",
+    "start": 104.2,
+    "end": 104.66,
+    "id": "w257"
+  },
+  {
+    "text": "qui",
+    "start": 104.66,
+    "end": 104.81,
+    "id": "w258"
+  },
+  {
+    "text": "prennent",
+    "start": 104.81,
+    "end": 105.21,
+    "id": "w259"
+  },
+  {
+    "text": "les",
+    "start": 105.21,
+    "end": 105.33,
+    "id": "w260"
+  },
+  {
+    "text": "décisions",
+    "start": 105.36,
+    "end": 105.76,
+    "id": "w261"
+  },
+  {
+    "text": "en",
+    "start": 105.88,
+    "end": 105.97,
+    "id": "w262"
+  },
+  {
+    "text": "séquence.",
+    "start": 105.97,
+    "end": 106.7,
+    "id": "w263"
+  },
+  {
+    "text": "Les",
+    "start": 106.7,
+    "end": 107.1,
+    "id": "w264"
+  },
+  {
+    "text": "jeux,",
+    "start": 107.1,
+    "end": 107.21,
+    "id": "w265"
+  },
+  {
+    "text": "la",
+    "start": 107.29,
+    "end": 107.4,
+    "id": "w266"
+  },
+  {
+    "text": "robotique",
+    "start": 107.4,
+    "end": 107.97,
+    "id": "w267"
+  },
+  {
+    "text": "ou",
+    "start": 107.97,
+    "end": 108.1,
+    "id": "w268"
+  },
+  {
+    "text": "le",
+    "start": 108.1,
+    "end": 108.23,
+    "id": "w269"
+  },
+  {
+    "text": "contrôle",
+    "start": 108.23,
+    "end": 108.8,
+    "id": "w270"
+  },
+  {
+    "text": "industriel",
+    "start": 108.8,
+    "end": 109.33,
+    "id": "w271"
+  },
+  {
+    "text": "tout",
+    "start": 109.46,
+    "end": 109.69,
+    "id": "w272"
+  },
+  {
+    "text": "simplement.",
+    "start": 110.09,
+    "end": 110.59,
+    "id": "w273"
+  },
+  {
+    "text": "Sutton",
+    "start": 110.59,
+    "end": 110.975,
+    "id": "w274"
+  },
+  {
+    "text": "et",
+    "start": 110.975,
+    "end": 111.36,
+    "id": "w275"
+  },
+  {
+    "text": "Andrew",
+    "start": 111.36,
+    "end": 111.64,
+    "id": "w276"
+  },
+  {
+    "text": "Bartow",
+    "start": 111.64,
+    "end": 112.09,
+    "id": "w277"
+  },
+  {
+    "text": "recevront",
+    "start": 112.09,
+    "end": 112.76,
+    "id": "w278"
+  },
+  {
+    "text": "le",
+    "start": 112.76,
+    "end": 112.83,
+    "id": "w279"
+  },
+  {
+    "text": "prix",
+    "start": 112.92,
+    "end": 113.2,
+    "id": "w280"
+  },
+  {
+    "text": "Turing",
+    "start": 113.2,
+    "end": 113.6,
+    "id": "w281"
+  },
+  {
+    "text": "2024",
+    "start": 113.72,
+    "end": 114.57,
+    "id": "w282"
+  },
+  {
+    "text": "pour",
+    "start": 114.57,
+    "end": 114.86,
+    "id": "w283"
+  },
+  {
+    "text": "ses",
+    "start": 114.86,
+    "end": 114.98,
+    "id": "w284"
+  },
+  {
+    "text": "travaux.",
+    "start": 115.39,
+    "end": 115.94,
+    "id": "w285"
+  },
+  {
+    "text": "Alors,",
+    "start": 116.44,
+    "end": 116.68,
+    "id": "w286"
+  },
+  {
+    "text": "faisons",
+    "start": 116.68,
+    "end": 116.92,
+    "id": "w287"
+  },
+  {
+    "text": "un",
+    "start": 116.92,
+    "end": 116.99,
+    "id": "w288"
+  },
+  {
+    "text": "résumé.",
+    "start": 116.99,
+    "end": 117.4,
+    "id": "w289"
+  },
+  {
+    "text": "Toronto",
+    "start": 117.4,
+    "end": 117.66,
+    "id": "w290"
+  },
+  {
+    "text": "a",
+    "start": 117.66,
+    "end": 117.92,
+    "id": "w291"
+  },
+  {
+    "text": "montré",
+    "start": 117.92,
+    "end": 118.22,
+    "id": "w292"
+  },
+  {
+    "text": "que",
+    "start": 118.22,
+    "end": 118.38,
+    "id": "w293"
+  },
+  {
+    "text": "les",
+    "start": 118.38,
+    "end": 118.53,
+    "id": "w294"
+  },
+  {
+    "text": "réseaux",
+    "start": 118.54,
+    "end": 118.97,
+    "id": "w295"
+  },
+  {
+    "text": "profonds",
+    "start": 118.97,
+    "end": 119.39,
+    "id": "w296"
+  },
+  {
+    "text": "pouvaient",
+    "start": 119.48,
+    "end": 119.86,
+    "id": "w297"
+  },
+  {
+    "text": "reconnaître.",
+    "start": 119.9,
+    "end": 120.8,
+    "id": "w298"
+  },
+  {
+    "text": "Montréal",
+    "start": 121.26,
+    "end": 121.32,
+    "id": "w299"
+  },
+  {
+    "text": "a",
+    "start": 121.32,
+    "end": 121.4,
+    "id": "w300"
+  },
+  {
+    "text": "fait",
+    "start": 121.4,
+    "end": 121.6,
+    "id": "w301"
+  },
+  {
+    "text": "progresser",
+    "start": 121.62,
+    "end": 122.17,
+    "id": "w302"
+  },
+  {
+    "text": "leur",
+    "start": 122.17,
+    "end": 122.4,
+    "id": "w303"
+  },
+  {
+    "text": "capacité",
+    "start": 122.4,
+    "end": 122.87,
+    "id": "w304"
+  },
+  {
+    "text": "à",
+    "start": 122.96,
+    "end": 123.03,
+    "id": "w305"
+  },
+  {
+    "text": "apprendre",
+    "start": 123.03,
+    "end": 123.55,
+    "id": "w306"
+  },
+  {
+    "text": "des",
+    "start": 123.55,
+    "end": 123.63,
+    "id": "w307"
+  },
+  {
+    "text": "représentations",
+    "start": 123.75,
+    "end": 124.64,
+    "id": "w308"
+  },
+  {
+    "text": "complexes.",
+    "start": 124.64,
+    "end": 125.3,
+    "id": "w309"
+  },
+  {
+    "text": "Et",
+    "start": 125.3,
+    "end": 125.8,
+    "id": "w310"
+  },
+  {
+    "text": "Edmonton",
+    "start": 125.8,
+    "end": 126.05,
+    "id": "w311"
+  },
+  {
+    "text": "leur",
+    "start": 126.13,
+    "end": 126.32,
+    "id": "w312"
+  },
+  {
+    "text": "a",
+    "start": 126.38,
+    "end": 126.42,
+    "id": "w313"
+  },
+  {
+    "text": "appris",
+    "start": 126.42,
+    "end": 126.82,
+    "id": "w314"
+  },
+  {
+    "text": "à",
+    "start": 126.82,
+    "end": 126.96,
+    "id": "w315"
+  },
+  {
+    "text": "agir",
+    "start": 126.96,
+    "end": 127.23,
+    "id": "w316"
+  },
+  {
+    "text": "et",
+    "start": 127.23,
+    "end": 127.37,
+    "id": "w317"
+  },
+  {
+    "text": "à",
+    "start": 127.37,
+    "end": 127.51,
+    "id": "w318"
+  },
+  {
+    "text": "s'améliorer",
+    "start": 127.51,
+    "end": 128.31,
+    "id": "w319"
+  },
+  {
+    "text": "en",
+    "start": 128.31,
+    "end": 128.45,
+    "id": "w320"
+  },
+  {
+    "text": "fonction",
+    "start": 128.45,
+    "end": 129,
+    "id": "w321"
+  },
+  {
+    "text": "de",
+    "start": 129,
+    "end": 129.14,
+    "id": "w322"
+  },
+  {
+    "text": "leurs",
+    "start": 129.14,
+    "end": 129.47,
+    "id": "w323"
+  },
+  {
+    "text": "expériences.",
+    "start": 129.48,
+    "end": 130.64,
+    "id": "w324"
+  },
+  {
+    "text": "Trois",
+    "start": 130.64,
+    "end": 131.27,
+    "id": "w325"
+  },
+  {
+    "text": "villes",
+    "start": 131.27,
+    "end": 131.41,
+    "id": "w326"
+  },
+  {
+    "text": "canadiennes,",
+    "start": 131.41,
+    "end": 132.32,
+    "id": "w327"
+  },
+  {
+    "text": "trois",
+    "start": 132.32,
+    "end": 132.67,
+    "id": "w328"
+  },
+  {
+    "text": "piliers",
+    "start": 132.67,
+    "end": 133.16,
+    "id": "w329"
+  },
+  {
+    "text": "de",
+    "start": 133.16,
+    "end": 133.3,
+    "id": "w330"
+  },
+  {
+    "text": "l'IA",
+    "start": 133.3,
+    "end": 133.58,
+    "id": "w331"
+  },
+  {
+    "text": "moderne.",
+    "start": 133.58,
+    "end": 134.34,
+    "id": "w332"
+  },
+  {
+    "text": "Pour",
+    "start": 134.34,
+    "end": 134.62,
+    "id": "w333"
+  },
+  {
+    "text": "un",
+    "start": 134.62,
+    "end": 134.9,
+    "id": "w334"
+  },
+  {
+    "text": "pays",
+    "start": 134.9,
+    "end": 134.94,
+    "id": "w335"
+  },
+  {
+    "text": "de",
+    "start": 134.94,
+    "end": 135.01,
+    "id": "w336"
+  },
+  {
+    "text": "40",
+    "start": 135.12,
+    "end": 135.42,
+    "id": "w337"
+  },
+  {
+    "text": "millions",
+    "start": 135.42,
+    "end": 135.9,
+    "id": "w338"
+  },
+  {
+    "text": "d'habitants,",
+    "start": 135.9,
+    "end": 136.68,
+    "id": "w339"
+  },
+  {
+    "text": "c'est",
+    "start": 136.68,
+    "end": 136.98,
+    "id": "w340"
+  },
+  {
+    "text": "une",
+    "start": 136.98,
+    "end": 137.14,
+    "id": "w341"
+  },
+  {
+    "text": "influence",
+    "start": 137.26,
+    "end": 137.49,
+    "id": "w342"
+  },
+  {
+    "text": "scientifique",
+    "start": 137.89,
+    "end": 138.4,
+    "id": "w343"
+  },
+  {
+    "text": "complètement",
+    "start": 138.42,
+    "end": 139.21,
+    "id": "w344"
+  },
+  {
+    "text": "disproportionnée.",
+    "start": 139.21,
+    "end": 140.49,
+    "id": "w345"
+  },
+  {
+    "text": "Alors,",
+    "start": 140.82,
+    "end": 140.87,
+    "id": "w346"
+  },
+  {
+    "text": "la",
+    "start": 140.96,
+    "end": 140.97,
+    "id": "w347"
+  },
+  {
+    "text": "question",
+    "start": 140.97,
+    "end": 141.39,
+    "id": "w348"
+  },
+  {
+    "text": "devient",
+    "start": 141.4,
+    "end": 141.78,
+    "id": "w349"
+  },
+  {
+    "text": "inévitable.",
+    "start": 141.78,
+    "end": 142.58,
+    "id": "w350"
+  },
+  {
+    "text": "Avec",
+    "start": 142.58,
+    "end": 142.94,
+    "id": "w351"
+  },
+  {
+    "text": "tout",
+    "start": 142.94,
+    "end": 143.14,
+    "id": "w352"
+  },
+  {
+    "text": "ça,",
+    "start": 143.16,
+    "end": 143.49,
+    "id": "w353"
+  },
+  {
+    "text": "pourquoi",
+    "start": 143.49,
+    "end": 144.06,
+    "id": "w354"
+  },
+  {
+    "text": "les",
+    "start": 144.06,
+    "end": 144.27,
+    "id": "w355"
+  },
+  {
+    "text": "gagnants",
+    "start": 144.27,
+    "end": 144.83,
+    "id": "w356"
+  },
+  {
+    "text": "économiques",
+    "start": 144.83,
+    "end": 145.53,
+    "id": "w357"
+  },
+  {
+    "text": "sont-ils",
+    "start": 145.88,
+    "end": 146.24,
+    "id": "w358"
+  },
+  {
+    "text": "ailleurs?",
+    "start": 146.24,
+    "end": 147.12,
+    "id": "w359"
+  }
+]

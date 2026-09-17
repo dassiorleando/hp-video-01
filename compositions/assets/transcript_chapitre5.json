@@ -1,0 +1,2972 @@
+[
+  {
+    "text": "Une",
+    "start": 0.14,
+    "end": 0.16,
+    "id": "w0"
+  },
+  {
+    "text": "technologie",
+    "start": 0.16,
+    "end": 0.74,
+    "id": "w1"
+  },
+  {
+    "text": "ne",
+    "start": 0.74,
+    "end": 0.84,
+    "id": "w2"
+  },
+  {
+    "text": "transforme",
+    "start": 0.84,
+    "end": 1.37,
+    "id": "w3"
+  },
+  {
+    "text": "pas",
+    "start": 1.37,
+    "end": 1.53,
+    "id": "w4"
+  },
+  {
+    "text": "une",
+    "start": 1.53,
+    "end": 1.68,
+    "id": "w5"
+  },
+  {
+    "text": "industrie",
+    "start": 1.68,
+    "end": 2.2,
+    "id": "w6"
+  },
+  {
+    "text": "parce",
+    "start": 2.2,
+    "end": 2.41,
+    "id": "w7"
+  },
+  {
+    "text": "que",
+    "start": 2.43,
+    "end": 2.56,
+    "id": "w8"
+  },
+  {
+    "text": "des",
+    "start": 2.56,
+    "end": 2.69,
+    "id": "w9"
+  },
+  {
+    "text": "chercheurs",
+    "start": 2.69,
+    "end": 3.14,
+    "id": "w10"
+  },
+  {
+    "text": "la",
+    "start": 3.14,
+    "end": 3.26,
+    "id": "w11"
+  },
+  {
+    "text": "maîtrisent.",
+    "start": 3.26,
+    "end": 3.86,
+    "id": "w12"
+  },
+  {
+    "text": "Elle",
+    "start": 3.86,
+    "end": 4.18,
+    "id": "w13"
+  },
+  {
+    "text": "transforme",
+    "start": 4.18,
+    "end": 4.58,
+    "id": "w14"
+  },
+  {
+    "text": "une",
+    "start": 4.58,
+    "end": 4.72,
+    "id": "w15"
+  },
+  {
+    "text": "industrie",
+    "start": 4.73,
+    "end": 5.17,
+    "id": "w16"
+  },
+  {
+    "text": "lorsqu'elle",
+    "start": 5.24,
+    "end": 5.72,
+    "id": "w17"
+  },
+  {
+    "text": "entre",
+    "start": 5.72,
+    "end": 5.98,
+    "id": "w18"
+  },
+  {
+    "text": "dans",
+    "start": 5.98,
+    "end": 6.18,
+    "id": "w19"
+  },
+  {
+    "text": "les",
+    "start": 6.18,
+    "end": 6.28,
+    "id": "w20"
+  },
+  {
+    "text": "opérations",
+    "start": 6.34,
+    "end": 6.85,
+    "id": "w21"
+  },
+  {
+    "text": "quotidiennes,",
+    "start": 6.88,
+    "end": 7.64,
+    "id": "w22"
+  },
+  {
+    "text": "quand",
+    "start": 7.64,
+    "end": 7.9,
+    "id": "w23"
+  },
+  {
+    "text": "les",
+    "start": 7.9,
+    "end": 8.01,
+    "id": "w24"
+  },
+  {
+    "text": "travailleurs",
+    "start": 8.01,
+    "end": 8.56,
+    "id": "w25"
+  },
+  {
+    "text": "l'utilisent,",
+    "start": 8.56,
+    "end": 9.18,
+    "id": "w26"
+  },
+  {
+    "text": "quand",
+    "start": 9.27,
+    "end": 9.46,
+    "id": "w27"
+  },
+  {
+    "text": "les",
+    "start": 9.47,
+    "end": 9.64,
+    "id": "w28"
+  },
+  {
+    "text": "entreprises",
+    "start": 9.64,
+    "end": 10.19,
+    "id": "w29"
+  },
+  {
+    "text": "changent",
+    "start": 10.3,
+    "end": 10.75,
+    "id": "w30"
+  },
+  {
+    "text": "leur",
+    "start": 10.75,
+    "end": 10.98,
+    "id": "w31"
+  },
+  {
+    "text": "processus",
+    "start": 10.98,
+    "end": 11.56,
+    "id": "w32"
+  },
+  {
+    "text": "et",
+    "start": 11.56,
+    "end": 11.7,
+    "id": "w33"
+  },
+  {
+    "text": "lorsque",
+    "start": 11.7,
+    "end": 12.01,
+    "id": "w34"
+  },
+  {
+    "text": "la",
+    "start": 12.01,
+    "end": 12.11,
+    "id": "w35"
+  },
+  {
+    "text": "productivité",
+    "start": 12.11,
+    "end": 12.69,
+    "id": "w36"
+  },
+  {
+    "text": "monte",
+    "start": 12.76,
+    "end": 12.98,
+    "id": "w37"
+  },
+  {
+    "text": "réellement.",
+    "start": 13.07,
+    "end": 13.74,
+    "id": "w38"
+  },
+  {
+    "text": "Et",
+    "start": 13.74,
+    "end": 13.92,
+    "id": "w39"
+  },
+  {
+    "text": "sur",
+    "start": 13.92,
+    "end": 14.1,
+    "id": "w40"
+  },
+  {
+    "text": "ce",
+    "start": 14.1,
+    "end": 14.28,
+    "id": "w41"
+  },
+  {
+    "text": "point,",
+    "start": 14.28,
+    "end": 14.67,
+    "id": "w42"
+  },
+  {
+    "text": "les",
+    "start": 14.67,
+    "end": 14.86,
+    "id": "w43"
+  },
+  {
+    "text": "chiffres",
+    "start": 14.86,
+    "end": 15.41,
+    "id": "w44"
+  },
+  {
+    "text": "sont",
+    "start": 15.41,
+    "end": 15.68,
+    "id": "w45"
+  },
+  {
+    "text": "brutaux.",
+    "start": 15.68,
+    "end": 16.38,
+    "id": "w46"
+  },
+  {
+    "text": "Au",
+    "start": 16.38,
+    "end": 16.78,
+    "id": "w47"
+  },
+  {
+    "text": "deuxième",
+    "start": 16.78,
+    "end": 16.99,
+    "id": "w48"
+  },
+  {
+    "text": "trimestre",
+    "start": 16.99,
+    "end": 17.46,
+    "id": "w49"
+  },
+  {
+    "text": "de",
+    "start": 17.46,
+    "end": 17.54,
+    "id": "w50"
+  },
+  {
+    "text": "2024,",
+    "start": 17.57,
+    "end": 18.32,
+    "id": "w51"
+  },
+  {
+    "text": "seulement",
+    "start": 18.32,
+    "end": 18.94,
+    "id": "w52"
+  },
+  {
+    "text": "6,1%",
+    "start": 18.94,
+    "end": 19.58,
+    "id": "w53"
+  },
+  {
+    "text": "des",
+    "start": 19.58,
+    "end": 19.79,
+    "id": "w54"
+  },
+  {
+    "text": "entreprises",
+    "start": 19.79,
+    "end": 20.46,
+    "id": "w55"
+  },
+  {
+    "text": "canadiennes",
+    "start": 20.7,
+    "end": 21.33,
+    "id": "w56"
+  },
+  {
+    "text": "déclaraient",
+    "start": 21.48,
+    "end": 22.02,
+    "id": "w57"
+  },
+  {
+    "text": "utiliser",
+    "start": 22.02,
+    "end": 22.46,
+    "id": "w58"
+  },
+  {
+    "text": "l'IA",
+    "start": 22.54,
+    "end": 22.71,
+    "id": "w59"
+  },
+  {
+    "text": "pour",
+    "start": 22.71,
+    "end": 22.94,
+    "id": "w60"
+  },
+  {
+    "text": "produire",
+    "start": 22.94,
+    "end": 23.39,
+    "id": "w61"
+  },
+  {
+    "text": "des",
+    "start": 23.41,
+    "end": 23.57,
+    "id": "w62"
+  },
+  {
+    "text": "biens",
+    "start": 23.57,
+    "end": 23.78,
+    "id": "w63"
+  },
+  {
+    "text": "ou",
+    "start": 23.88,
+    "end": 23.96,
+    "id": "w64"
+  },
+  {
+    "text": "fournir",
+    "start": 23.96,
+    "end": 24.35,
+    "id": "w65"
+  },
+  {
+    "text": "des",
+    "start": 24.37,
+    "end": 24.52,
+    "id": "w66"
+  },
+  {
+    "text": "services.",
+    "start": 24.52,
+    "end": 25.18,
+    "id": "w67"
+  },
+  {
+    "text": "Un",
+    "start": 25.18,
+    "end": 25.59,
+    "id": "w68"
+  },
+  {
+    "text": "an",
+    "start": 25.59,
+    "end": 26,
+    "id": "w69"
+  },
+  {
+    "text": "plus",
+    "start": 26,
+    "end": 26.09,
+    "id": "w70"
+  },
+  {
+    "text": "tard,",
+    "start": 26.09,
+    "end": 26.67,
+    "id": "w71"
+  },
+  {
+    "text": "12,2%.",
+    "start": 26.67,
+    "end": 28.2,
+    "id": "w72"
+  },
+  {
+    "text": "Au",
+    "start": 28.2,
+    "end": 28.34,
+    "id": "w73"
+  },
+  {
+    "text": "deuxième",
+    "start": 28.34,
+    "end": 28.91,
+    "id": "w74"
+  },
+  {
+    "text": "trimestre",
+    "start": 28.91,
+    "end": 29.49,
+    "id": "w75"
+  },
+  {
+    "text": "de",
+    "start": 29.49,
+    "end": 29.62,
+    "id": "w76"
+  },
+  {
+    "text": "2026,",
+    "start": 29.71,
+    "end": 30.53,
+    "id": "w77"
+  },
+  {
+    "text": "nous",
+    "start": 30.53,
+    "end": 30.79,
+    "id": "w78"
+  },
+  {
+    "text": "sommes",
+    "start": 30.79,
+    "end": 31.16,
+    "id": "w79"
+  },
+  {
+    "text": "à",
+    "start": 31.23,
+    "end": 31.31,
+    "id": "w80"
+  },
+  {
+    "text": "19,2%.",
+    "start": 31.31,
+    "end": 32.32,
+    "id": "w81"
+  },
+  {
+    "text": "Oui,",
+    "start": 32.46,
+    "end": 32.6,
+    "id": "w82"
+  },
+  {
+    "text": "la",
+    "start": 32.63,
+    "end": 32.74,
+    "id": "w83"
+  },
+  {
+    "text": "progression",
+    "start": 32.74,
+    "end": 33.42,
+    "id": "w84"
+  },
+  {
+    "text": "est",
+    "start": 33.42,
+    "end": 33.61,
+    "id": "w85"
+  },
+  {
+    "text": "rapide",
+    "start": 33.61,
+    "end": 33.97,
+    "id": "w86"
+  },
+  {
+    "text": "parce",
+    "start": 33.97,
+    "end": 34.28,
+    "id": "w87"
+  },
+  {
+    "text": "que",
+    "start": 34.28,
+    "end": 34.46,
+    "id": "w88"
+  },
+  {
+    "text": "la",
+    "start": 34.46,
+    "end": 34.56,
+    "id": "w89"
+  },
+  {
+    "text": "proportion",
+    "start": 34.62,
+    "end": 35.2,
+    "id": "w90"
+  },
+  {
+    "text": "a",
+    "start": 35.2,
+    "end": 35.26,
+    "id": "w91"
+  },
+  {
+    "text": "triplé",
+    "start": 35.26,
+    "end": 35.67,
+    "id": "w92"
+  },
+  {
+    "text": "en",
+    "start": 35.67,
+    "end": 35.8,
+    "id": "w93"
+  },
+  {
+    "text": "deux",
+    "start": 35.8,
+    "end": 36.04,
+    "id": "w94"
+  },
+  {
+    "text": "ans.",
+    "start": 36.04,
+    "end": 36.53,
+    "id": "w95"
+  },
+  {
+    "text": "Mais",
+    "start": 36.53,
+    "end": 37.31,
+    "id": "w96"
+  },
+  {
+    "text": "retournez",
+    "start": 37.31,
+    "end": 37.54,
+    "id": "w97"
+  },
+  {
+    "text": "le",
+    "start": 37.54,
+    "end": 37.69,
+    "id": "w98"
+  },
+  {
+    "text": "chiffre.",
+    "start": 37.69,
+    "end": 38.48,
+    "id": "w99"
+  },
+  {
+    "text": "Quatre",
+    "start": 38.48,
+    "end": 39.28,
+    "id": "w100"
+  },
+  {
+    "text": "entreprises",
+    "start": 39.28,
+    "end": 39.65,
+    "id": "w101"
+  },
+  {
+    "text": "sur",
+    "start": 39.65,
+    "end": 39.84,
+    "id": "w102"
+  },
+  {
+    "text": "cinq",
+    "start": 39.84,
+    "end": 40.07,
+    "id": "w103"
+  },
+  {
+    "text": "n'utilisent",
+    "start": 40.12,
+    "end": 40.84,
+    "id": "w104"
+  },
+  {
+    "text": "toujours",
+    "start": 40.85,
+    "end": 41.37,
+    "id": "w105"
+  },
+  {
+    "text": "pas",
+    "start": 41.44,
+    "end": 41.57,
+    "id": "w106"
+  },
+  {
+    "text": "l'IA",
+    "start": 41.67,
+    "end": 41.86,
+    "id": "w107"
+  },
+  {
+    "text": "dans",
+    "start": 41.86,
+    "end": 42.1,
+    "id": "w108"
+  },
+  {
+    "text": "leurs",
+    "start": 42.13,
+    "end": 42.47,
+    "id": "w109"
+  },
+  {
+    "text": "opérations.",
+    "start": 42.47,
+    "end": 43.57,
+    "id": "w110"
+  },
+  {
+    "text": "En",
+    "start": 43.57,
+    "end": 44.005,
+    "id": "w111"
+  },
+  {
+    "text": "plus,",
+    "start": 44.005,
+    "end": 44.44,
+    "id": "w112"
+  },
+  {
+    "text": "dans",
+    "start": 44.44,
+    "end": 44.54,
+    "id": "w113"
+  },
+  {
+    "text": "le",
+    "start": 44.54,
+    "end": 44.7,
+    "id": "w114"
+  },
+  {
+    "text": "pays",
+    "start": 44.7,
+    "end": 45.01,
+    "id": "w115"
+  },
+  {
+    "text": "qui",
+    "start": 45.01,
+    "end": 45.23,
+    "id": "w116"
+  },
+  {
+    "text": "a",
+    "start": 45.28,
+    "end": 45.34,
+    "id": "w117"
+  },
+  {
+    "text": "contribué",
+    "start": 45.34,
+    "end": 46.13,
+    "id": "w118"
+  },
+  {
+    "text": "à",
+    "start": 46.13,
+    "end": 46.29,
+    "id": "w119"
+  },
+  {
+    "text": "l'inventer.",
+    "start": 46.3,
+    "end": 47.35,
+    "id": "w120"
+  },
+  {
+    "text": "Et",
+    "start": 47.35,
+    "end": 47.513,
+    "id": "w121"
+  },
+  {
+    "text": "il",
+    "start": 47.513,
+    "end": 47.675,
+    "id": "w122"
+  },
+  {
+    "text": "y",
+    "start": 47.675,
+    "end": 47.838,
+    "id": "w123"
+  },
+  {
+    "text": "a",
+    "start": 47.838,
+    "end": 48,
+    "id": "w124"
+  },
+  {
+    "text": "pire.",
+    "start": 48,
+    "end": 48.57,
+    "id": "w125"
+  },
+  {
+    "text": "Deux",
+    "start": 48.57,
+    "end": 49.44,
+    "id": "w126"
+  },
+  {
+    "text": "entreprises",
+    "start": 49.44,
+    "end": 49.76,
+    "id": "w127"
+  },
+  {
+    "text": "canadiennes",
+    "start": 49.76,
+    "end": 50.61,
+    "id": "w128"
+  },
+  {
+    "text": "sur",
+    "start": 50.61,
+    "end": 50.85,
+    "id": "w129"
+  },
+  {
+    "text": "cinq",
+    "start": 50.85,
+    "end": 51.22,
+    "id": "w130"
+  },
+  {
+    "text": "déclarent",
+    "start": 51.22,
+    "end": 51.96,
+    "id": "w131"
+  },
+  {
+    "text": "carrément",
+    "start": 51.96,
+    "end": 52.69,
+    "id": "w132"
+  },
+  {
+    "text": "que",
+    "start": 52.74,
+    "end": 52.89,
+    "id": "w133"
+  },
+  {
+    "text": "l'IA",
+    "start": 52.89,
+    "end": 53.09,
+    "id": "w134"
+  },
+  {
+    "text": "n'est",
+    "start": 53.09,
+    "end": 53.34,
+    "id": "w135"
+  },
+  {
+    "text": "pas",
+    "start": 53.36,
+    "end": 53.47,
+    "id": "w136"
+  },
+  {
+    "text": "pertinente",
+    "start": 53.5,
+    "end": 54.04,
+    "id": "w137"
+  },
+  {
+    "text": "pour",
+    "start": 54.04,
+    "end": 54.2,
+    "id": "w138"
+  },
+  {
+    "text": "leurs",
+    "start": 54.2,
+    "end": 54.34,
+    "id": "w139"
+  },
+  {
+    "text": "activités.",
+    "start": 54.47,
+    "end": 54.96,
+    "id": "w140"
+  },
+  {
+    "text": "Pas",
+    "start": 54.96,
+    "end": 55.46,
+    "id": "w141"
+  },
+  {
+    "text": "trop",
+    "start": 55.46,
+    "end": 55.59,
+    "id": "w142"
+  },
+  {
+    "text": "cher,",
+    "start": 55.59,
+    "end": 56.13,
+    "id": "w143"
+  },
+  {
+    "text": "pas",
+    "start": 56.13,
+    "end": 56.4,
+    "id": "w144"
+  },
+  {
+    "text": "trop",
+    "start": 56.4,
+    "end": 56.74,
+    "id": "w145"
+  },
+  {
+    "text": "compliqué.",
+    "start": 56.83,
+    "end": 58,
+    "id": "w146"
+  },
+  {
+    "text": "Plutôt",
+    "start": 58.58,
+    "end": 58.7,
+    "id": "w147"
+  },
+  {
+    "text": "pas",
+    "start": 58.72,
+    "end": 59,
+    "id": "w148"
+  },
+  {
+    "text": "pertinente.",
+    "start": 59,
+    "end": 60.32,
+    "id": "w149"
+  },
+  {
+    "text": "Et",
+    "start": 60.32,
+    "end": 60.82,
+    "id": "w150"
+  },
+  {
+    "text": "l'adoption",
+    "start": 60.82,
+    "end": 61.18,
+    "id": "w151"
+  },
+  {
+    "text": "est",
+    "start": 61.18,
+    "end": 61.4,
+    "id": "w152"
+  },
+  {
+    "text": "profondément",
+    "start": 61.4,
+    "end": 62.35,
+    "id": "w153"
+  },
+  {
+    "text": "inégale.",
+    "start": 62.35,
+    "end": 63.22,
+    "id": "w154"
+  },
+  {
+    "text": "L'information,",
+    "start": 63.64,
+    "end": 64.07,
+    "id": "w155"
+  },
+  {
+    "text": "la",
+    "start": 64.07,
+    "end": 64.18,
+    "id": "w156"
+  },
+  {
+    "text": "finance",
+    "start": 64.18,
+    "end": 64.54,
+    "id": "w157"
+  },
+  {
+    "text": "et",
+    "start": 64.58,
+    "end": 64.69,
+    "id": "w158"
+  },
+  {
+    "text": "les",
+    "start": 64.69,
+    "end": 64.86,
+    "id": "w159"
+  },
+  {
+    "text": "services",
+    "start": 64.86,
+    "end": 65.32,
+    "id": "w160"
+  },
+  {
+    "text": "professionnels",
+    "start": 65.32,
+    "end": 66.07,
+    "id": "w161"
+  },
+  {
+    "text": "sont",
+    "start": 66.18,
+    "end": 66.36,
+    "id": "w162"
+  },
+  {
+    "text": "très",
+    "start": 66.36,
+    "end": 66.64,
+    "id": "w163"
+  },
+  {
+    "text": "avancés.",
+    "start": 66.67,
+    "end": 67.36,
+    "id": "w164"
+  },
+  {
+    "text": "Les",
+    "start": 67.36,
+    "end": 68.02,
+    "id": "w165"
+  },
+  {
+    "text": "entreprises",
+    "start": 68.02,
+    "end": 68.36,
+    "id": "w166"
+  },
+  {
+    "text": "urbaines",
+    "start": 68.36,
+    "end": 68.93,
+    "id": "w167"
+  },
+  {
+    "text": "sont",
+    "start": 68.93,
+    "end": 69.22,
+    "id": "w168"
+  },
+  {
+    "text": "à",
+    "start": 69.22,
+    "end": 69.29,
+    "id": "w169"
+  },
+  {
+    "text": "21%.",
+    "start": 69.39,
+    "end": 70.12,
+    "id": "w170"
+  },
+  {
+    "text": "Les",
+    "start": 70.26,
+    "end": 70.28,
+    "id": "w171"
+  },
+  {
+    "text": "entreprises",
+    "start": 70.28,
+    "end": 70.88,
+    "id": "w172"
+  },
+  {
+    "text": "rurales",
+    "start": 70.88,
+    "end": 71.25,
+    "id": "w173"
+  },
+  {
+    "text": "à",
+    "start": 71.32,
+    "end": 71.36,
+    "id": "w174"
+  },
+  {
+    "text": "moins",
+    "start": 71.36,
+    "end": 71.53,
+    "id": "w175"
+  },
+  {
+    "text": "de",
+    "start": 71.63,
+    "end": 71.74,
+    "id": "w176"
+  },
+  {
+    "text": "10%.",
+    "start": 71.74,
+    "end": 72.32,
+    "id": "w177"
+  },
+  {
+    "text": "Ici,",
+    "start": 72.32,
+    "end": 72.587,
+    "id": "w178"
+  },
+  {
+    "text": "je",
+    "start": 72.587,
+    "end": 72.853,
+    "id": "w179"
+  },
+  {
+    "text": "veux",
+    "start": 72.853,
+    "end": 73.12,
+    "id": "w180"
+  },
+  {
+    "text": "vous",
+    "start": 73.12,
+    "end": 73.37,
+    "id": "w181"
+  },
+  {
+    "text": "parler",
+    "start": 73.37,
+    "end": 73.79,
+    "id": "w182"
+  },
+  {
+    "text": "de",
+    "start": 73.79,
+    "end": 73.91,
+    "id": "w183"
+  },
+  {
+    "text": "ce",
+    "start": 73.96,
+    "end": 74.07,
+    "id": "w184"
+  },
+  {
+    "text": "que",
+    "start": 74.07,
+    "end": 74.28,
+    "id": "w185"
+  },
+  {
+    "text": "je",
+    "start": 74.28,
+    "end": 74.4,
+    "id": "w186"
+  },
+  {
+    "text": "vois",
+    "start": 74.49,
+    "end": 74.69,
+    "id": "w187"
+  },
+  {
+    "text": "concrètement.",
+    "start": 74.69,
+    "end": 75.84,
+    "id": "w188"
+  },
+  {
+    "text": "Mon",
+    "start": 75.84,
+    "end": 76.54,
+    "id": "w189"
+  },
+  {
+    "text": "entreprise",
+    "start": 76.54,
+    "end": 76.65,
+    "id": "w190"
+  },
+  {
+    "text": "fait",
+    "start": 76.68,
+    "end": 76.9,
+    "id": "w191"
+  },
+  {
+    "text": "de",
+    "start": 76.9,
+    "end": 77.02,
+    "id": "w192"
+  },
+  {
+    "text": "l'intégration",
+    "start": 77.02,
+    "end": 77.88,
+    "id": "w193"
+  },
+  {
+    "text": "de",
+    "start": 77.88,
+    "end": 77.95,
+    "id": "w194"
+  },
+  {
+    "text": "systèmes",
+    "start": 78.05,
+    "end": 78.53,
+    "id": "w195"
+  },
+  {
+    "text": "et",
+    "start": 78.58,
+    "end": 78.68,
+    "id": "w196"
+  },
+  {
+    "text": "de",
+    "start": 78.68,
+    "end": 78.78,
+    "id": "w197"
+  },
+  {
+    "text": "l'automatisation",
+    "start": 78.84,
+    "end": 79.8,
+    "id": "w198"
+  },
+  {
+    "text": "avec",
+    "start": 79.8,
+    "end": 79.93,
+    "id": "w199"
+  },
+  {
+    "text": "l'IA",
+    "start": 80.08,
+    "end": 80.29,
+    "id": "w200"
+  },
+  {
+    "text": "ici",
+    "start": 80.29,
+    "end": 80.42,
+    "id": "w201"
+  },
+  {
+    "text": "au",
+    "start": 80.42,
+    "end": 80.61,
+    "id": "w202"
+  },
+  {
+    "text": "Québec.",
+    "start": 80.61,
+    "end": 81.4,
+    "id": "w203"
+  },
+  {
+    "text": "Et",
+    "start": 81.4,
+    "end": 81.57,
+    "id": "w204"
+  },
+  {
+    "text": "on",
+    "start": 81.57,
+    "end": 81.74,
+    "id": "w205"
+  },
+  {
+    "text": "travaille",
+    "start": 81.74,
+    "end": 82,
+    "id": "w206"
+  },
+  {
+    "text": "avec",
+    "start": 82,
+    "end": 82.19,
+    "id": "w207"
+  },
+  {
+    "text": "des",
+    "start": 82.19,
+    "end": 82.32,
+    "id": "w208"
+  },
+  {
+    "text": "PME,",
+    "start": 82.32,
+    "end": 82.53,
+    "id": "w209"
+  },
+  {
+    "text": "des",
+    "start": 82.58,
+    "end": 82.69,
+    "id": "w210"
+  },
+  {
+    "text": "entreprises",
+    "start": 82.69,
+    "end": 83.21,
+    "id": "w211"
+  },
+  {
+    "text": "de",
+    "start": 83.21,
+    "end": 83.29,
+    "id": "w212"
+  },
+  {
+    "text": "services",
+    "start": 83.29,
+    "end": 83.59,
+    "id": "w213"
+  },
+  {
+    "text": "et",
+    "start": 83.73,
+    "end": 83.77,
+    "id": "w214"
+  },
+  {
+    "text": "des",
+    "start": 83.77,
+    "end": 83.91,
+    "id": "w215"
+  },
+  {
+    "text": "professionnels.",
+    "start": 83.91,
+    "end": 84.78,
+    "id": "w216"
+  },
+  {
+    "text": "Et",
+    "start": 84.78,
+    "end": 84.92,
+    "id": "w217"
+  },
+  {
+    "text": "le",
+    "start": 84.92,
+    "end": 85,
+    "id": "w218"
+  },
+  {
+    "text": "pattern",
+    "start": 85,
+    "end": 85.4,
+    "id": "w219"
+  },
+  {
+    "text": "que",
+    "start": 85.4,
+    "end": 85.57,
+    "id": "w220"
+  },
+  {
+    "text": "je",
+    "start": 85.57,
+    "end": 85.68,
+    "id": "w221"
+  },
+  {
+    "text": "rencontre",
+    "start": 85.68,
+    "end": 86.19,
+    "id": "w222"
+  },
+  {
+    "text": "le",
+    "start": 86.19,
+    "end": 86.3,
+    "id": "w223"
+  },
+  {
+    "text": "plus",
+    "start": 86.3,
+    "end": 86.53,
+    "id": "w224"
+  },
+  {
+    "text": "souvent,",
+    "start": 86.53,
+    "end": 87.02,
+    "id": "w225"
+  },
+  {
+    "text": "c'est",
+    "start": 87.08,
+    "end": 87.22,
+    "id": "w226"
+  },
+  {
+    "text": "celui-ci.",
+    "start": 87.32,
+    "end": 88.02,
+    "id": "w227"
+  },
+  {
+    "text": "Pour",
+    "start": 88.02,
+    "end": 88.46,
+    "id": "w228"
+  },
+  {
+    "text": "la",
+    "start": 88.46,
+    "end": 88.48,
+    "id": "w229"
+  },
+  {
+    "text": "majorité",
+    "start": 88.48,
+    "end": 89.18,
+    "id": "w230"
+  },
+  {
+    "text": "des",
+    "start": 89.18,
+    "end": 89.41,
+    "id": "w231"
+  },
+  {
+    "text": "entreprises,",
+    "start": 89.41,
+    "end": 90.39,
+    "id": "w232"
+  },
+  {
+    "text": "adopter",
+    "start": 90.45,
+    "end": 90.96,
+    "id": "w233"
+  },
+  {
+    "text": "l'IA",
+    "start": 90.96,
+    "end": 91.25,
+    "id": "w234"
+  },
+  {
+    "text": "signifie",
+    "start": 91.25,
+    "end": 91.87,
+    "id": "w235"
+  },
+  {
+    "text": "ouvrir",
+    "start": 91.87,
+    "end": 92.15,
+    "id": "w236"
+  },
+  {
+    "text": "un",
+    "start": 92.38,
+    "end": 92.48,
+    "id": "w237"
+  },
+  {
+    "text": "chatbot",
+    "start": 92.48,
+    "end": 93.01,
+    "id": "w238"
+  },
+  {
+    "text": "et",
+    "start": 93.01,
+    "end": 93.17,
+    "id": "w239"
+  },
+  {
+    "text": "lui",
+    "start": 93.17,
+    "end": 93.36,
+    "id": "w240"
+  },
+  {
+    "text": "demander",
+    "start": 93.49,
+    "end": 94.03,
+    "id": "w241"
+  },
+  {
+    "text": "de",
+    "start": 94.03,
+    "end": 94.18,
+    "id": "w242"
+  },
+  {
+    "text": "rédiger",
+    "start": 94.18,
+    "end": 94.79,
+    "id": "w243"
+  },
+  {
+    "text": "un",
+    "start": 94.79,
+    "end": 94.94,
+    "id": "w244"
+  },
+  {
+    "text": "courriel.",
+    "start": 94.94,
+    "end": 95.96,
+    "id": "w245"
+  },
+  {
+    "text": "C'est",
+    "start": 95.96,
+    "end": 96.45,
+    "id": "w246"
+  },
+  {
+    "text": "utile,",
+    "start": 96.45,
+    "end": 96.78,
+    "id": "w247"
+  },
+  {
+    "text": "mais",
+    "start": 96.78,
+    "end": 97.05,
+    "id": "w248"
+  },
+  {
+    "text": "c'est",
+    "start": 97.05,
+    "end": 97.33,
+    "id": "w249"
+  },
+  {
+    "text": "peut-être",
+    "start": 97.38,
+    "end": 98.04,
+    "id": "w250"
+  },
+  {
+    "text": "5%",
+    "start": 98.04,
+    "end": 98.3,
+    "id": "w251"
+  },
+  {
+    "text": "du",
+    "start": 98.3,
+    "end": 98.4,
+    "id": "w252"
+  },
+  {
+    "text": "potentiel.",
+    "start": 98.44,
+    "end": 99.39,
+    "id": "w253"
+  },
+  {
+    "text": "Mais",
+    "start": 99.39,
+    "end": 99.88,
+    "id": "w254"
+  },
+  {
+    "text": "j'ai",
+    "start": 99.88,
+    "end": 99.92,
+    "id": "w255"
+  },
+  {
+    "text": "vu",
+    "start": 100.02,
+    "end": 100.05,
+    "id": "w256"
+  },
+  {
+    "text": "pire.",
+    "start": 100.05,
+    "end": 100.56,
+    "id": "w257"
+  },
+  {
+    "text": "J'ai",
+    "start": 100.56,
+    "end": 100.86,
+    "id": "w258"
+  },
+  {
+    "text": "vu",
+    "start": 100.86,
+    "end": 101.16,
+    "id": "w259"
+  },
+  {
+    "text": "d'autres",
+    "start": 101.16,
+    "end": 101.32,
+    "id": "w260"
+  },
+  {
+    "text": "entreprises",
+    "start": 101.32,
+    "end": 101.95,
+    "id": "w261"
+  },
+  {
+    "text": "et",
+    "start": 101.95,
+    "end": 102.06,
+    "id": "w262"
+  },
+  {
+    "text": "professionnels",
+    "start": 102.06,
+    "end": 102.86,
+    "id": "w263"
+  },
+  {
+    "text": "qui",
+    "start": 102.86,
+    "end": 103.03,
+    "id": "w264"
+  },
+  {
+    "text": "n'utilisent",
+    "start": 103.03,
+    "end": 103.6,
+    "id": "w265"
+  },
+  {
+    "text": "même",
+    "start": 103.7,
+    "end": 103.93,
+    "id": "w266"
+  },
+  {
+    "text": "pas",
+    "start": 103.93,
+    "end": 104.1,
+    "id": "w267"
+  },
+  {
+    "text": "l'IA",
+    "start": 104.1,
+    "end": 104.31,
+    "id": "w268"
+  },
+  {
+    "text": "au",
+    "start": 104.31,
+    "end": 104.42,
+    "id": "w269"
+  },
+  {
+    "text": "quotidien.",
+    "start": 104.42,
+    "end": 105.26,
+    "id": "w270"
+  },
+  {
+    "text": "La",
+    "start": 105.26,
+    "end": 105.57,
+    "id": "w271"
+  },
+  {
+    "text": "vraie",
+    "start": 105.57,
+    "end": 105.88,
+    "id": "w272"
+  },
+  {
+    "text": "valeur",
+    "start": 105.88,
+    "end": 106.02,
+    "id": "w273"
+  },
+  {
+    "text": "apparaît",
+    "start": 106.05,
+    "end": 106.59,
+    "id": "w274"
+  },
+  {
+    "text": "quand",
+    "start": 106.59,
+    "end": 106.86,
+    "id": "w275"
+  },
+  {
+    "text": "l'IA",
+    "start": 106.94,
+    "end": 107.14,
+    "id": "w276"
+  },
+  {
+    "text": "est",
+    "start": 107.14,
+    "end": 107.32,
+    "id": "w277"
+  },
+  {
+    "text": "directement",
+    "start": 107.32,
+    "end": 107.97,
+    "id": "w278"
+  },
+  {
+    "text": "utilisée",
+    "start": 108.04,
+    "end": 108.5,
+    "id": "w279"
+  },
+  {
+    "text": "dans",
+    "start": 108.58,
+    "end": 108.79,
+    "id": "w280"
+  },
+  {
+    "text": "les",
+    "start": 108.82,
+    "end": 108.98,
+    "id": "w281"
+  },
+  {
+    "text": "processus.",
+    "start": 108.98,
+    "end": 109.82,
+    "id": "w282"
+  },
+  {
+    "text": "Dans",
+    "start": 109.82,
+    "end": 110.04,
+    "id": "w283"
+  },
+  {
+    "text": "une",
+    "start": 110.04,
+    "end": 110.26,
+    "id": "w284"
+  },
+  {
+    "text": "manufacture,",
+    "start": 110.26,
+    "end": 110.96,
+    "id": "w285"
+  },
+  {
+    "text": "on",
+    "start": 110.96,
+    "end": 111.05,
+    "id": "w286"
+  },
+  {
+    "text": "peut",
+    "start": 111.1,
+    "end": 111.25,
+    "id": "w287"
+  },
+  {
+    "text": "détecter",
+    "start": 111.32,
+    "end": 111.8,
+    "id": "w288"
+  },
+  {
+    "text": "les",
+    "start": 111.81,
+    "end": 111.98,
+    "id": "w289"
+  },
+  {
+    "text": "défauts",
+    "start": 111.98,
+    "end": 112.43,
+    "id": "w290"
+  },
+  {
+    "text": "de",
+    "start": 112.43,
+    "end": 112.53,
+    "id": "w291"
+  },
+  {
+    "text": "qualité",
+    "start": 112.55,
+    "end": 113,
+    "id": "w292"
+  },
+  {
+    "text": "sur",
+    "start": 113,
+    "end": 113.15,
+    "id": "w293"
+  },
+  {
+    "text": "des",
+    "start": 113.2,
+    "end": 113.34,
+    "id": "w294"
+  },
+  {
+    "text": "images.",
+    "start": 113.34,
+    "end": 113.94,
+    "id": "w295"
+  },
+  {
+    "text": "Prévoir",
+    "start": 114.22,
+    "end": 114.27,
+    "id": "w296"
+  },
+  {
+    "text": "des",
+    "start": 114.36,
+    "end": 114.4,
+    "id": "w297"
+  },
+  {
+    "text": "pannes",
+    "start": 114.4,
+    "end": 114.64,
+    "id": "w298"
+  },
+  {
+    "text": "avant",
+    "start": 114.64,
+    "end": 114.85,
+    "id": "w299"
+  },
+  {
+    "text": "qu'elle",
+    "start": 114.85,
+    "end": 115.12,
+    "id": "w300"
+  },
+  {
+    "text": "n'arrête",
+    "start": 115.15,
+    "end": 115.51,
+    "id": "w301"
+  },
+  {
+    "text": "une",
+    "start": 115.51,
+    "end": 115.64,
+    "id": "w302"
+  },
+  {
+    "text": "ligne",
+    "start": 115.73,
+    "end": 115.85,
+    "id": "w303"
+  },
+  {
+    "text": "de",
+    "start": 115.85,
+    "end": 115.92,
+    "id": "w304"
+  },
+  {
+    "text": "production.",
+    "start": 115.93,
+    "end": 116.58,
+    "id": "w305"
+  },
+  {
+    "text": "Retrouver",
+    "start": 117.08,
+    "end": 117.09,
+    "id": "w306"
+  },
+  {
+    "text": "une",
+    "start": 117.22,
+    "end": 117.26,
+    "id": "w307"
+  },
+  {
+    "text": "information.",
+    "start": 117.26,
+    "end": 118.1,
+    "id": "w308"
+  },
+  {
+    "text": "Enfuir",
+    "start": 118.1,
+    "end": 118.54,
+    "id": "w309"
+  },
+  {
+    "text": "dans",
+    "start": 118.54,
+    "end": 118.56,
+    "id": "w310"
+  },
+  {
+    "text": "des",
+    "start": 118.56,
+    "end": 118.68,
+    "id": "w311"
+  },
+  {
+    "text": "milliers",
+    "start": 118.71,
+    "end": 119.08,
+    "id": "w312"
+  },
+  {
+    "text": "de",
+    "start": 119.08,
+    "end": 119.17,
+    "id": "w313"
+  },
+  {
+    "text": "documents",
+    "start": 119.17,
+    "end": 119.52,
+    "id": "w314"
+  },
+  {
+    "text": "techniques.",
+    "start": 119.6,
+    "end": 120.3,
+    "id": "w315"
+  },
+  {
+    "text": "Dans",
+    "start": 120.3,
+    "end": 120.62,
+    "id": "w316"
+  },
+  {
+    "text": "une",
+    "start": 120.62,
+    "end": 120.94,
+    "id": "w317"
+  },
+  {
+    "text": "entreprise",
+    "start": 120.94,
+    "end": 121.32,
+    "id": "w318"
+  },
+  {
+    "text": "de",
+    "start": 121.32,
+    "end": 121.44,
+    "id": "w319"
+  },
+  {
+    "text": "services,",
+    "start": 121.44,
+    "end": 122.04,
+    "id": "w320"
+  },
+  {
+    "text": "on",
+    "start": 122.04,
+    "end": 122.16,
+    "id": "w321"
+  },
+  {
+    "text": "peut",
+    "start": 122.16,
+    "end": 122.4,
+    "id": "w322"
+  },
+  {
+    "text": "résumer",
+    "start": 122.4,
+    "end": 122.84,
+    "id": "w323"
+  },
+  {
+    "text": "des",
+    "start": 122.93,
+    "end": 123.04,
+    "id": "w324"
+  },
+  {
+    "text": "dossiers,",
+    "start": 123.1,
+    "end": 123.66,
+    "id": "w325"
+  },
+  {
+    "text": "suivre",
+    "start": 123.66,
+    "end": 124.02,
+    "id": "w326"
+  },
+  {
+    "text": "des",
+    "start": 124.02,
+    "end": 124.19,
+    "id": "w327"
+  },
+  {
+    "text": "soumissions,",
+    "start": 124.2,
+    "end": 124.97,
+    "id": "w328"
+  },
+  {
+    "text": "classer",
+    "start": 125,
+    "end": 125.39,
+    "id": "w329"
+  },
+  {
+    "text": "des",
+    "start": 125.4,
+    "end": 125.58,
+    "id": "w330"
+  },
+  {
+    "text": "demandes,",
+    "start": 125.58,
+    "end": 126.17,
+    "id": "w331"
+  },
+  {
+    "text": "répondre",
+    "start": 126.18,
+    "end": 126.72,
+    "id": "w332"
+  },
+  {
+    "text": "plus",
+    "start": 126.72,
+    "end": 126.96,
+    "id": "w333"
+  },
+  {
+    "text": "vite",
+    "start": 126.96,
+    "end": 127.2,
+    "id": "w334"
+  },
+  {
+    "text": "aux",
+    "start": 127.2,
+    "end": 127.38,
+    "id": "w335"
+  },
+  {
+    "text": "clients.",
+    "start": 127.38,
+    "end": 128.04,
+    "id": "w336"
+  },
+  {
+    "text": "Dans",
+    "start": 128.04,
+    "end": 128.31,
+    "id": "w337"
+  },
+  {
+    "text": "une",
+    "start": 128.31,
+    "end": 128.58,
+    "id": "w338"
+  },
+  {
+    "text": "municipalité,",
+    "start": 128.58,
+    "end": 129.25,
+    "id": "w339"
+  },
+  {
+    "text": "c'est",
+    "start": 129.25,
+    "end": 129.51,
+    "id": "w340"
+  },
+  {
+    "text": "possible",
+    "start": 129.51,
+    "end": 129.96,
+    "id": "w341"
+  },
+  {
+    "text": "d'accélérer",
+    "start": 129.96,
+    "end": 130.66,
+    "id": "w342"
+  },
+  {
+    "text": "la",
+    "start": 130.66,
+    "end": 130.77,
+    "id": "w343"
+  },
+  {
+    "text": "recherche",
+    "start": 130.77,
+    "end": 131.25,
+    "id": "w344"
+  },
+  {
+    "text": "documentaire",
+    "start": 131.28,
+    "end": 131.91,
+    "id": "w345"
+  },
+  {
+    "text": "et",
+    "start": 131.98,
+    "end": 132.05,
+    "id": "w346"
+  },
+  {
+    "text": "l'analyse",
+    "start": 132.05,
+    "end": 132.53,
+    "id": "w347"
+  },
+  {
+    "text": "des",
+    "start": 132.53,
+    "end": 132.65,
+    "id": "w348"
+  },
+  {
+    "text": "données",
+    "start": 132.72,
+    "end": 133.13,
+    "id": "w349"
+  },
+  {
+    "text": "publiques.",
+    "start": 133.13,
+    "end": 133.96,
+    "id": "w350"
+  },
+  {
+    "text": "Dans",
+    "start": 133.96,
+    "end": 134.24,
+    "id": "w351"
+  },
+  {
+    "text": "un",
+    "start": 134.24,
+    "end": 134.52,
+    "id": "w352"
+  },
+  {
+    "text": "cabinet",
+    "start": 134.52,
+    "end": 134.75,
+    "id": "w353"
+  },
+  {
+    "text": "professionnel,",
+    "start": 134.75,
+    "end": 135.67,
+    "id": "w354"
+  },
+  {
+    "text": "vous",
+    "start": 135.67,
+    "end": 135.91,
+    "id": "w355"
+  },
+  {
+    "text": "pouvez",
+    "start": 135.91,
+    "end": 136.28,
+    "id": "w356"
+  },
+  {
+    "text": "automatiser",
+    "start": 136.28,
+    "end": 136.95,
+    "id": "w357"
+  },
+  {
+    "text": "le",
+    "start": 136.95,
+    "end": 137.07,
+    "id": "w358"
+  },
+  {
+    "text": "répétitif",
+    "start": 137.07,
+    "end": 137.72,
+    "id": "w359"
+  },
+  {
+    "text": "en",
+    "start": 137.72,
+    "end": 137.83,
+    "id": "w360"
+  },
+  {
+    "text": "laissant",
+    "start": 137.85,
+    "end": 138.22,
+    "id": "w361"
+  },
+  {
+    "text": "la",
+    "start": 138.44,
+    "end": 138.46,
+    "id": "w362"
+  },
+  {
+    "text": "décision",
+    "start": 138.46,
+    "end": 139,
+    "id": "w363"
+  },
+  {
+    "text": "finale",
+    "start": 139,
+    "end": 139.37,
+    "id": "w364"
+  },
+  {
+    "text": "à",
+    "start": 139.37,
+    "end": 139.42,
+    "id": "w365"
+  },
+  {
+    "text": "une",
+    "start": 139.55,
+    "end": 139.67,
+    "id": "w366"
+  },
+  {
+    "text": "personne",
+    "start": 139.67,
+    "end": 140.16,
+    "id": "w367"
+  },
+  {
+    "text": "qualifiée.",
+    "start": 140.16,
+    "end": 141.1,
+    "id": "w368"
+  },
+  {
+    "text": "Mais",
+    "start": 141.1,
+    "end": 141.34,
+    "id": "w369"
+  },
+  {
+    "text": "je",
+    "start": 141.34,
+    "end": 141.58,
+    "id": "w370"
+  },
+  {
+    "text": "vais",
+    "start": 141.58,
+    "end": 141.65,
+    "id": "w371"
+  },
+  {
+    "text": "être",
+    "start": 141.65,
+    "end": 141.92,
+    "id": "w372"
+  },
+  {
+    "text": "direct.",
+    "start": 141.92,
+    "end": 142.44,
+    "id": "w373"
+  },
+  {
+    "text": "Installer",
+    "start": 142.44,
+    "end": 143.15,
+    "id": "w374"
+  },
+  {
+    "text": "un",
+    "start": 143.15,
+    "end": 143.86,
+    "id": "w375"
+  },
+  {
+    "text": "outil",
+    "start": 143.86,
+    "end": 144.06,
+    "id": "w376"
+  },
+  {
+    "text": "ne",
+    "start": 144.06,
+    "end": 144.26,
+    "id": "w377"
+  },
+  {
+    "text": "suffit",
+    "start": 144.26,
+    "end": 144.87,
+    "id": "w378"
+  },
+  {
+    "text": "pas.",
+    "start": 144.87,
+    "end": 145.52,
+    "id": "w379"
+  },
+  {
+    "text": "Il",
+    "start": 145.52,
+    "end": 148.34,
+    "id": "w380"
+  },
+  {
+    "text": "y",
+    "start": 148.34,
+    "end": 148.41,
+    "id": "w381"
+  },
+  {
+    "text": "a",
+    "start": 148.41,
+    "end": 148.48,
+    "id": "w382"
+  },
+  {
+    "text": "de",
+    "start": 148.48,
+    "end": 148.62,
+    "id": "w383"
+  },
+  {
+    "text": "la",
+    "start": 148.62,
+    "end": 148.76,
+    "id": "w384"
+  },
+  {
+    "text": "valeur,",
+    "start": 148.76,
+    "end": 149.3,
+    "id": "w385"
+  },
+  {
+    "text": "une",
+    "start": 149.3,
+    "end": 149.45,
+    "id": "w386"
+  },
+  {
+    "text": "entreprise",
+    "start": 149.46,
+    "end": 150,
+    "id": "w387"
+  },
+  {
+    "text": "doit",
+    "start": 150,
+    "end": 150.2,
+    "id": "w388"
+  },
+  {
+    "text": "comprendre",
+    "start": 150.24,
+    "end": 150.75,
+    "id": "w389"
+  },
+  {
+    "text": "ses",
+    "start": 150.75,
+    "end": 150.91,
+    "id": "w390"
+  },
+  {
+    "text": "données,",
+    "start": 150.91,
+    "end": 151.5,
+    "id": "w391"
+  },
+  {
+    "text": "ses",
+    "start": 151.5,
+    "end": 151.75,
+    "id": "w392"
+  },
+  {
+    "text": "processus,",
+    "start": 151.75,
+    "end": 152.62,
+    "id": "w393"
+  },
+  {
+    "text": "ses",
+    "start": 152.7,
+    "end": 152.89,
+    "id": "w394"
+  },
+  {
+    "text": "risques,",
+    "start": 152.89,
+    "end": 153.61,
+    "id": "w395"
+  },
+  {
+    "text": "et",
+    "start": 153.62,
+    "end": 153.73,
+    "id": "w396"
+  },
+  {
+    "text": "surtout",
+    "start": 153.85,
+    "end": 154.17,
+    "id": "w397"
+  },
+  {
+    "text": "le",
+    "start": 154.17,
+    "end": 154.22,
+    "id": "w398"
+  },
+  {
+    "text": "problème",
+    "start": 154.3,
+    "end": 154.85,
+    "id": "w399"
+  },
+  {
+    "text": "qu'elle",
+    "start": 154.85,
+    "end": 155.28,
+    "id": "w400"
+  },
+  {
+    "text": "essaie",
+    "start": 155.28,
+    "end": 155.65,
+    "id": "w401"
+  },
+  {
+    "text": "réellement",
+    "start": 155.65,
+    "end": 156.23,
+    "id": "w402"
+  },
+  {
+    "text": "de",
+    "start": 156.32,
+    "end": 156.44,
+    "id": "w403"
+  },
+  {
+    "text": "résoudre.",
+    "start": 156.44,
+    "end": 157.14,
+    "id": "w404"
+  },
+  {
+    "text": "Parce",
+    "start": 157.54,
+    "end": 157.61,
+    "id": "w405"
+  },
+  {
+    "text": "que",
+    "start": 157.61,
+    "end": 157.9,
+    "id": "w406"
+  },
+  {
+    "text": "automatiser",
+    "start": 157.9,
+    "end": 158.79,
+    "id": "w407"
+  },
+  {
+    "text": "un",
+    "start": 158.79,
+    "end": 158.95,
+    "id": "w408"
+  },
+  {
+    "text": "mauvais",
+    "start": 158.95,
+    "end": 159.39,
+    "id": "w409"
+  },
+  {
+    "text": "processus",
+    "start": 159.53,
+    "end": 160.25,
+    "id": "w410"
+  },
+  {
+    "text": "avec",
+    "start": 160.25,
+    "end": 160.57,
+    "id": "w411"
+  },
+  {
+    "text": "l'IA",
+    "start": 160.57,
+    "end": 160.87,
+    "id": "w412"
+  },
+  {
+    "text": "ne",
+    "start": 160.94,
+    "end": 161.05,
+    "id": "w413"
+  },
+  {
+    "text": "le",
+    "start": 161.05,
+    "end": 161.21,
+    "id": "w414"
+  },
+  {
+    "text": "rend",
+    "start": 161.21,
+    "end": 161.53,
+    "id": "w415"
+  },
+  {
+    "text": "pas",
+    "start": 161.53,
+    "end": 161.77,
+    "id": "w416"
+  },
+  {
+    "text": "forcément",
+    "start": 161.77,
+    "end": 162.58,
+    "id": "w417"
+  },
+  {
+    "text": "meilleur.",
+    "start": 162.58,
+    "end": 163.32,
+    "id": "w418"
+  },
+  {
+    "text": "C'est",
+    "start": 163.32,
+    "end": 163.63,
+    "id": "w419"
+  },
+  {
+    "text": "pour",
+    "start": 163.63,
+    "end": 163.94,
+    "id": "w420"
+  },
+  {
+    "text": "ça",
+    "start": 163.94,
+    "end": 164.07,
+    "id": "w421"
+  },
+  {
+    "text": "que",
+    "start": 164.07,
+    "end": 164.26,
+    "id": "w422"
+  },
+  {
+    "text": "le",
+    "start": 164.26,
+    "end": 164.39,
+    "id": "w423"
+  },
+  {
+    "text": "prochain",
+    "start": 164.39,
+    "end": 164.9,
+    "id": "w424"
+  },
+  {
+    "text": "chapitre",
+    "start": 164.9,
+    "end": 165.39,
+    "id": "w425"
+  },
+  {
+    "text": "de",
+    "start": 165.39,
+    "end": 165.51,
+    "id": "w426"
+  },
+  {
+    "text": "l'IA",
+    "start": 165.52,
+    "end": 165.76,
+    "id": "w427"
+  },
+  {
+    "text": "canadienne",
+    "start": 165.76,
+    "end": 166.5,
+    "id": "w428"
+  },
+  {
+    "text": "ne",
+    "start": 166.5,
+    "end": 166.67,
+    "id": "w429"
+  },
+  {
+    "text": "se",
+    "start": 166.67,
+    "end": 166.83,
+    "id": "w430"
+  },
+  {
+    "text": "jouera",
+    "start": 166.85,
+    "end": 167.27,
+    "id": "w431"
+  },
+  {
+    "text": "pas",
+    "start": 167.34,
+    "end": 167.59,
+    "id": "w432"
+  },
+  {
+    "text": "forcément",
+    "start": 167.87,
+    "end": 168.48,
+    "id": "w433"
+  },
+  {
+    "text": "dans",
+    "start": 168.48,
+    "end": 168.66,
+    "id": "w434"
+  },
+  {
+    "text": "les",
+    "start": 168.66,
+    "end": 168.8,
+    "id": "w435"
+  },
+  {
+    "text": "laboratoires",
+    "start": 168.8,
+    "end": 169.33,
+    "id": "w436"
+  },
+  {
+    "text": "de",
+    "start": 169.33,
+    "end": 169.45,
+    "id": "w437"
+  },
+  {
+    "text": "Toronto,",
+    "start": 169.45,
+    "end": 169.82,
+    "id": "w438"
+  },
+  {
+    "text": "d'Edmonton",
+    "start": 169.9,
+    "end": 170.98,
+    "id": "w439"
+  },
+  {
+    "text": "ou",
+    "start": 171.01,
+    "end": 171.21,
+    "id": "w440"
+  },
+  {
+    "text": "de",
+    "start": 171.21,
+    "end": 171.4,
+    "id": "w441"
+  },
+  {
+    "text": "Montréal.",
+    "start": 171.6,
+    "end": 172.52,
+    "id": "w442"
+  },
+  {
+    "text": "Il",
+    "start": 172.52,
+    "end": 172.785,
+    "id": "w443"
+  },
+  {
+    "text": "se",
+    "start": 172.785,
+    "end": 173.05,
+    "id": "w444"
+  },
+  {
+    "text": "jouera",
+    "start": 173.05,
+    "end": 173.28,
+    "id": "w445"
+  },
+  {
+    "text": "dans",
+    "start": 173.28,
+    "end": 173.59,
+    "id": "w446"
+  },
+  {
+    "text": "les",
+    "start": 173.59,
+    "end": 173.82,
+    "id": "w447"
+  },
+  {
+    "text": "PME",
+    "start": 173.82,
+    "end": 174.04,
+    "id": "w448"
+  },
+  {
+    "text": "de",
+    "start": 174.04,
+    "end": 174.17,
+    "id": "w449"
+  },
+  {
+    "text": "Sherbrooke,",
+    "start": 174.24,
+    "end": 175.04,
+    "id": "w450"
+  },
+  {
+    "text": "dans",
+    "start": 175.04,
+    "end": 175.28,
+    "id": "w451"
+  },
+  {
+    "text": "les",
+    "start": 175.34,
+    "end": 175.47,
+    "id": "w452"
+  },
+  {
+    "text": "manufactures",
+    "start": 175.58,
+    "end": 176.31,
+    "id": "w453"
+  },
+  {
+    "text": "de",
+    "start": 176.31,
+    "end": 176.43,
+    "id": "w454"
+  },
+  {
+    "text": "l'Estrie,",
+    "start": 176.44,
+    "end": 177.04,
+    "id": "w455"
+  },
+  {
+    "text": "dans",
+    "start": 177.66,
+    "end": 177.75,
+    "id": "w456"
+  },
+  {
+    "text": "les",
+    "start": 177.75,
+    "end": 177.92,
+    "id": "w457"
+  },
+  {
+    "text": "entreprises",
+    "start": 177.92,
+    "end": 178.55,
+    "id": "w458"
+  },
+  {
+    "text": "agricoles,",
+    "start": 178.55,
+    "end": 179.2,
+    "id": "w459"
+  },
+  {
+    "text": "les",
+    "start": 179.21,
+    "end": 179.41,
+    "id": "w460"
+  },
+  {
+    "text": "hôpitaux,",
+    "start": 179.41,
+    "end": 180.11,
+    "id": "w461"
+  },
+  {
+    "text": "les",
+    "start": 180.11,
+    "end": 180.29,
+    "id": "w462"
+  },
+  {
+    "text": "municipalités",
+    "start": 180.31,
+    "end": 181.28,
+    "id": "w463"
+  },
+  {
+    "text": "et",
+    "start": 181.28,
+    "end": 181.38,
+    "id": "w464"
+  },
+  {
+    "text": "d'autres",
+    "start": 181.38,
+    "end": 181.8,
+    "id": "w465"
+  },
+  {
+    "text": "entreprises",
+    "start": 181.8,
+    "end": 182.39,
+    "id": "w466"
+  },
+  {
+    "text": "du",
+    "start": 182.39,
+    "end": 182.49,
+    "id": "w467"
+  },
+  {
+    "text": "Canada.",
+    "start": 182.49,
+    "end": 183,
+    "id": "w468"
+  },
+  {
+    "text": "Le",
+    "start": 183,
+    "end": 183.14,
+    "id": "w469"
+  },
+  {
+    "text": "Canada",
+    "start": 183.14,
+    "end": 183.46,
+    "id": "w470"
+  },
+  {
+    "text": "peut",
+    "start": 183.46,
+    "end": 183.68,
+    "id": "w471"
+  },
+  {
+    "text": "avoir",
+    "start": 183.69,
+    "end": 183.93,
+    "id": "w472"
+  },
+  {
+    "text": "les",
+    "start": 183.98,
+    "end": 184.13,
+    "id": "w473"
+  },
+  {
+    "text": "meilleurs",
+    "start": 184.2,
+    "end": 184.67,
+    "id": "w474"
+  },
+  {
+    "text": "chercheurs",
+    "start": 184.67,
+    "end": 185.24,
+    "id": "w475"
+  },
+  {
+    "text": "du",
+    "start": 185.3,
+    "end": 185.36,
+    "id": "w476"
+  },
+  {
+    "text": "monde,",
+    "start": 185.36,
+    "end": 185.86,
+    "id": "w477"
+  },
+  {
+    "text": "mais",
+    "start": 185.86,
+    "end": 186.11,
+    "id": "w478"
+  },
+  {
+    "text": "si",
+    "start": 186.11,
+    "end": 186.23,
+    "id": "w479"
+  },
+  {
+    "text": "ses",
+    "start": 186.23,
+    "end": 186.39,
+    "id": "w480"
+  },
+  {
+    "text": "propres",
+    "start": 186.44,
+    "end": 186.84,
+    "id": "w481"
+  },
+  {
+    "text": "entreprises",
+    "start": 187.07,
+    "end": 187.56,
+    "id": "w482"
+  },
+  {
+    "text": "n'utilisent",
+    "start": 187.56,
+    "end": 188.24,
+    "id": "w483"
+  },
+  {
+    "text": "pas",
+    "start": 188.24,
+    "end": 188.43,
+    "id": "w484"
+  },
+  {
+    "text": "ces",
+    "start": 188.43,
+    "end": 188.53,
+    "id": "w485"
+  },
+  {
+    "text": "technologies,",
+    "start": 188.65,
+    "end": 189.58,
+    "id": "w486"
+  },
+  {
+    "text": "les",
+    "start": 189.58,
+    "end": 189.887,
+    "id": "w487"
+  },
+  {
+    "text": "gains",
+    "start": 189.887,
+    "end": 190.193,
+    "id": "w488"
+  },
+  {
+    "text": "de",
+    "start": 190.193,
+    "end": 190.5,
+    "id": "w489"
+  },
+  {
+    "text": "productivité",
+    "start": 190.5,
+    "end": 191.2,
+    "id": "w490"
+  },
+  {
+    "text": "apparaîtront",
+    "start": 191.2,
+    "end": 192.11,
+    "id": "w491"
+  },
+  {
+    "text": "ailleurs.",
+    "start": 192.11,
+    "end": 192.94,
+    "id": "w492"
+  },
+  {
+    "text": "Point",
+    "start": 192.94,
+    "end": 194.02,
+    "id": "w493"
+  },
+  {
+    "text": "final.",
+    "start": 194.02,
+    "end": 194.42,
+    "id": "w494"
+  }
+]
