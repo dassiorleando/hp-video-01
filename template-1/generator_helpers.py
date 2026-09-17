@@ -291,29 +291,63 @@ def hardcut_block(hid: str, text: str, start: float, duration: float,
     return html_snippet, js_lines
 
 
-def kinetic_text_block(kid: str, words, start: float, stagger: float = 0.12):
+def kinetic_text_block(kid: str, words, start: float, stagger: float = 0.12,
+                        duration: float = None):
     """TEXTE KINÉTIQUE — les mots s'écrivent un à un en jaune (write-on).
-    words = liste de chaînes. Retourne (html_snippet, js_timeline_lines).
+    words = liste de chaînes. duration (temps écoulé depuis start, optionnel)
+    — si omis, calculé automatiquement (durée du write-on + 1.5s de tenue)
+    plutôt que la constante fixe "3" utilisée avant le 2026-09-17 (qui
+    pouvait couper la scène avant la fin du write-on sur une liste longue de
+    mots, ou la garder affichée inutilement longtemps sur une liste courte).
+
+    Retourne (html_snippet, js_timeline_lines).
     """
     spans = ''.join(f'<span class="kinetic-word">{esc(w)}</span>' for w in words)
-    html_snippet = f'  <div class="kinetic-text clip" id="{kid}" data-start="{start}" data-duration="3">{spans}</div>\n'
+    if duration is None:
+        duration = round(len(words) * stagger + 1.5, 2)
+    html_snippet = f'  <div class="kinetic-text clip" id="{kid}" data-start="{start}" data-duration="{round(duration, 2)}">{spans}</div>\n'
     js_lines = [
         f'tl.fromTo("#{kid} .kinetic-word", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.25, stagger: {stagger} }}, {start});'
     ]
     return html_snippet, js_lines
 
 
-def kinetic_swap_block(kid: str, word_a: str, word_b: str, start: float, swap_at: float):
+def kinetic_swap_block(kid: str, word_a: str, word_b: str, start: float, swap_at: float,
+                        end: float = None):
     """TEXTE KINÉTIQUE, variante swap — un mot s'efface, un autre le remplace
     au même endroit (ex. « CAPITAL » -> « CLIENT »). swap_at est un temps
-    ABSOLU (pas un offset) — doit être > start.
+    ABSOLU (pas un offset) — doit être > start. end (temps ABSOLU, optionnel)
+    est le moment où la scène se referme ; si omis, défaut à swap_at + 1.8s
+    (le temps que le second mot reste affiché avant la coupe).
+
+    FIX (2026-09-17, audit complet du script avant toute utilisation réelle
+    en composition — la seule note qui appelle cette fonction, chapitre 6
+    bataille 2 "CAPITAL" -> "CLIENT", est explicitement PLEIN CADRE) : le
+    HTML posait class="kinetic-swap clip" directement, mais .kinetic-swap
+    lui-même déclare position:relative + display:inline-block SANS aucun
+    centrage — ça écrase le position:absolute + inset:0 de .clip sans rien
+    mettre à la place, donc l'élément retombe dans le flux normal du
+    document à taille zéro, collé en haut-gauche de l'écran (vérifié par un
+    rendu Playwright : bounding box 0x0 à top:14/left:0 au lieu d'être
+    centré). Même famille de bug que .stamp-wrap/.name-tag ce même jour —
+    un centrage manquant sur le .clip lui-même. Le HTML enveloppe
+    maintenant .kinetic-swap dans un .kinetic-swap-wrap dédié (le .clip,
+    display:flex centré) exactement comme stamp_block() le fait avec
+    .stamp-wrap ; .kinetic-swap reste la boîte interne dimensionnée à son
+    texte.
 
     Retourne (html_snippet, js_timeline_lines).
     """
+    if end is None:
+        end = round(swap_at + 1.8, 3)
+    dur = round(end - start, 2)
     html_snippet = (
-        f'  <div class="kinetic-swap clip" id="{kid}" data-start="{start}" data-duration="4">\n'
-        f'    <span class="kinetic-swap-word" id="{kid}-a">{esc(word_a)}</span>\n'
-        f'    <span class="kinetic-swap-word" id="{kid}-b">{esc(word_b)}</span>\n'
+        f'  <div id="{kid}-wrap" class="clip kinetic-swap-wrap" data-start="{start}" '
+        f'data-duration="{dur}">\n'
+        f'    <div class="kinetic-swap" id="{kid}">\n'
+        f'      <span class="kinetic-swap-word" id="{kid}-a">{esc(word_a)}</span>\n'
+        f'      <span class="kinetic-swap-word" id="{kid}-b">{esc(word_b)}</span>\n'
+        f'    </div>\n'
         f'  </div>\n'
     )
     js_lines = [
@@ -497,6 +531,149 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
         f'{{ scale: 1.07, duration: {round(duration,3)}, ease: "none" }}, {start});',
     ]
     return html_snippet, js_lines
+
+
+def title_card_block(card_id: str, line1_words, line2_words, start: float,
+                      duration: float, accent_line2: bool = True,
+                      font_size: int = 58, max_width: int = 1520):
+    """CARTON DE TITRE / CARTON DE FERMETURE — mots qui claquent un à un
+    (scale 1.25 -> 1, power4.out) sur fond noir uni, avec un filigrane de
+    feuille d'érable qui apparaît en fondu lent derrière le texte. Utilisé
+    au tout début de la vidéo (cold open, "LE CANADA A INVENTÉ L'IA
+    MODERNE...") ET à la toute fin (CONCLUSION, CARTON DE FERMETURE — le
+    script dit explicitement "même traitement typographique que le titre du
+    cold open") : symétrique par construction, d'où l'extraction en un seul
+    patron réutilisable.
+
+    Extrait le 2026-09-17 (audit complet du script) de
+    compositions/gen_cold_open.py (qui l'avait codé en dur pour le cold open
+    sous #outro-card) — générique ici, accepte n'importe quel titre en 1 ou
+    2 lignes plutôt que le texte fixe d'origine.
+
+    line1_words / line2_words : listes de mots DÉJÀ découpés (ex.
+    "texte".split(" ")) — PAS passés par esc() ici (contrairement aux autres
+    fonctions du kit), pour permettre les entités HTML typographiques
+    (ex. "&Eacute;", "&hellip;", "&nbsp;") comme dans le carton d'origine ;
+    échapper en amont tout texte narratif brut qui n'a pas besoin
+    d'entités. line2_words peut être une liste vide ([]) pour un titre
+    d'une seule ligne. accent_line2=True colore la deuxième ligne en bleu
+    clair (#60a5fa) plutôt qu'en blanc, comme dans le carton d'origine.
+
+    Retourne (html_snippet, js_timeline_lines).
+    """
+    maple_leaf_svg = (
+        '<svg class="maple-leaf" viewBox="0 0 512 512" fill="#3b82f6">'
+        '<path d="M256 18 L280 120 L360 70 L334 150 L432 140 L360 200 L440 250 L350 260 '
+        'L390 340 L300 310 L302 400 L256 330 L210 400 L212 310 L122 340 L162 260 L72 250 '
+        'L152 200 L80 140 L178 150 L152 70 L232 120 Z"/></svg>'
+    )
+    line1_html = ' '.join(f'<span class="title-word" id="{card_id}-a{i}">{w}</span>'
+                           for i, w in enumerate(line1_words))
+    line2_html = ' '.join(f'<span class="title-word" id="{card_id}-b{i}">{w}</span>'
+                           for i, w in enumerate(line2_words)) if line2_words else ''
+    overrides = []
+    if font_size != 58:
+        overrides.append(f'font-size:{font_size}px')
+    if max_width != 1520:
+        overrides.append(f'max-width:{max_width}px')
+    title_style = f' style="{"; ".join(overrides)};"' if overrides else ""
+    accent_attr = ' class="accent"' if accent_line2 else ''
+    line2_block = f'\n      <div{accent_attr}>{line2_html}</div>' if line2_html else ''
+    html_snippet = (
+        f'  <div id="{card_id}" class="clip title-card" data-start="{start}" '
+        f'data-duration="{round(duration, 2)}">\n'
+        f'    {maple_leaf_svg}\n'
+        f'    <div class="title-text"{title_style}>\n'
+        f'      <div>{line1_html}</div>{line2_block}\n'
+        f'    </div>\n'
+        f'  </div>\n'
+    )
+    js_lines = []
+    stagger = 0.11
+    delay = 0.0
+    for i in range(len(line1_words)):
+        ts = round(start + 0.2 + delay, 3)
+        js_lines.append(
+            f'tl.fromTo("#{card_id}-a{i}", {{ opacity: 0, scale: 1.25 }}, '
+            f'{{ opacity: 1, scale: 1, duration: 0.1, ease: "power4.out" }}, {ts});'
+        )
+        delay += stagger
+    if line2_words:
+        delay += 0.15
+        for i in range(len(line2_words)):
+            ts = round(start + 0.2 + delay, 3)
+            js_lines.append(
+                f'tl.fromTo("#{card_id}-b{i}", {{ opacity: 0, scale: 1.25 }}, '
+                f'{{ opacity: 1, scale: 1, duration: 0.1, ease: "power4.out" }}, {ts});'
+            )
+            delay += stagger
+    js_lines.append(
+        f'tl.fromTo("#{card_id} .maple-leaf", {{ opacity: 0, scale: 0.9 }}, '
+        f'{{ opacity: 0.06, scale: 1, duration: 1.2, ease: "power1.out" }}, {round(start,3)});'
+    )
+    return html_snippet, js_lines
+
+
+def timeline_block(tid: str, milestones, start: float, duration: float,
+                    horizontal: bool = True):
+    """CAPSULE-DONNÉE — LIGNE DU TEMPS / JALONS : des étapes lumineuses
+    apparaissent successivement, reliées par un trait qui grandit d'une
+    étape à l'autre (ex. chapitre 4 "Toronto -> Google -> OpenAI", chapitre 6
+    "2013 : Google achète DNNresearch -> 2026 : ... Digital Transformation
+    Canada"). Ajouté le 2026-09-17 (audit complet du script — ce motif
+    revient au moins deux fois, jamais construit avant).
+
+    milestones = liste de (label_text, activate_time) — activate_time est un
+    temps ABSOLU auquel ce jalon s'allume (dot + trait qui s'étend jusqu'à
+    lui + label qui apparaît). Le premier jalon est allumé dès `start`
+    (juste le dot, sans trait entrant). Les jalons sont répartis
+    AUTOMATIQUEMENT à intervalles égaux le long de la piste (pas besoin de
+    calculer leur position toi-même) ; pour un espacement inégal (dates non
+    linéaires), ajuster le `style="left:X%"` / `style="top:X%"` de l'élément
+    `#{tid}-msN` généré, après coup. Une petite vignette-photo (CADRE-TÉLÉ)
+    optionnelle par jalon n'est PAS gérée ici — ce patron ne couvre que la
+    ligne + les points + les labels ; ajouter un .photo-card positionné à
+    côté de chaque jalon séparément si le script le demande (voir
+    STYLE_GUIDE §2 pour .photo-card).
+
+    Retourne (html_snippet, js_timeline_lines). Plein cadre par défaut
+    (fond bleu nuit quadrillé — ajouter .grid-bg séparément dans la
+    composition) ; horizontal=False empile les jalons verticalement.
+    """
+    n = len(milestones)
+    cls = 'timeline timeline--horizontal' if horizontal else 'timeline'
+    axis_prop = 'width' if horizontal else 'height'
+    pos_prop = 'left' if horizontal else 'top'
+    html_parts = [f'  <div id="{tid}" class="clip {cls}" data-start="{start}" '
+                  f'data-duration="{round(duration, 2)}">\n']
+    html_parts.append(f'    <div class="timeline-track" id="{tid}-track">\n')
+    html_parts.append(f'      <div class="timeline-track-fill" id="{tid}-track-fill"></div>\n')
+    for i, (label, _at) in enumerate(milestones):
+        ms_id = f'{tid}-ms{i}'
+        pct = round(100 * i / (n - 1), 2) if n > 1 else 50.0
+        html_parts.append(
+            f'      <div class="timeline-milestone" id="{ms_id}" style="{pos_prop}:{pct}%;">\n'
+            f'        <div class="timeline-dot"></div>\n'
+            f'        <div class="timeline-label">{esc(label)}</div>\n'
+            f'      </div>\n'
+        )
+    html_parts.append('    </div>\n')
+    html_parts.append('  </div>\n')
+    js_lines = []
+    # le trait (.timeline-track-fill, un vrai enfant -- pas un ::after, que
+    # GSAP ne peut pas cibler par sélecteur) grandit par segments, d'un
+    # jalon au suivant (pourcentage de la piste totale = (n-1) segments
+    # égaux).
+    for i, (_label, at) in enumerate(milestones):
+        ms_id = f'{tid}-ms{i}'
+        js_lines.append(f'tl.to("#{ms_id}", {{ opacity: 1, duration: 0.3 }}, {at});')
+        js_lines.append(f'tl.to("#{ms_id} .timeline-dot", {{ scale: 1, duration: 0.3, ease: "back.out(2.5)" }}, {at});')
+        if i > 0 and n > 1:
+            pct = round(100 * i / (n - 1), 2)
+            js_lines.append(
+                f'tl.to("#{tid}-track-fill", {{ {axis_prop}: "{pct}%", duration: 0.4, ease: "power2.out" }}, {at});'
+            )
+    return ''.join(html_parts), js_lines
 
 
 # ---------------------------------------------------------------------------

@@ -105,6 +105,17 @@ html,body { margin:0; padding:0; background:#000; }
 /* variante compacte pour un texte à 2 mots (ex. "Financement refusé") :
    ajouter style="font-size:70px; padding:12px 34px;" en inline sur l'instance */
 
+/* Conteneur générique pour stamp_block() (generator_helpers.py). Même patron
+   que #impasse-stamp de chapitre-1 : display:flex DIRECTEMENT sur le même
+   élément .clip qui porte .stamp-text (pas de wrapper intermédiaire sans
+   centrage). .clip = position:absolute, donc un élément .clip n'est PAS
+   traité comme flex-item par un parent flex externe — le centrage doit
+   obligatoirement vivre ici, sur le .clip lui-même. Fix 2026-09-17 : avant
+   ce correctif, stamp_block() ne posait aucun display sur son "-wrap", ce
+   qui l'étirait plein cadre (inset:0) et donnait un bandeau diagonal pleine
+   largeur au lieu du bloc compact pivoté attendu. */
+.stamp-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
 /* ---- mots-héros (hero words) -------------------------------------------
    Par-dessus la vidéo en direct uniquement (jamais sur une carte plein
    cadre). Deux variantes : information (droite, sans boîte) et verdict
@@ -140,8 +151,15 @@ html,body { margin:0; padding:0; background:#000; }
    COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
    CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
    présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
-   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin. */
-.split2 { position:absolute; inset:0; display:flex; }
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin.
+   FIX 2026-09-17 (retour utilisateur "pas premium", visage du présentateur
+   visible/encombré derrière le split) : .split2 n'avait jamais de fond
+   opaque, donc malgré ce commentaire ("le présentateur n'est pas visible"),
+   la vidéo en direct restait visible en transparence derrière tout le split
+   -- texte et icônes flottaient par-dessus le visage/torse au lieu d'un
+   vrai plein cadre. Même fond que les autres CAPSULE-DONNÉE plein cadre de
+   chapitre-1 (#hinton-card, etc.) : #03050a. */
+.split2 { position:absolute; inset:0; display:flex; background:#03050a; }
 .split2.split2--horizontal { flex-direction:column; }
 .split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
 .split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
@@ -245,9 +263,47 @@ html,body { margin:0; padding:0; background:#000; }
    ou plein cadre. */
 .kinetic-text { display:flex; flex-wrap:wrap; gap:0.35em; font-size:52px; font-weight:800; color:#facc15; }
 .kinetic-word { opacity:0; }
-/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT) */
+/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT)
+   FIX 2026-09-17 (audit complet du script, avant toute utilisation réelle en
+   composition) : .kinetic-swap posait position:relative sans aucune règle de
+   centrage plein cadre, alors que la seule note du script qui l'utilise
+   (chapitre 6, bataille 2, "CAPITAL" -> "CLIENT") est explicitement plein
+   cadre -- l'élément se retrouvait donc collé en haut-gauche de l'écran à
+   taille zéro (position:relative + display:inline-block, aucun ancêtre pour
+   le centrer). Même famille de bug que .stamp-wrap/.name-tag ce même jour --
+   centrage manquant sur le .clip lui-même. Nouveau wrapper .kinetic-swap-wrap
+   (posé sur l'élément .clip) fait le centrage ; .kinetic-swap reste la boîte
+   interne dimensionnée à son texte. */
+.kinetic-swap-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
 .kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
-.kinetic-swap .kinetic-swap-word { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; }
+/* left:0/top:0 (avant le 2026-09-17) ne fonctionne QUE si .kinetic-swap a
+   lui-même une taille -- or ses deux enfants sont tous les deux
+   position:absolute, donc AUCUN des deux ne contribue à la taille
+   intrinsèque du parent inline-block (bug vérifié par rendu Playwright :
+   #kinetic-swap faisait 0x0, donc "left:0/top:0" plaçait chaque mot au
+   pixel exact du coin, pas centré). left:50%/top:50% + translate(-50%,-50%)
+   centre chaque mot sur le point du parent indépendamment de sa taille
+   propre (chaque mot peut avoir une largeur différente, ex. "CAPITAL" vs
+   "CLIENT") -- fonctionne même si le parent reste à 0x0. */
+.kinetic-swap .kinetic-swap-word { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); white-space:nowrap; opacity:0; }
+
+/* ---- SURIMPRESSION LISTE (voile + liste qui s'accumule) -----------------
+   Ajouté 2026-09-17 (demande utilisateur, chapitre 2 : "plus de données,
+   plus de calcul, des réseaux de plus en plus profonds, et des modèles qui
+   apprennent leurs propres représentations"). Voile plein cadre SEMI-
+   TRANSPARENT par-dessus la vidéo en direct -- contrairement à
+   #hardcut-black (noir total, opaque), le présentateur reste visible,
+   assombri, en arrière-plan. Chaque ligne de la liste s'ajoute une à une,
+   au rythme de la parole, et reste affichée (la liste s'accumule) jusqu'à
+   la fin de la surimpression entière -- voir
+   generator_helpers.py:list_overlay_block(). Ne PAS mettre position/inset
+   directement sur .list-overlay : laisser .clip gérer entièrement le
+   plein cadre (voir le bug du 2026-09-17 sur .name-tag/.split2 -- une
+   règle qui ne redéfinit qu'une partie des 4 côtés d'un .clip entre en
+   conflit avec son inset:0). */
+.list-overlay { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:38px; padding:0 180px; background:rgba(3,5,10,0.74); opacity:0; pointer-events:none; }
+.list-overlay-item { display:flex; align-items:center; gap:28px; max-width:1560px; font-size:52px; font-weight:800; line-height:1.25; color:#fff; opacity:0; }
+.list-overlay-item::before { content:""; width:16px; height:16px; border-radius:50%; background:#3b82f6; flex:none; }
 
 /* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
    Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,
@@ -328,6 +384,48 @@ html,body { margin:0; padding:0; background:#000; }
   line-height:1.2; opacity:0;
 }
 .chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
+
+/* ---- CARTON DE TITRE / CARTON DE FERMETURE (mots qui claquent, filigrane érable) ----
+   Extrait le 2026-09-17 de compositions/gen_cold_open.py (#outro-card, codé
+   en dur pour le titre du cold open) -- générique ici : la CONCLUSION du
+   script demande "même traitement typographique que le titre du cold open"
+   pour son CARTON DE FERMETURE, symétrique par construction. Voir
+   generator_helpers.py:title_card_block(). Ne pas confondre avec
+   .chapter-opening-card ci-dessus : pas de photo, pas de kicker, juste le
+   texte massif + le filigrane, sur fond noir uni. */
+.title-card { background:#03050a; z-index:60; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.title-card .maple-leaf { position:absolute; width:820px; height:820px; opacity:0.06; top:50%; left:50%; transform:translate(-50%,-50%); }
+.title-card .title-text { position:relative; max-width:1520px; font-size:58px; font-weight:800; text-align:center; line-height:1.3; color:#fff; }
+.title-card .title-word { display:inline-block; opacity:0; }
+.title-card .accent .title-word { color:#60a5fa; }
+
+/* ---- CAPSULE-DONNÉE — LIGNE DU TEMPS / JALONS ---------------------------
+   Ajouté le 2026-09-17 (audit complet du script) : des étapes lumineuses
+   qui s'allument une à une, reliées par un trait qui grandit d'une étape à
+   la suivante (ex. chapitre 4 "Toronto -> Google -> OpenAI", chapitre 6
+   "2013 -> 2026"). Voir generator_helpers.py:timeline_block(). Plein cadre
+   par défaut -- ajouter .grid-bg séparément dans la composition pour le
+   fond bleu nuit quadrillé habituel des CAPSULE-DONNÉE. */
+.timeline { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.timeline.timeline--horizontal { flex-direction:row; }
+.timeline-track { position:relative; background:rgba(96,165,250,0.25); }
+.timeline:not(.timeline--horizontal) .timeline-track { width:3px; height:60%; }
+.timeline--horizontal .timeline-track { width:60%; height:3px; }
+/* trait de progression : un vrai enfant (PAS un ::after -- GSAP ne peut pas
+   cibler un pseudo-élément par sélecteur CSS), voir timeline_block(). */
+.timeline-track-fill { position:absolute; top:0; left:0; background:#3b82f6; }
+.timeline:not(.timeline--horizontal) .timeline-track-fill { width:100%; height:0%; }
+.timeline--horizontal .timeline-track-fill { height:100%; width:0%; }
+/* jalons : enfants de .timeline-track, positionnés en % le long de sa
+   propre longueur (left pour horizontal, top pour vertical -- posé en
+   inline style par timeline_block(), réparti à intervalles égaux). */
+.timeline-milestone {
+  position:absolute; display:flex; flex-direction:column; align-items:center; gap:14px;
+  opacity:0.35; transform:translate(-50%,-50%); white-space:nowrap;
+}
+.timeline:not(.timeline--horizontal) .timeline-milestone { flex-direction:row; gap:20px; }
+.timeline-dot { width:20px; height:20px; border-radius:50%; background:#3b82f6; box-shadow:0 0 20px 4px rgba(59,130,246,0.5); transform:scale(0); flex:none; }
+.timeline-label { font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center; }
 </style>
 </head>
 <body>
@@ -352,7 +450,10 @@ html,body { margin:0; padding:0; background:#000; }
   </div>
   <div data-hf-id="hf-be7d" class="hero clip hero--right" id="hero-hw1" data-start="5.0" data-duration="1.0"><div data-hf-id="hf-q7m7" class="hero-text" id="hw1">EXEMPLE DE TITRE</div></div>
   <div data-hf-id="hf-11py" id="split-1" class="clip" data-start="6.5" data-duration="3.0" style="z-index:33; pointer-events:none;">
-    <div data-hf-id="hf-bi37" class="split-photo-panel" id="split-1-panel"><img data-hf-id="hf-9rsv" src="assets/photos/circuit-board.jpg" alt=""><div data-hf-id="hf-bzji" class="split-tint"></div></div>
+    <div data-hf-id="hf-bi37" class="split-photo-panel" id="split-1-panel">
+      <img data-hf-id="hf-9rsv" src="assets/photos/circuit-board.jpg" alt="">
+      <div data-hf-id="hf-bzji" class="split-tint"></div>
+    </div>
     <div data-hf-id="hf-pyng" class="split-divider" id="split-1-divider"></div>
     <div data-hf-id="hf-3zm8" class="split-caption" id="split-1-caption">Légende de l'archive</div>
     <div data-hf-id="hf-7y9y" class="split-source" id="split-1-source">Source : archives</div>
@@ -363,7 +464,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-4vzb" style="font-size:64px; font-weight:900; color:#fff;">42&#160;%</div>
     </div>
   </div>
-  <div data-hf-id="hf-ycdj" id="stamp-1-wrap" class="clip" data-start="12.5" data-duration="1.2">
+  <div data-hf-id="hf-1xl1" id="stamp-1-wrap" class="clip stamp-wrap" data-start="12.5" data-duration="1.2">
     <div data-hf-id="hf-61yt" class="stamp-text" id="stamp-1">Rupture</div>
   </div>
   <div data-hf-id="hf-vmsn" id="montage-1" class="clip montage-rafale" data-start="14.0" data-duration="1.5">
@@ -380,7 +481,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-pnp5" class="montage-label">Exemple C</div>
     </div>
   </div>
-  <div data-hf-id="hf-n3l8" class="kinetic-text clip" id="kinetic-1" data-start="16.0" data-duration="3"><span data-hf-id="hf-ee0n" class="kinetic-word">Exemple</span><span data-hf-id="hf-bnvs" class="kinetic-word">de</span><span data-hf-id="hf-tb23" class="kinetic-word">texte</span><span data-hf-id="hf-4yji" class="kinetic-word">kinétique</span></div>
+  <div data-hf-id="hf-o78p" class="kinetic-text clip" id="kinetic-1" data-start="16.0" data-duration="1.98"><span data-hf-id="hf-ee0n" class="kinetic-word">Exemple</span><span data-hf-id="hf-bnvs" class="kinetic-word">de</span><span data-hf-id="hf-tb23" class="kinetic-word">texte</span><span data-hf-id="hf-4yji" class="kinetic-word">kinétique</span></div>
   <div data-hf-id="hf-f701" class="hardcut-text" id="hardcut-1" data-start="18.5" data-duration="2.0">EXEMPLE DE QUESTION DRAMATIQUE?</div>
 </div>
 </div>

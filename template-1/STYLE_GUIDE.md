@@ -139,6 +139,42 @@ visuelle que `.hl` (le surlignage en ligne dans une CARTE-CITATION).
 → `.kinetic-text` / `.kinetic-word` (write-on), `.kinetic-swap` (swap),
 `kinetic_text_block()`, `kinetic_swap_block()`.
 
+La variante **swap est toujours plein cadre** dans le script (ex. chapitre 6,
+« CAPITAL » → « CLIENT ») : `kinetic_swap_block()` enveloppe `.kinetic-swap`
+dans un `.kinetic-swap-wrap` (le `.clip`, centré en flex) — ne jamais poser
+`class="kinetic-swap clip"` directement sans ce wrapper (bug réel trouvé et
+corrigé le 2026-09-17, voir §6).
+
+### Surimpression liste (voile + liste qui s'accumule)
+Voile plein cadre **semi-transparent** par-dessus la vidéo en direct — le
+présentateur reste visible, assombri en arrière-plan (différent de la
+coupure au noir ci-dessus, qui est opaque à 100 %). Une liste de points-clés
+en gros caractères s'ajoute un par un au rythme de la parole et reste
+affichée (la liste s'accumule) jusqu'à la fin de la surimpression. Ajouté le
+2026-09-17 pour la récapitulation du chapitre 2 (« plus de données, plus de
+calcul, des réseaux de plus en plus profonds… ») mais générique — toute
+liste de 2 à 5 points calée sur le script. → `.list-overlay` /
+`.list-overlay-item`, `list_overlay_block()`.
+
+### Ligne du temps / jalons
+Des étapes lumineuses qui s'allument une à une, reliées par un trait qui
+grandit d'une étape à l'autre (ex. chapitre 4 « Toronto → Google → OpenAI »,
+chapitre 6 « 2013 → 2026 » en boucle). Jalons répartis automatiquement à
+intervalles égaux le long de la piste ; plein cadre par défaut, horizontal
+ou vertical. Ajouté le 2026-09-17 (ce motif revient au moins deux fois dans
+le script, jamais construit avant). → `.timeline` / `.timeline-track` /
+`.timeline-track-fill` / `.timeline-milestone`, `timeline_block()`.
+
+### Carton de titre / carton de fermeture
+Mots blancs (deuxième ligne en bleu clair) qui claquent un à un sur fond
+noir, filigrane de feuille d'érable en fondu lent derrière le texte. Utilisé
+au tout début de la vidéo (cold open) **et** à la toute fin (CONCLUSION,
+CARTON DE FERMETURE — le script dit explicitement « même traitement
+typographique que le titre du cold open ») : symétrique par construction.
+Extrait le 2026-09-17 de `compositions/gen_cold_open.py` (qui l'avait codé
+en dur) vers un patron générique du kit. → `.title-card` / `.title-word`,
+`title_card_block()`.
+
 ### Triptyque fixe / montage en cascade / montage-écho
 - **Triptyque** : trois colonnes égales avec icône + intitulé, qui
   s'allument une à une au rythme de la narration (ex. les trois villes du
@@ -232,19 +268,48 @@ complet. Bug réel trouvé le 2026-09-16 sur `#chapter-card`
 |---|---|
 | `STYLE_GUIDE.md` | ce document — le vocabulaire et les règles |
 | `style-kit.css` | les classes CSS réutilisables, à copier dans le `<style>` du nouveau générateur |
-| `generator_helpers.py` | fonctions Python de référence : `stamp_block()`, `hero_word_block()`, `data_card_panel()`, `split_screen_block()`, `split2_block()`, `montage_block()`, `hardcut_block()`, `kinetic_text_block()`, `kinetic_swap_block()`, `triptych_block()`, `cascade_block()`, `interface_mock_block()`, `ken_burns_zoom()`, `scale_2x_wrapper()` |
-| `gen_starter.py` | squelette générateur **exécutable** qui assemble la majorité des blocs ci-dessus en une mini-composition d'exemple — le point de départ concret pour un nouveau générateur |
+| `generator_helpers.py` | fonctions Python de référence : `stamp_block()`, `hero_word_block()`, `data_card_panel()`, `split_screen_block()`, `split2_block()`, `montage_block()`, `hardcut_block()`, `kinetic_text_block()`, `kinetic_swap_block()`, `list_overlay_block()`, `triptych_block()`, `cascade_block()`, `interface_mock_block()`, `chapter_opening_card_block()`, `title_card_block()`, `timeline_block()`, `ken_burns_zoom()`, `scale_2x_wrapper()` |
+| `gen_starter.py` | squelette générateur **exécutable** qui assemble la majorité des blocs ci-dessus en une mini-composition d'exemple — le point de départ concret pour un nouveau générateur. Importe ses fonctions directement depuis `generator_helpers.py` (pas de copier-coller local) depuis le 2026-09-17, précisément pour que ce squelette ne puisse plus diverger silencieusement du kit — voir l'audit ci-dessous. |
 | `example-composition.html` | la sortie de `gen_starter.py`, pour prévisualiser sans exécuter |
 
-**Audit d'alignement (2026-09-16)** : les patrons ci-dessus ont été vérifiés
-contre le vocabulaire complet du script (117 notes entre crochets, cold open
-+ 6 chapitres + conclusion) et couvrent maintenant toutes les catégories
-récurrentes. Restent volontairement hors kit (pas des patrons visuels
-réutilisables, voir §2) : FACE CAMÉRA, PLAN FIXE, et les indications
-purement sonores (TRANSITION MUSICALE, FONDU SONORE FINAL, SFX). Les
-cartons d'ouverture/fermeture du cold open (CARTON DE TITRE, CARTON DE
-FERMETURE) vivent dans `compositions/cold-open.html`, une composition à
-part avec son propre style — pas encore extraits dans ce kit.
+**Audit d'alignement (2026-09-17, 2e passe)** — le premier audit (2026-09-16)
+avait vérifié la COUVERTURE du vocabulaire (117 notes entre crochets, cold
+open + 6 chapitres + conclusion) mais pas la CORRECTION de chaque patron
+"couvert". Cette 2e passe a relu le script au complet (chapitres 3 à 6 +
+conclusion inclus, pas encore construits) et corrigé ce qui restait faux ou
+manquant :
+- **Bugs réels trouvés et corrigés** (même famille à chaque fois : un
+  élément qui ne pose qu'une partie de son positionnement/centrage entre en
+  conflit avec `.clip` ou se retrouve sans dimension) — bandeau plein
+  largeur au lieu du tampon compact (`.stamp-wrap`), `.split2` jamais
+  opaque, badges `.name-tag` qui débordent, régression du panneau GPU sur
+  le visage du présentateur (tous corrigés le 2026-09-17 sur chapitre 2, en
+  amont de cet audit) ; **`.kinetic-swap` non centré plein cadre** (jamais
+  utilisé avant cet audit — trouvé par relecture avant tout usage réel,
+  vérifié par rendu Playwright : boîte à 0×0 collée en haut-gauche au lieu
+  d'être centrée — voir `.kinetic-swap-wrap` et §2 "Texte kinétique").
+- **Patrons ajoutés** parce qu'un usage à venir (chapitres 3-6, conclusion)
+  n'avait encore aucun helper propre : `list_overlay_block()` (surimpression
+  liste, demande utilisateur chapitre 2), `title_card_block()` (extrait de
+  `gen_cold_open.py`, requis tel quel pour le CARTON DE FERMETURE de la
+  conclusion), `timeline_block()` (ligne du temps/jalons, motif répété au
+  moins deux fois : chapitres 4 et 6).
+- **`gen_starter.py` corrigé** pour importer `generator_helpers.py` au lieu
+  de dupliquer son code (voir tableau ci-dessus) — la copie locale de
+  `stamp_block()` y était encore bogguée (version d'avant le fix du
+  2026-09-17), ce qui aurait réintroduit le bug dans tout nouveau projet
+  démarré à partir de ce squelette.
+- Restent volontairement hors kit (pas des patrons visuels réutilisables,
+  voir §2) : FACE CAMÉRA, PLAN FIXE, SÉQUENCE COMIQUE (réutilise
+  `.photo-card`/`.montage-item` avec un timing plus long), CHAÎNE D'ICÔNES
+  (variante horizontale de `cascade_block()` — pas encore un paramètre
+  dédié, à construire au cas par cas en attendant), et les indications
+  purement sonores (TRANSITION MUSICALE, FONDU SONORE FINAL, SFX). Le
+  CARTON D'OUVERTURE façon terminal (« Toronto, 2012 », voir §2bis pour le
+  distinguer de `chapter_opening_card_block()`) reste dupliqué en dur entre
+  `compositions/gen_cold_open.py` et `compositions/gen_chapitre2.py` — pas
+  encore extrait, mais n'est demandé par le script qu'à ces deux endroits
+  (déjà construits), donc pas bloquant pour les chapitres 3-6.
 
 ## 7. Comment l'utiliser pour une vidéo à produire
 

@@ -122,10 +122,11 @@ Ouvre `compositions/gen_chapitre2.py` et fais ces ajustements :
    ```
 
 2. **Récupère les fonctions du kit par import plutôt que par copier-coller**
-   (évite que les deux copies divergent avec le temps) — ajoute en haut du
-   fichier, puis supprime les définitions de fonctions dupliquées
-   (`stamp_block`, `hero_word_block`, etc.) que `gen_starter.py` contenait
-   pour rester autonome :
+   (évite que les deux copies divergent avec le temps — depuis le
+   2026-09-17, `gen_starter.py` lui-même fait déjà cet import plutôt que de
+   dupliquer le code des fonctions, donc l'ajout ci-dessous remplace
+   simplement le `from generator_helpers import (...)` déjà présent par la
+   liste complète dont TON chapitre a besoin) :
 
    ```python
    import sys
@@ -134,9 +135,20 @@ Ouvre `compositions/gen_chapitre2.py` et fais ces ajustements :
        esc, make_t, scale_2x_wrapper, stamp_block, hero_word_block,
        data_card_panel, split_screen_block, split2_block, montage_block,
        hardcut_block, kinetic_text_block, kinetic_swap_block,
-       triptych_block, cascade_block, interface_mock_block, ken_burns_zoom,
+       list_overlay_block, triptych_block, cascade_block,
+       interface_mock_block, chapter_opening_card_block, title_card_block,
+       timeline_block, ken_burns_zoom,
    )
    ```
+
+   N'importe que ce dont tu as besoin — cette liste montre l'ensemble
+   disponible (STYLE_GUIDE §6 décrit ce que fait chaque fonction, §2 quelle
+   note du script correspond à laquelle). Ne recopie jamais le CORPS d'une
+   fonction dans ton générateur, même pour "l'adapter" : modifie plutôt
+   `generator_helpers.py` lui-même si un patron doit changer, pour que tous
+   les chapitres qui l'utilisent profitent du correctif (voir STYLE_GUIDE
+   §6, audit du 2026-09-17, où une copie locale oubliée avait réintroduit un
+   bug déjà corrigé ailleurs).
 
 3. **Change `COMP_ID`, `VIDEO_SRC`, `INTRO_PAD`, `TOTAL_DUR`** pour le
    chapitre 2, et remplace le bloc "EXEMPLE" par les scènes réelles du
