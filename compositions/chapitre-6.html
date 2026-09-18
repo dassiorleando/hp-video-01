@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+/* =========================================================================
+   STYLE KIT — vidéos "documentaire face caméra" (style Automathing)
+   Extrait de compositions/chapitre-1.html. Voir ../../STYLE_GUIDE.md pour le
+   vocabulaire du script et la logique derrière chaque classe.
+
+   Usage : copier les blocs pertinents dans le bloc style d'un nouveau
+   générateur de composition (ou lire ce fichier directement et l'insérer
+   tel quel entre des balises style — voir compositions/gen_cold_open.py
+   pour cet usage). Ce fichier n'est PAS mounté par HyperFrames (ce n'est
+   pas une sous-composition) — c'est une bibliothèque de référence.
+   ATTENTION : n'écris jamais le texte litéral d'une balise style ouvrante
+   ou fermante dans un commentaire de ce fichier, même en exemple — un
+   générateur qui insère ce fichier tel quel dans du HTML transformerait ce
+   texte en vraie balise et casserait le bloc de style qui l'englobe (bug
+   réel trouvé le 2026-09-16 dans compositions/cold-open.html).
+   ========================================================================= */
+
+/* ---- base + vrai 4K (voir STYLE_GUIDE §5) -----------------------------
+   Tout le contenu ci-dessous est authoré en 1920x1080 ; #scale-2x agrandit
+   uniformément 2x pour remplir un canevas 3840x2160/60fps. Zéro valeur de
+   pixel à recalculer à la main. */
+html,body { margin:0; padding:0; background:#000; }
+#scale-2x { position:absolute; top:0; left:0; width:1920px; height:1080px; transform:scale(2); transform-origin:top left; }
+.clip { position:absolute; inset:0; }
+
+/* ---- .clip-inner : sortie GSAP correcte pour une scène plein-cadre -----
+   Le framework HyperFrames gère déjà la visibilité de tout élément
+   `class="clip"` (montage/démontage automatique à data-start/data-duration).
+   Si un fondu de sortie GSAP anime l'opacité du `.clip` LUI-MÊME (au lieu
+   d'un enfant) et que ce fondu se termine pile à la frontière data-duration,
+   `hyperframes check` lève une vraie erreur (gsap_exit_missing_hard_kill) :
+   un seek non-linéaire (rendu par workers parallèles, scrubbing) peut
+   retomber juste après le fondu sans qu'un état final "dur" ait été posé.
+   Convention : le contenu visuel d'une scène plein-cadre avec fondu de
+   sortie va dans un <div class="clip-inner"> imbriqué dans le `.clip`, et
+   c'est CET enfant (jamais le `.clip` parent) qui reçoit le tween de sortie
+   + un tl.set(...) de verrouillage dur pile à data-duration. Bug réel
+   trouvé le 2026-09-16 sur #chapter-card (chapitre-1.html ET
+   chapter_opening_card_block() dans generator_helpers.py). */
+.clip-inner { position:absolute; inset:0; }
+
+/* ---- vidéo présentateur -------------------------------------------------
+   OBLIGATOIRE sur tout <video id="main-video"> : sans cette règle, le
+   <video> se rend à sa résolution intrinsèque (ex. 3840x2160) à l'intérieur
+   du canevas d'authoring 1920x1080, au lieu de remplir son conteneur .clip —
+   résultat : la vidéo apparaît cadrée/zoomée sur son coin supérieur gauche,
+   le présentateur n'étant plus centré (bug réel trouvé le 2026-09-16 dans
+   compositions/cold-open.html, absent de chapitre-1.html qui définissait
+   cette règle localement dans son propre générateur plutôt qu'ici). */
+#main-video { width:100%; height:100%; object-fit:cover; }
+
+/* ---- ambiance globale (grade / vignette / grain) ----------------------
+   À placer en overlay plein cadre, par-dessus la vidéo en direct, pour un
+   rendu cohérent d'une vidéo à l'autre. */
+#grade { background:linear-gradient(180deg, rgba(10,20,40,0.18), rgba(10,20,40,0.32)); mix-blend-mode:multiply; z-index:15; }
+#vignette { box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.55); z-index:16; }
+#grain-overlay { z-index:57; mix-blend-mode:overlay; opacity:0.5; pointer-events:none; }
+/* filtre SVG associé à #grain-overlay (à mettre dans un <svg><defs>) :
+   <filter id="grain">
+     <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+     <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/>
+   </filter> */
+
+/* ---- fond "carte de données" : quadrillage bleu nuit --------------------
+   Fond standard de toute CAPSULE-DONNÉE. Le masque radial adoucit les bords
+   pour ne pas créer une grille dure jusqu'au coin de l'écran. */
+.grid-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(96,165,250,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96,165,250,0.09) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(ellipse 60% 65% at 50% 45%, #000 55%, transparent 100%);
+}
+
+/* ---- panneau de lisibilité ("map-panel") -------------------------------
+   Backdrop semi-transparent à coins arrondis derrière un bloc de
+   texte/illustration en incrustation sur la vidéo en direct, pour que le
+   contenu reste lisible même sur un t-shirt à motif. Réutilisé pour toute
+   CARTE-CITATION / CAPSULE-DONNÉE en mode "incrustation". */
+.map-panel {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(4,8,16,0.6); border-radius:20px; padding:32px 44px 26px; opacity:0;
+}
+
+/* ---- tampon administratif ("style IMPASSE") ----------------------------
+   Le patron pour tout verdict court et tranchant (voir STYLE_GUIDE §2).
+   Animation GSAP associée (à coller dans le timeline builder) :
+     tl.fromTo("#ID", { opacity:0, scale:1.4 }, { opacity:1, scale:1, duration:0.18, ease:"power4.out" }, START);
+     tl.to("#ID", { opacity:0, duration:0.25 }, START + DURATION - 0.3);
+   Le conteneur parent doit centrer horizontalement/verticalement
+   (display:flex; align-items:center; justify-content:center). */
+.stamp-text {
+  font-size:104px; font-weight:900; letter-spacing:0.05em; text-transform:uppercase;
+  color:#ef4444; border:7px solid #ef4444; padding:16px 50px;
+  transform:rotate(-7deg) scale(1.4); opacity:0;
+}
+/* variante compacte pour un texte à 2 mots (ex. "Financement refusé") :
+   ajouter style="font-size:70px; padding:12px 34px;" en inline sur l'instance */
+
+/* Conteneur générique pour stamp_block() (generator_helpers.py). Même patron
+   que #impasse-stamp de chapitre-1 : display:flex DIRECTEMENT sur le même
+   élément .clip qui porte .stamp-text (pas de wrapper intermédiaire sans
+   centrage). .clip = position:absolute, donc un élément .clip n'est PAS
+   traité comme flex-item par un parent flex externe — le centrage doit
+   obligatoirement vivre ici, sur le .clip lui-même. Fix 2026-09-17 : avant
+   ce correctif, stamp_block() ne posait aucun display sur son "-wrap", ce
+   qui l'étirait plein cadre (inset:0) et donnait un bandeau diagonal pleine
+   largeur au lieu du bloc compact pivoté attendu. */
+.stamp-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+
+/* ---- mots-héros (hero words) -------------------------------------------
+   Par-dessus la vidéo en direct uniquement (jamais sur une carte plein
+   cadre). Deux variantes : information (droite, sans boîte) et verdict
+   (tampon, centré — réutiliser .stamp-text par-dessus .hero-text). */
+.hero { z-index:30; display:flex; align-items:flex-start; justify-content:center; padding-top:150px; pointer-events:none; }
+.hero-text {
+  max-width:1500px; font-size:74px; font-weight:900; text-transform:uppercase;
+  color:#60a5fa; line-height:1.05; text-align:center; text-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0;
+}
+/* variante "information" — alignée à droite, hors du visage centré */
+.hero--right { justify-content:flex-end; padding-right:130px; }
+.hero--right .hero-text { max-width:820px; text-align:right; }
+/* variante "verdict" — combiner avec .stamp-text sur le même élément */
+.hero--stamp { align-items:center; padding-top:0; }
+.hero--stamp .hero-text { font-size:104px; color:#ef4444; border:7px solid #ef4444; padding:16px 50px; text-shadow:none; transform:rotate(-7deg) scale(1.4); }
+
+/* ---- SPLIT-SCREEN, VARIANTE 1 : face-safe (photo gauche 50% / vidéo droite 50%) ----
+   Le présentateur reste visible à droite pendant qu'une photo occupe la
+   gauche. Voir STYLE_GUIDE §2. Le recentrage de la vidéo (#main-video { x })
+   se fait via GSAP, pas en CSS — voir generator_helpers.py:split_screen_block().
+   ATTENTION : ne pas confondre avec la variante 2 ci-dessous — les notes
+   "SPLIT SCREEN VERTICAL/HORIZONTAL/COMPARATIF" du script ne décrivent PAS
+   cette variante, voir plus bas. */
+.split-photo-panel { position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; box-shadow:10px 0 40px rgba(0,0,0,0.55); opacity:0; }
+.split-photo-panel img { width:100%; height:100%; object-fit:cover; filter:grayscale(0.35) brightness(0.68) contrast(1.06); }
+.split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
+.split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
+.split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
+.split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
+
+/* ---- SPLIT-SCREEN, VARIANTE 2 : deux panneaux graphiques côte à côte ----
+   C'est CE patron que décrivent "SPLIT SCREEN VERTICAL/HORIZONTAL/
+   COMPARATIF" dans le script : deux illustrations/CAPSULE-DONNÉE/
+   CADRE-TÉLÉ opposés l'un à l'autre, PAS le présentateur + une photo. Le
+   présentateur n'est pas visible pendant ce plan (c'est un plein cadre en
+   deux moitiés). Utiliser .grid-bg dans chaque moitié si besoin.
+   FIX 2026-09-17 (retour utilisateur "pas premium", visage du présentateur
+   visible/encombré derrière le split) : .split2 n'avait jamais de fond
+   opaque, donc malgré ce commentaire ("le présentateur n'est pas visible"),
+   la vidéo en direct restait visible en transparence derrière tout le split
+   -- texte et icônes flottaient par-dessus le visage/torse au lieu d'un
+   vrai plein cadre. Même fond que les autres CAPSULE-DONNÉE plein cadre de
+   chapitre-1 (#hinton-card, etc.) : #03050a. */
+.split2 { position:absolute; inset:0; display:flex; background:#03050a; }
+.split2.split2--horizontal { flex-direction:column; }
+.split2-panel { position:relative; flex:1 1 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; }
+.split2-divider { position:absolute; background:rgba(96,165,250,0.4); z-index:2; }
+.split2:not(.split2--horizontal) .split2-divider { top:0; left:50%; width:2px; height:100%; transform:translateX(-1px); }
+.split2--horizontal .split2-divider { left:0; top:50%; width:100%; height:2px; transform:translateY(-1px); }
+.split2-label { position:absolute; bottom:24px; font-size:18px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; opacity:0; }
+
+/* ---- mentions "Source" / badges de date / surlignage jaune ------------- */
+.source-tag {
+  position:absolute; right:22px; bottom:18px; font-size:16px; font-style:italic;
+  color:rgba(203,213,225,0.55); letter-spacing:0.02em; opacity:0; z-index:5;
+}
+.date-badge {
+  position:absolute; top:16px; left:16px; font-size:15px; font-weight:700; letter-spacing:0.1em;
+  color:#e2e8f0; background:rgba(4,7,12,0.72); border:1px solid rgba(255,255,255,0.18);
+  padding:6px 14px; border-radius:3px; text-transform:uppercase; opacity:0; z-index:5;
+}
+.hl { background:#facc15; color:#1a1408; padding:0 3px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+
+/* ---- CADRE-TÉLÉ : photo d'archive encadrée (coin, non plein-cadre) ----- */
+.photo-card { width:380px; opacity:0; border:2px solid rgba(96,165,250,0.55); border-radius:6px; overflow:hidden; box-shadow:0 20px 44px rgba(0,0,0,0.5); background:#03050a; }
+.photo-card img { display:block; width:100%; height:220px; object-fit:cover; filter:grayscale(0.25) brightness(0.85) contrast(1.05); }
+.photo-card .photo-caption { padding:10px 16px; font-size:16px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#93c5fd; background:rgba(10,14,24,0.9); }
+
+/* ---- coupure de presse (archive papier) --------------------------------- */
+.clipping-card { width:360px; padding:24px 28px; background:#efe6d2; color:#1a1408; transform:rotate(3deg); box-shadow:0 18px 40px rgba(0,0,0,0.45); opacity:0; }
+.clipping-card .headline { font-family:Georgia, "Times New Roman", serif; font-weight:900; font-size:25px; line-height:1.16; text-transform:uppercase; }
+.clipping-card .dateline { margin-top:12px; font-family:Georgia, serif; font-size:15px; font-style:italic; color:#4a3f2a; border-top:1px solid rgba(26,20,8,0.25); padding-top:9px; }
+
+/* ---- fiche dossier (portrait archive avec coins de cadre) --------------- */
+.dossier-frame { position:relative; padding:64px 96px; border:1px solid rgba(96,165,250,0.35); border-radius:6px; opacity:0; display:flex; align-items:center; gap:56px; }
+.dossier-frame .corner { position:absolute; width:26px; height:26px; border:2px solid #60a5fa; opacity:0.8; }
+.dossier-frame .corner.tl { top:-1px; left:-1px; border-right:none; border-bottom:none; }
+.dossier-frame .corner.tr { top:-1px; right:-1px; border-left:none; border-bottom:none; }
+.dossier-frame .corner.bl { bottom:-1px; left:-1px; border-right:none; border-top:none; }
+.dossier-frame .corner.br { bottom:-1px; right:-1px; border-left:none; border-top:none; }
+.dossier-avatar { width:150px; height:150px; flex:none; }
+.dossier-text { text-align:left; }
+.dossier-label { font-size:20px; font-weight:700; letter-spacing:0.22em; color:#60a5fa; }
+.dossier-name { margin-top:10px; font-size:50px; font-weight:800; color:#fff; }
+.dossier-sub { margin-top:14px; font-size:27px; color:#cbd5e1; }
+.epoch-tag { position:absolute; top:-32px; left:6px; font-size:16px; font-weight:700; letter-spacing:0.1em; color:#93c5fd; background:rgba(59,130,246,0.14); border:1px solid rgba(96,165,250,0.4); padding:7px 16px; border-radius:4px; transform:rotate(-2deg); opacity:0; white-space:nowrap; }
+
+/* ---- sous-titres brûlés (si activés) ------------------------------------ */
+.caption { position:absolute; left:0; right:0; bottom:105px; display:flex; justify-content:center; z-index:60; pointer-events:none; }
+.caption-inner {
+  max-width:1540px; padding:16px 34px 16px 26px; background:rgba(4,7,12,0.78);
+  border-left:5px solid #3b82f6; border-radius:10px;
+  font-size:33px; font-weight:600; line-height:1.32; color:#f8fafc; text-align:center;
+  box-shadow:0 14px 32px rgba(0,0,0,0.35); opacity:0;
+}
+
+/* ---- barre de progression (carton de chapitre) -------------------------- */
+#progress-track { z-index:65; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); }
+#progress-fill { position:absolute; top:0; left:0; height:100%; width:0; background:#3b82f6; }
+#progress-label { position:absolute; top:10px; left:24px; font-size:15px; font-weight:700; letter-spacing:0.14em; color:rgba(147,197,253,0.6); text-transform:uppercase; opacity:0; z-index:66; }
+
+/* ---- particules ambiantes (drift subtil, persistant) --------------------- */
+.particle { fill:#3b82f6; opacity:0.22; }
+
+/* =========================================================================
+   Patrons ajoutés lors de l'audit d'alignement complet du script (les 6
+   chapitres + cold open + conclusion) — ces catégories sont fréquentes
+   dans le script mais n'avaient encore jamais été construites en HTML.
+   ========================================================================= */
+
+/* ---- MONTAGE ICÔNES / MONTAGE RAFALE ------------------------------------
+   Séquence rapide de plans très courts (0.3-1s chacun), un seul visible à
+   la fois — icône ou photo, avec une étiquette jaune qui s'accroche
+   brièvement. En jump cut sec (pas de fondu) pour "MONTAGE RAFALE", léger
+   fondu pour "MONTAGE ICÔNES". Un seul conteneur, un enfant .montage-item
+   par plan, visibilité pilotée par le timeline JS (voir
+   generator_helpers.py:montage_block()). */
+.montage-rafale { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.montage-item { position:absolute; display:flex; flex-direction:column; align-items:center; gap:18px; opacity:0; }
+.montage-item .montage-icon { width:140px; height:140px; }
+.montage-item .montage-label {
+  padding:8px 20px; background:#facc15; color:#1a1408; font-size:20px; font-weight:800;
+  letter-spacing:0.03em; border-radius:4px; white-space:nowrap;
+}
+
+/* ---- coupure au noir + texte massif -------------------------------------
+   Pour les moments les plus dramatiques (question rhétorique, révélation) :
+   cut sec (pas de fondu) vers un écran noir total, puis un texte blanc
+   massif apparaît en fondu rapide, centré, police austère. Différent du
+   tampon administratif (.stamp-text) : pas de rouge, pas de rotation, pas
+   de bordure — la gravité vient du noir total et de l'échelle du texte, pas
+   d'un style "verdict tamponné". */
+#hardcut-black { z-index:90; background:#000; opacity:0; pointer-events:none; }
+.hardcut-text {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding:0 160px; font-size:96px; font-weight:900; text-align:center; text-transform:uppercase;
+  color:#fff; line-height:1.15; letter-spacing:0.01em; opacity:0; z-index:91;
+}
+
+/* ---- TEXTE KINÉTIQUE -----------------------------------------------------
+   Mots qui s'écrivent un à un (write-on) ou un mot qui se substitue à un
+   autre (swap) — toujours en jaune, même famille visuelle que .hl (le
+   surlignage en ligne). Container positionnable en incrustation à côté du
+   visage (voir script : "à côté du visage du présentateur qui reste net")
+   ou plein cadre. */
+.kinetic-text { display:flex; flex-wrap:wrap; gap:0.35em; font-size:52px; font-weight:800; color:#facc15; }
+.kinetic-word { opacity:0; }
+/* variante "swap" (un mot remplace un autre au même endroit, ex. CAPITAL -> CLIENT)
+   FIX 2026-09-17 (audit complet du script, avant toute utilisation réelle en
+   composition) : .kinetic-swap posait position:relative sans aucune règle de
+   centrage plein cadre, alors que la seule note du script qui l'utilise
+   (chapitre 6, bataille 2, "CAPITAL" -> "CLIENT") est explicitement plein
+   cadre -- l'élément se retrouvait donc collé en haut-gauche de l'écran à
+   taille zéro (position:relative + display:inline-block, aucun ancêtre pour
+   le centrer). Même famille de bug que .stamp-wrap/.name-tag ce même jour --
+   centrage manquant sur le .clip lui-même. Nouveau wrapper .kinetic-swap-wrap
+   (posé sur l'élément .clip) fait le centrage ; .kinetic-swap reste la boîte
+   interne dimensionnée à son texte. */
+.kinetic-swap-wrap { display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.kinetic-swap { position:relative; display:inline-block; font-size:64px; font-weight:900; color:#facc15; text-transform:uppercase; }
+/* left:0/top:0 (avant le 2026-09-17) ne fonctionne QUE si .kinetic-swap a
+   lui-même une taille -- or ses deux enfants sont tous les deux
+   position:absolute, donc AUCUN des deux ne contribue à la taille
+   intrinsèque du parent inline-block (bug vérifié par rendu Playwright :
+   #kinetic-swap faisait 0x0, donc "left:0/top:0" plaçait chaque mot au
+   pixel exact du coin, pas centré). left:50%/top:50% + translate(-50%,-50%)
+   centre chaque mot sur le point du parent indépendamment de sa taille
+   propre (chaque mot peut avoir une largeur différente, ex. "CAPITAL" vs
+   "CLIENT") -- fonctionne même si le parent reste à 0x0. */
+.kinetic-swap .kinetic-swap-word { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); white-space:nowrap; opacity:0; }
+
+/* ---- SURIMPRESSION LISTE (voile + liste qui s'accumule) -----------------
+   Ajouté 2026-09-17 (demande utilisateur, chapitre 2 : "plus de données,
+   plus de calcul, des réseaux de plus en plus profonds, et des modèles qui
+   apprennent leurs propres représentations"). Voile plein cadre SEMI-
+   TRANSPARENT par-dessus la vidéo en direct -- contrairement à
+   #hardcut-black (noir total, opaque), le présentateur reste visible,
+   assombri, en arrière-plan. Chaque ligne de la liste s'ajoute une à une,
+   au rythme de la parole, et reste affichée (la liste s'accumule) jusqu'à
+   la fin de la surimpression entière -- voir
+   generator_helpers.py:list_overlay_block(). Ne PAS mettre position/inset
+   directement sur .list-overlay : laisser .clip gérer entièrement le
+   plein cadre (voir le bug du 2026-09-17 sur .name-tag/.split2 -- une
+   règle qui ne redéfinit qu'une partie des 4 côtés d'un .clip entre en
+   conflit avec son inset:0). */
+.list-overlay { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:38px; padding:0 180px; background:rgba(3,5,10,0.74); opacity:0; pointer-events:none; }
+.list-overlay-item { display:flex; align-items:center; gap:28px; max-width:1560px; font-size:52px; font-weight:800; line-height:1.25; color:#fff; opacity:0; }
+.list-overlay-item::before { content:""; width:16px; height:16px; border-radius:50%; background:#3b82f6; flex:none; }
+
+/* ---- TRIPTYQUE FIXE / MONTAGE VERTICAL EN CASCADE -----------------------
+   Triptyque : trois colonnes égales, chacune avec une icône + un intitulé,
+   qui s'allument une à une au rythme de la narration (ex. les trois villes
+   du chapitre 3, les trois batailles du chapitre 6). Cascade : une liste
+   qui s'empile verticalement, un élément à la fois (ex. les quatre secteurs
+   du chapitre 5). */
+.triptych { position:absolute; inset:0; display:flex; }
+.triptych-col { flex:1 1 33.333%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; opacity:0.35; }
+.triptych-col.active { opacity:1; }
+.triptych-col .triptych-icon { width:120px; height:120px; }
+.triptych-col .triptych-label { font-size:24px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; color:#fff; text-align:center; max-width:80%; }
+.cascade-list { position:absolute; inset:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:22px; padding-left:200px; }
+.cascade-item { display:flex; align-items:center; gap:20px; opacity:0; transform:translateY(14px); }
+.cascade-item .cascade-icon { width:56px; height:56px; flex:none; }
+.cascade-item .cascade-label { font-size:32px; font-weight:700; color:#e2e8f0; }
+
+/* ---- INSERT INTERFACE (mock d'UI, ex. zone de commentaire YouTube) ------
+   Faux élément d'interface sobre et crédible, en incrustation coin d'écran
+   — jamais un vrai logo/UI officiel, une reconstitution générique. */
+.interface-mock {
+  position:absolute; left:48px; bottom:48px; width:520px; padding:14px 18px;
+  background:#fff; border-radius:24px; box-shadow:0 18px 40px rgba(0,0,0,0.4);
+  display:flex; align-items:center; gap:12px; opacity:0;
+}
+.interface-mock .interface-avatar { width:36px; height:36px; border-radius:50%; background:#cbd5e1; flex:none; }
+.interface-mock .interface-input { flex:1; font-size:16px; color:#475569; font-family:Arial, sans-serif; }
+.interface-mock .interface-cursor { display:inline-block; width:2px; height:16px; background:#475569; vertical-align:middle; margin-left:2px; }
+
+/* ---- CARTON D'OUVERTURE DE CHAPITRE (scène archive plein écran) --------
+   Version élevée, plein cadre, du "CARTON DE CHAPITRE" du script — jouée
+   une fois au tout début de chaque chapitre, avant que la vidéo en direct
+   ne démarre (voir STYLE_GUIDE §2bis). Photo + grain + halo + une ligne de
+   "lecture système" qui s'écrit en machine à écrire, puis kicker + titre +
+   trait. NE remplace PAS la barre de progression persistante
+   (#progress-track/#progress-label ci-dessus) — les deux coexistent.
+   Valeurs de titre calibrées le 2026-09-16 (v25 de chapitre-1.html) : tenue
+   >= ~5s pour laisser le titre respirer, police généreuse pour rester
+   lisible même sur un titre de chapitre à deux lignes. */
+.chapter-opening-card {
+  background:#030509;
+  z-index:50;
+}
+/* Le centrage vit sur .clip-inner (l'enfant réel de la scène), PAS sur
+   .chapter-opening-card lui-même : depuis l'introduction de .clip-inner
+   (sortie GSAP, voir plus haut), le .clip-inner enfant a position:absolute;
+   inset:0, ce qui remplit tout le cadre et annule tout centrage flex posé
+   sur son parent — le texte se retrouvait épinglé en haut-gauche au lieu
+   d'être centré. Régression réelle trouvée le 2026-09-16 (signalée par
+   l'utilisateur sur le carton "TORONTO, 2012" de cold-open.html, qui suit
+   exactement ce même patron). */
+.chapter-opening-card .clip-inner {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.chapter-opening-card .chapter-opening-photo {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-overlay {
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(59,130,246,0.06) 0px, rgba(59,130,246,0.06) 1px, transparent 1px, transparent 4px),
+    radial-gradient(ellipse at 50% 40%, rgba(30,58,95,0.45) 0%, rgba(2,4,8,0.93) 74%);
+}
+.chapter-opening-card .scanlines {
+  position:absolute; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay; opacity:0.55;
+}
+.chapter-opening-card .chapter-opening-readout-wrap { overflow:hidden; width:0; }
+.chapter-opening-card .chapter-opening-readout {
+  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
+  color:#93c5fd; opacity:0.9;
+}
+.chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
+.chapter-opening-card .chapter-opening-title {
+  margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
+  line-height:1.2; opacity:0; color:#fff;
+  /* FIX (2026-09-17, chapitre 3 -- premier retour utilisateur sur ce
+     carton) : aucune couleur n'était définie ici, contrairement à toutes
+     les autres classes de texte du carton (.chapter-opening-kicker:
+     #60a5fa, .chapter-opening-readout: #93c5fd) -- le titre héritait donc
+     de la couleur de texte par défaut du navigateur (noir), illisible sur
+     le fond sombre. Affecte potentiellement tous les chapitres utilisant
+     chapter_opening_card_block(), pas seulement chapitre 3. */
+}
+.chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
+
+/* ---- CARTON DE TITRE / CARTON DE FERMETURE (mots qui claquent, filigrane érable) ----
+   Extrait le 2026-09-17 de compositions/gen_cold_open.py (#outro-card, codé
+   en dur pour le titre du cold open) -- générique ici : la CONCLUSION du
+   script demande "même traitement typographique que le titre du cold open"
+   pour son CARTON DE FERMETURE, symétrique par construction. Voir
+   generator_helpers.py:title_card_block(). Ne pas confondre avec
+   .chapter-opening-card ci-dessus : pas de photo, pas de kicker, juste le
+   texte massif + le filigrane, sur fond noir uni. */
+.title-card { background:#03050a; z-index:60; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.title-card .maple-leaf { position:absolute; width:820px; height:820px; opacity:0.06; top:50%; left:50%; transform:translate(-50%,-50%); }
+.title-card .title-text { position:relative; max-width:1520px; font-size:58px; font-weight:800; text-align:center; line-height:1.3; color:#fff; }
+.title-card .title-word { display:inline-block; opacity:0; }
+.title-card .accent .title-word { color:#60a5fa; }
+
+/* ---- CAPSULE-DONNÉE — LIGNE DU TEMPS / JALONS ---------------------------
+   Ajouté le 2026-09-17 (audit complet du script) : des étapes lumineuses
+   qui s'allument une à une, reliées par un trait qui grandit d'une étape à
+   la suivante (ex. chapitre 4 "Toronto -> Google -> OpenAI", chapitre 6
+   "2013 -> 2026"). Voir generator_helpers.py:timeline_block(). Plein cadre
+   par défaut -- ajouter .grid-bg séparément dans la composition pour le
+   fond bleu nuit quadrillé habituel des CAPSULE-DONNÉE. */
+.timeline { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.timeline.timeline--horizontal { flex-direction:row; }
+.timeline-track { position:relative; background:rgba(96,165,250,0.25); }
+.timeline:not(.timeline--horizontal) .timeline-track { width:3px; height:60%; }
+.timeline--horizontal .timeline-track { width:60%; height:3px; }
+/* trait de progression : un vrai enfant (PAS un ::after -- GSAP ne peut pas
+   cibler un pseudo-élément par sélecteur CSS), voir timeline_block(). */
+.timeline-track-fill { position:absolute; top:0; left:0; background:#3b82f6; }
+.timeline:not(.timeline--horizontal) .timeline-track-fill { width:100%; height:0%; }
+.timeline--horizontal .timeline-track-fill { height:100%; width:0%; }
+/* jalons : enfants de .timeline-track, positionnés en % le long de sa
+   propre longueur (left pour horizontal, top pour vertical -- posé en
+   inline style par timeline_block(), réparti à intervalles égaux). */
+.timeline-milestone {
+  position:absolute; display:flex; flex-direction:column; align-items:center; gap:14px;
+  opacity:0.35; transform:translate(-50%,-50%); white-space:nowrap;
+}
+.timeline:not(.timeline--horizontal) .timeline-milestone { flex-direction:row; gap:20px; }
+.timeline-dot { width:20px; height:20px; border-radius:50%; background:#3b82f6; box-shadow:0 0 20px 4px rgba(59,130,246,0.5); transform:scale(0); flex:none; }
+/* FIX (retour utilisateur, 2026-09-17) : ces libellés (Toronto/Google/OpenAI)
+   passent directement sur la vidéo du présentateur -- sans contour, le blanc
+   se fond dans les zones claires (chemise) comme le fond peut se fondre dans
+   les zones sombres. Contour noir simulé par une pile de text-shadow (plus
+   fiable/net à ce corps de texte que -webkit-text-stroke) pour rester lisible
+   quel que soit ce qu'il y a derrière. */
+.timeline-label {
+  font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center;
+  text-shadow:
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 -2.5px 0 #000, 0 2.5px 0 #000, -2.5px 0 0 #000, 2.5px 0 0 #000;
+}
+
+html,body { margin:0; padding:0; background:#000; }
+
+/* ---- badge Automathing (patron correct -- voir gen_chapitre2.py / cold-open) */
+#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
+#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
+
+/* ---- TRIPTYQUE — aperçu des 3 batailles (incrustation, bas de cadre) ------
+   triptych_block()/.triptych n'a AUCUN fond opaque (voir style-kit.css) --
+   ancré en bas plutôt que centré (défaut de .triptych-col) pour ne jamais
+   retomber sur le visage, même principe que le fix #career-timeline du
+   chapitre 4. */
+#three-battles.triptych { align-items:flex-end; padding-bottom:110px; }
+/* FIX (retour utilisateur, preview live 00:22) : icônes/libellés illisibles
+   sur la chemise claire du présentateur -- .triptych-label (style-kit.css)
+   n'a aucun contour, exactement le même bug déjà corrigé sur
+   #pichette-timeline .timeline-label plus haut. Même remède (contour noir
+   par pile de text-shadow) + un drop-shadow sombre sur les icônes (traits
+   fins bleu clair, invisibles sans halo sur un fond clair). Override scopé
+   à #three-battles pour ne pas toucher triptych_block() aux chapitres 2/3
+   (déjà livrés). */
+#three-battles .triptych-label {
+  text-shadow:
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 -2.5px 0 #000, 0 2.5px 0 #000, -2.5px 0 0 #000, 2.5px 0 0 #000;
+}
+#three-battles .triptych-icon {
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.95)) drop-shadow(0 0 7px rgba(0,0,0,0.7));
+}
+
+/* ---- CADRE-TÉLÉ — salle de serveurs (archive, coin haut-droite) ----------- */
+.archive-insert { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
+
+/* ---- CAPSULE-DONNÉE — icône de rack de serveurs qui clignote (incrustation) */
+.rack-icon-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
+.rack-icon-wrap svg { width:88px; height:88px; }
+.rack-icon-label { font-size:19px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.05em; text-align:center; }
+
+/* ---- CAPSULE-DONNÉE — chiffres empilés 2G$/700M$/850MW (incrustation) ----- */
+.stacked-row { display:flex; align-items:center; gap:18px; opacity:0; transform:translateY(10px); }
+.stacked-row .stacked-bar { height:34px; border-radius:6px; background:linear-gradient(90deg,#1d4ed8,#3b82f6); box-shadow:0 0 16px 2px rgba(59,130,246,0.35); }
+.stacked-row .stacked-value { font-size:26px; font-weight:900; color:#fff; white-space:nowrap; }
+.stacked-row .stacked-label { font-size:14px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+
+/* ---- CAPSULE-DONNÉE — carte du Canada (plein cadre, réseau de points) ----- */
+#carte-canada { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.canada-dot { fill:#3b82f6; opacity:0; }
+.canada-link { stroke:#3b82f6; stroke-width:1.5; opacity:0; fill:none; }
+.canada-maple { opacity:0.05; }
+.canada-caption { margin-top:26px; font-size:22px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.05em; text-align:center; opacity:0; }
+
+/* ---- CAPSULE-DONNÉE — icône de pousse (incrustation, réutilise le motif du
+   chapitre 4 -- même vocabulaire visuel, voir gen_chapitre4.py SPROUT_ICON) */
+.sprout-caption-title { font-size:19px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px; text-align:center; }
+.sprout-icon-box svg { width:100px; height:110px; }
+.sprout-caption { margin-top:14px; font-size:19px; color:#cbd5e1; text-align:center; max-width:360px; }
+
+/* ---- INSERT GRAPHIQUE — jauge verticale fonds de croissance 500M$ (incrustation) */
+.gauge-vert-track { position:relative; width:64px; height:200px; border-radius:10px; background:rgba(148,163,184,0.18); border:1px solid rgba(147,197,253,0.25); overflow:hidden; }
+.gauge-vert-fill { position:absolute; left:0; right:0; bottom:0; height:0%; background:linear-gradient(180deg,#60a5fa,#1d4ed8); }
+.gauge-vert-value { margin-top:14px; font-size:24px; font-weight:900; color:#fff; text-align:center; }
+.gauge-vert-label { margin-top:4px; font-size:15px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.04em; text-align:center; max-width:220px; opacity:0; }
+
+/* ---- CARTE-CITATION — Digital Transformation Canada, mandat (plein cadre,
+   OPAQUE -- retour utilisateur : couvre entièrement la vidéo pendant que le
+   présentateur regarde hors-caméra pour lire, 02:26-02:30, même patron que
+   #carte-canada/#pilot-gag : fond uni + .grid-bg, pas une incrustation) --- */
+#dtc-panel { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.dtc-icon-box { display:flex; justify-content:center; opacity:0; }
+.dtc-icon-box svg { width:96px; height:96px; }
+.dtc-title { margin-top:26px; font-size:38px; font-weight:800; color:#fff; text-align:center; max-width:900px; opacity:0; }
+.dtc-sub { margin-top:12px; font-size:22px; font-weight:700; color:#93c5fd; text-align:center; max-width:760px; opacity:0; }
+
+/* ---- MONTAGE ICÔNES — adoption : labo/usine/PME/hôpital (incrustation,
+   haut-droite via montage_block(align="right") -- jamais centré sur le
+   présentateur, voir la note de bug cold-open dans generator_helpers.py) --- */
+.adoption-montage.montage-rafale { align-items:flex-start; padding-top:110px; }
+.montage-item .montage-icon svg { width:100%; height:100%; }
+
+/* ---- CAPSULE-DONNÉE — ligne du temps 2013 -> 2026 (incrustation, bas de
+   cadre -- même fix que #career-timeline au chapitre 4). BUG trouvé en
+   auto-QA (screenshot ch6-12-timeline) : le libellé du 2e jalon, non
+   raccourci, dépassait largement le cadre à droite (texte coupé net au
+   bord) ET chevauchait le badge AUTOMATHING (jalon posé à 100% d'une piste
+   à 60% de large = 80% du cadre, en plein dans le coin bas-droit du badge).
+   Fix à trois volets : piste rétrécie (42% au lieu de 60%, les deux jalons
+   restent loin des bords) + libellés autorisés à faire un retour à la ligne
+   dans une largeur bornée (au lieu du white-space:nowrap par défaut, pensé
+   pour des libellés d'un seul mot comme au chapitre 4) + remontée du bloc
+   (padding-bottom 190px au lieu de 110px) pour dégager la zone verticale du
+   badge. */
+#pichette-timeline.timeline { align-items:flex-end; padding-bottom:190px; }
+#pichette-timeline .timeline-track { width:42%; }
+#pichette-timeline .timeline-label { white-space:normal; max-width:400px; line-height:1.3; }
+
+/* ---- CAPSULE-DONNÉE — jauge de progression 12% -> 19% -> 60% (incrustation) */
+.adoption-gauge-headline { font-size:64px; font-weight:900; color:#fff; line-height:1; text-align:center; opacity:0; }
+.adoption-gauge-sub { margin-top:6px; font-size:18px; font-weight:700; color:#93c5fd; text-align:center; opacity:0; }
+/* FIX (retour utilisateur) : deux paires headline/sub superposées (60% ->
+   19%, fondu-croisé) au lieu d'une boîte vide en attendant le 1er chiffre --
+   la pile réserve la hauteur pour que le rail ne saute pas d'une ligne à
+   l'autre. */
+.adoption-gauge-textstack { position:relative; width:400px; min-height:108px; }
+.adoption-gauge-textstack .adoption-gauge-headline,
+.adoption-gauge-textstack .adoption-gauge-sub { position:absolute; left:0; right:0; }
+.adoption-gauge-textstack .adoption-gauge-headline { top:0; }
+.adoption-gauge-textstack .adoption-gauge-sub { top:70px; }
+.adoption-gauge-track { position:relative; width:400px; height:16px; border-radius:8px; background:rgba(148,163,184,0.18); margin-top:20px; }
+.adoption-gauge-fill { position:absolute; left:0; top:0; bottom:0; width:0%; border-radius:8px; background:linear-gradient(90deg,#1d4ed8,#3b82f6); }
+.adoption-gauge-flag { position:absolute; right:0; top:-30px; display:flex; flex-direction:column; align-items:center; opacity:0; }
+.adoption-gauge-flag .flag-line { width:2px; height:46px; background:rgba(250,204,21,0.6); }
+.adoption-gauge-flag .flag-label { font-size:13px; font-weight:800; color:#facc15; white-space:nowrap; margin-top:2px; }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-4qv8" id="chapitre-6" data-composition-id="chapitre-6" data-width="3840" data-height="2160" data-fps="60" data-duration="266.14">
+<div data-hf-id="hf-7cuk" id="scale-2x">
+  <div data-hf-id="hf-bdts" id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="5.8">
+    <div data-hf-id="hf-psio" class="clip-inner" id="chapter-open-inner">
+    <img data-hf-id="hf-dwxm" class="chapter-opening-photo" src="assets/photos/server-room.jpg" alt="">
+    <div data-hf-id="hf-66jr" class="chapter-opening-overlay"></div>
+    <div data-hf-id="hf-8pzc" class="scanlines"></div>
+    <div data-hf-id="hf-71qi" class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE 6</div>
+    <div data-hf-id="hf-me03" class="chapter-opening-title" id="chapter-open-title">Les trois batailles du Canada</div>
+    <div data-hf-id="hf-pyuc" class="chapter-opening-rule" id="chapter-open-rule"></div>
+    </div>
+  </div>
+  <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
+    <video data-hf-id="hf-mbmy" id="main-video" class="clip" src="assets/chapitre_6_batailles.mp4" muted data-start="5.8" data-duration="259.94" data-hf-media-start-basis="local"></video>
+  </div>
+  <audio data-hf-id="hf-goi3" id="main-audio" src="assets/chapitre_6_batailles.mp4" data-start="5.8" data-duration="259.94" data-hf-media-start-basis="local"></audio>
+
+  <audio data-hf-id="hf-773u" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="5.8" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-8jvp" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="7.8" data-duration="257.94" data-media-start="2.0" data-volume="0.13" data-hf-media-start-basis="local"></audio>
+
+
+  <audio data-hf-id="hf-1hyh" id="whoosh-0" src="assets/whoosh.mp3" data-start="0.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-0o7p" id="whoosh-1" src="assets/whoosh.mp3" data-start="21.8" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-xbqm" id="whoosh-2" src="assets/whoosh.mp3" data-start="72.44" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-lvkx" id="whoosh-3" src="assets/whoosh.mp3" data-start="193.64" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-svec" id="whoosh-4" src="assets/whoosh.mp3" data-start="209.82" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-6h8v" id="whoosh-5" src="assets/whoosh.mp3" data-start="218.82" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+
+  <div data-hf-id="hf-zaat" id="grade" class="clip" data-start="5.8" data-duration="259.94"></div>
+  <div data-hf-id="hf-x0yu" id="vignette" class="clip" data-start="5.8" data-duration="259.94"></div>
+  <div data-hf-id="hf-r919" id="grain-overlay" class="clip" data-start="0" data-duration="266.14" style="filter:url(#grain)"></div>
+
+  <svg data-hf-id="hf-8rgt" width="0" height="0" style="position:absolute">
+    <defs data-hf-id="hf-mh0t">
+      <filter data-hf-id="hf-mntt" id="grain">
+        <feturbulence data-hf-id="hf-9on9" type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+        <fecolormatrix data-hf-id="hf-d30s" in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0" />
+      </filter>
+    </defs>
+  </svg>
+
+  <svg data-hf-id="hf-wwjt" id="p6-particles" class="clip" data-start="0" data-duration="266.14" viewBox="0 0 1920 1080" width="1920" height="1080" style="z-index:20">
+    <circle data-hf-id="hf-svj8" class="particle" id="p6-particle-0" cx="140" cy="160" r="3" />
+    <circle data-hf-id="hf-017s" class="particle" id="p6-particle-1" cx="360" cy="640" r="2.5" />
+    <circle data-hf-id="hf-wi7i" class="particle" id="p6-particle-2" cx="580" cy="280" r="3.5" />
+    <circle data-hf-id="hf-r6q2" class="particle" id="p6-particle-3" cx="840" cy="800" r="2" />
+    <circle data-hf-id="hf-m0v8" class="particle" id="p6-particle-4" cx="1100" cy="220" r="3" />
+    <circle data-hf-id="hf-xzl5" class="particle" id="p6-particle-5" cx="1340" cy="660" r="2.5" />
+    <circle data-hf-id="hf-42dd" class="particle" id="p6-particle-6" cx="1580" cy="360" r="3" />
+    <circle data-hf-id="hf-lf2e" class="particle" id="p6-particle-7" cx="1770" cy="880" r="2.5" />
+  </svg>
+
+  <div data-hf-id="hf-2zkm" id="progress-track" class="clip" data-start="0" data-duration="266.14">
+    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
+    <div data-hf-id="hf-ae0m" id="progress-label">CHAPITRE 6 / 6</div>
+  </div>
+
+  <div data-hf-id="hf-2d9l" id="three-battles" class="clip triptych" data-start="21.8" data-duration="4.3">
+    <div data-hf-id="hf-x72f" class="triptych-col" id="three-battles-col0">
+      <svg data-hf-id="hf-chfr" class="triptych-icon" viewBox="0 0 100 100"><rect data-hf-id="hf-p1so" x="30" y="30" width="40" height="40" rx="4" fill="none" stroke="#93c5fd" stroke-width="5" /><rect data-hf-id="hf-a5b2" x="42" y="42" width="16" height="16" fill="none" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-96ue" x1="30" y1="42" x2="18" y2="42" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-4nzi" x1="30" y1="58" x2="18" y2="58" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-ejoj" x1="70" y1="42" x2="82" y2="42" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-vyhv" x1="70" y1="58" x2="82" y2="58" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-ayh2" x1="42" y1="30" x2="42" y2="18" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-2q3u" x1="58" y1="30" x2="58" y2="18" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-kobb" x1="42" y1="70" x2="42" y2="82" stroke="#93c5fd" stroke-width="4" /><line data-hf-id="hf-krbn" x1="58" y1="70" x2="58" y2="82" stroke="#93c5fd" stroke-width="4" /></svg>
+      <div data-hf-id="hf-yiyi" class="triptych-label">Puissance de calcul</div>
+    </div>
+    <div data-hf-id="hf-t8ye" class="triptych-col" id="three-battles-col1">
+      <svg data-hf-id="hf-qesn" class="triptych-icon" viewBox="0 0 100 100"><rect data-hf-id="hf-oond" x="28" y="14" width="44" height="74" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-jsne" x1="28" y1="32" x2="72" y2="32" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-alhy" x1="28" y1="50" x2="72" y2="50" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-6ity" x1="28" y1="68" x2="72" y2="68" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-cz7k" x1="50" y1="14" x2="50" y2="88" stroke="#93c5fd" stroke-width="3" /></svg>
+      <div data-hf-id="hf-342v" class="triptych-label">Garder nos entreprises</div>
+    </div>
+    <div data-hf-id="hf-paud" class="triptych-col" id="three-battles-col2">
+      <svg data-hf-id="hf-q0hm" class="triptych-icon" viewBox="0 0 100 100"><path data-hf-id="hf-qrfb" d="M15 78 L38 50 L55 65 L85 25" fill="none" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /><path data-hf-id="hf-x9lv" d="M65 25 H85 V45" fill="none" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div data-hf-id="hf-gxrs" class="triptych-label">Adoption</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-mrmu" id="server-photo" class="archive-insert clip" data-start="26.1" data-duration="2.3">
+    <div data-hf-id="hf-lo06" class="photo-card" id="server-photo-card">
+      <img data-hf-id="hf-n6u2" src="assets/photos/server-room.jpg" alt="">
+      <div data-hf-id="hf-er58" class="photo-caption">Salle de serveurs</div>
+    </div>
+    <div data-hf-id="hf-rf7t" class="source-tag" id="server-photo-source" style="right:120px; bottom:auto; top:384px; opacity:1;">Source : archives</div>
+  </div>
+
+  <div data-hf-id="hf-9ndl" id="rack-panel-wrap" class="clip" data-start="28.4" data-duration="2.24" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:80px; pointer-events:none;">
+    <div data-hf-id="hf-b5al" class="map-panel" id="rack-panel">
+      <div data-hf-id="hf-4a8u" class="rack-icon-wrap">
+        <svg data-hf-id="hf-fohl" viewBox="0 0 100 100"><rect data-hf-id="hf-mytk" x="26" y="12" width="48" height="76" rx="4" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-v6qa" x1="26" y1="30" x2="74" y2="30" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-vzmi" x1="26" y1="48" x2="74" y2="48" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-qewy" x1="26" y1="66" x2="74" y2="66" stroke="#93c5fd" stroke-width="3" /><circle data-hf-id="hf-5s0i" class="rack-led" cx="66" cy="21" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-vt6r" class="rack-led" cx="66" cy="39" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-tlkf" class="rack-led" cx="66" cy="57" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-ljej" class="rack-led" cx="66" cy="75" r="3.5" fill="#22c55e" /></svg>
+        <div data-hf-id="hf-obii" class="rack-icon-label">Puissance de calcul</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-qcp7" id="stacked-panel-wrap" class="clip" data-start="46.52" data-duration="25.92" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; pointer-events:none;">
+    <div data-hf-id="hf-7725" class="map-panel" id="stacked-panel">
+      <div data-hf-id="hf-djna" style="display:flex; flex-direction:column; align-items:flex-start; gap:16px;">
+        <div data-hf-id="hf-tdeh" class="stacked-row" id="stacked-row-0">
+          <div data-hf-id="hf-9qhv" class="stacked-bar" style="width:90px;"></div>
+          <div data-hf-id="hf-7xl4" style="display:flex; flex-direction:column; align-items:flex-start;">
+            <div data-hf-id="hf-6kli" class="stacked-value">2 G$</div>
+            <div data-hf-id="hf-gthd" class="stacked-label">Budget 2024, calcul souverain (5 ans)</div>
+          </div>
+        </div>
+        <div data-hf-id="hf-slqo" class="stacked-row" id="stacked-row-1">
+          <div data-hf-id="hf-cyom" class="stacked-bar" style="width:150px;"></div>
+          <div data-hf-id="hf-ru4g" style="display:flex; flex-direction:column; align-items:flex-start;">
+            <div data-hf-id="hf-72i9" class="stacked-value">700 M$</div>
+            <div data-hf-id="hf-ehs8" class="stacked-label">AI Compute Challenge</div>
+          </div>
+        </div>
+        <div data-hf-id="hf-3h8b" class="stacked-row" id="stacked-row-2">
+          <div data-hf-id="hf-okqj" class="stacked-bar" style="width:210px;"></div>
+          <div data-hf-id="hf-qn7d" style="display:flex; flex-direction:column; align-items:flex-start;">
+            <div data-hf-id="hf-t6eo" class="stacked-value">850 MW</div>
+            <div data-hf-id="hf-10kk" class="stacked-label">Capacité souveraine visée d'ici 2030</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-hbaj" class="source-tag" id="stacked-source" data-parent="stacked-panel" style="opacity:0; left:60px; bottom:60px;">Source : Budget fédéral 2024 / stratégie AI for All</div>
+
+  <div data-hf-id="hf-8128" id="carte-canada" class="clip" data-start="72.44" data-duration="7.13">
+    <div data-hf-id="hf-q4u8" class="grid-bg"></div>
+    <svg data-hf-id="hf-mppx" viewBox="0 0 1520 720" width="1200" height="568" fill="#3b82f6">
+      <g data-hf-id="hf-p7pr" class="canada-maple" id="canada-maple" transform="translate(826.7,315.6) scale(1.4) translate(-256,-256)"><path data-hf-id="hf-djgf" d="M256 18 L280 120 L360 70 L334 150 L432 140 L360 200 L440 250 L350 260 L390 340 L300 310 L302 400 L256 330 L210 400 L212 310 L122 340 L162 260 L72 250 L152 200 L80 140 L178 150 L152 70 L232 120 Z" /></g>
+      <line data-hf-id="hf-20gg" class="canada-link" id="canada-link-0" x1="360" y1="260" x2="560" y2="200" />
+      <line data-hf-id="hf-0oi0" class="canada-link" id="canada-link-1" x1="560" y1="200" x2="760" y2="320" />
+      <line data-hf-id="hf-xttu" class="canada-link" id="canada-link-2" x1="760" y1="320" x2="960" y2="180" />
+      <line data-hf-id="hf-bqya" class="canada-link" id="canada-link-3" x1="960" y1="180" x2="1160" y2="300" />
+      <line data-hf-id="hf-avcj" class="canada-link" id="canada-link-4" x1="1160" y1="300" x2="1360" y2="220" />
+      <line data-hf-id="hf-n0ey" class="canada-link" id="canada-link-5" x1="1360" y1="220" x2="560" y2="420" />
+      <line data-hf-id="hf-sdtk" class="canada-link" id="canada-link-6" x1="560" y1="420" x2="960" y2="440" />
+      <line data-hf-id="hf-z8ik" class="canada-link" id="canada-link-7" x1="960" y1="440" x2="760" y2="500" />
+      <circle data-hf-id="hf-ochs" class="canada-dot" id="canada-dot-0" cx="360" cy="260" r="7" />
+      <circle data-hf-id="hf-52np" class="canada-dot" id="canada-dot-1" cx="560" cy="200" r="7" />
+      <circle data-hf-id="hf-bf13" class="canada-dot" id="canada-dot-2" cx="760" cy="320" r="7" />
+      <circle data-hf-id="hf-oci8" class="canada-dot" id="canada-dot-3" cx="960" cy="180" r="7" />
+      <circle data-hf-id="hf-95pi" class="canada-dot" id="canada-dot-4" cx="1160" cy="300" r="7" />
+      <circle data-hf-id="hf-viou" class="canada-dot" id="canada-dot-5" cx="1360" cy="220" r="7" />
+      <circle data-hf-id="hf-wyie" class="canada-dot" id="canada-dot-6" cx="560" cy="420" r="7" />
+      <circle data-hf-id="hf-gv15" class="canada-dot" id="canada-dot-7" cx="960" cy="440" r="7" />
+      <circle data-hf-id="hf-563l" class="canada-dot" id="canada-dot-8" cx="760" cy="500" r="7" />
+    </svg>
+    <div data-hf-id="hf-29un" class="canada-caption" id="canada-caption">Climat froid · réseau électrique propre</div>
+  </div>
+
+  <div data-hf-id="hf-9gvb" id="sprout-panel-wrap" class="clip" data-start="102.17" data-duration="15.25" style="display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none;">
+    <div data-hf-id="hf-m2g3" class="map-panel" id="sprout-panel">
+      <div data-hf-id="hf-7vah" class="sprout-caption-title">Croissance canadienne</div>
+      <div data-hf-id="hf-rjqv" class="sprout-icon-box"><svg data-hf-id="hf-ca88" viewBox="0 0 60 70" width="60" height="70" fill="none" stroke="#22c55e" stroke-width="3.5"><path data-hf-id="hf-xp95" d="M30 65 V35" stroke-linecap="round" /><path data-hf-id="hf-u2yz" d="M30 40 C10 40 8 20 8 12 C22 12 30 24 30 40 Z" /><path data-hf-id="hf-9vl6" d="M30 32 C50 32 52 15 52 8 C38 8 30 18 30 32 Z" /><path data-hf-id="hf-3s0r" d="M46 4 L52 -2 L54 6 Z" fill="#ef4444" stroke="none" transform="translate(-4,10) scale(0.7)" /></svg></div>
+      <div data-hf-id="hf-szva" class="sprout-caption">70&#160;% des startups canadiennes en IA quittent le pays</div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-1rsp" id="gauge-vert-panel-wrap" class="clip" data-start="118.9" data-duration="8.62" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; pointer-events:none;">
+    <div data-hf-id="hf-798j" class="map-panel" id="gauge-vert-panel">
+      <div data-hf-id="hf-ob6r" style="display:flex; flex-direction:column; align-items:center;">
+        <div data-hf-id="hf-89rp" class="gauge-vert-track"><div data-hf-id="hf-yr6c" class="gauge-vert-fill" id="gauge-vert-fill"></div></div>
+        <div data-hf-id="hf-6y9y" class="gauge-vert-value" id="gauge-vert-value">500 M$</div>
+        <div data-hf-id="hf-cvq5" class="gauge-vert-label" id="gauge-vert-label">Fonds de croissance IA</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-6ujx" id="dtc-panel" class="clip" data-start="146.0" data-duration="6.0">
+    <div data-hf-id="hf-wbnc" class="grid-bg"></div>
+    <div data-hf-id="hf-f3k6" class="dtc-icon-box" id="dtc-icon-box"><svg data-hf-id="hf-c1ot" viewBox="0 0 100 100"><rect data-hf-id="hf-li9p" x="28" y="14" width="44" height="74" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-odqm" x1="28" y1="32" x2="72" y2="32" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-19ve" x1="28" y1="50" x2="72" y2="50" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-lm0q" x1="28" y1="68" x2="72" y2="68" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-sxtk" x1="50" y1="14" x2="50" y2="88" stroke="#93c5fd" stroke-width="3" /></svg></div>
+    <div data-hf-id="hf-yaxf" class="dtc-title" id="dtc-title">Digital Transformation Canada</div>
+    <div data-hf-id="hf-5utc" class="dtc-sub" id="dtc-sub">Mandat : utiliser le pouvoir d'achat de l'État fédéral</div>
+  </div>
+
+  <div data-hf-id="hf-jhne" id="pichette-timeline" class="clip timeline timeline--horizontal" data-start="193.64" data-duration="9.0">
+    <div data-hf-id="hf-m5vr" class="timeline-track" id="pichette-timeline-track">
+      <div data-hf-id="hf-k6nr" class="timeline-track-fill" id="pichette-timeline-track-fill"></div>
+      <div data-hf-id="hf-sw9i" class="timeline-milestone" id="pichette-timeline-ms0" style="left:0.0%;">
+        <div data-hf-id="hf-kcab" class="timeline-dot"></div>
+        <div data-hf-id="hf-wpdz" class="timeline-label">2013 : Google achète DNNresearch</div>
+      </div>
+      <div data-hf-id="hf-yp94" class="timeline-milestone" id="pichette-timeline-ms1" style="left:100.0%;">
+        <div data-hf-id="hf-tcpf" class="timeline-dot"></div>
+        <div data-hf-id="hf-dlo5" class="timeline-label">2026 : Digital Transformation Canada</div>
+      </div>
+    </div>
+  </div>
+  <div data-hf-id="hf-a1mq" class="source-tag" id="pichette-source" style="left:60px; bottom:60px; opacity:0;">Source : archives / Digital Transformation Canada</div>
+
+  <div data-hf-id="hf-kuwk" id="adoption-montage" class="clip montage-rafale" data-start="209.82" data-duration="8.96" style="justify-content:flex-end; padding-right:150px;">
+    <div data-hf-id="hf-474k" class="montage-item" id="adoption-montage-0">
+      <svg data-hf-id="hf-jojf" class="montage-icon" viewBox="0 0 100 100"><path data-hf-id="hf-owci" d="M42 15 H58 V32 L76 78 C79 85 74 90 66 90 H34 C26 90 21 85 24 78 L42 32 Z" fill="none" stroke="#93c5fd" stroke-width="5" stroke-linejoin="round" /><line data-hf-id="hf-6bfc" x1="38" y1="15" x2="62" y2="15" stroke="#93c5fd" stroke-width="5" stroke-linecap="round" /><circle data-hf-id="hf-s871" cx="50" cy="70" r="5" fill="#facc15" /><circle data-hf-id="hf-yznp" cx="38" cy="78" r="3" fill="#facc15" /><circle data-hf-id="hf-75gj" cx="60" cy="80" r="3" fill="#facc15" /></svg>
+      <div data-hf-id="hf-00qg" class="montage-label">Laboratoire</div>
+    </div>
+    <div data-hf-id="hf-4ysd" class="montage-item" id="adoption-montage-1">
+      <svg data-hf-id="hf-kwcb" class="montage-icon" viewBox="0 0 100 100"><path data-hf-id="hf-q3ke" d="M12 88 V45 L34 58 V45 L56 58 V38 L78 52 V88 Z" fill="none" stroke="#93c5fd" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><rect data-hf-id="hf-tgks" x="60" y="18" width="9" height="20" fill="none" stroke="#93c5fd" stroke-width="4" /><path data-hf-id="hf-g5gc" d="M60 18 Q56 10 64 4" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-kghs" class="montage-label">Usine</div>
+    </div>
+    <div data-hf-id="hf-b4i6" class="montage-item" id="adoption-montage-2">
+      <svg data-hf-id="hf-ki1a" class="montage-icon" viewBox="0 0 100 100"><path data-hf-id="hf-3b1r" d="M25 35 H75 L70 88 H30 Z" fill="none" stroke="#93c5fd" stroke-width="5" stroke-linejoin="round" /><path data-hf-id="hf-6k2h" d="M36 35 V25 C36 15 64 15 64 25 V35" fill="none" stroke="#93c5fd" stroke-width="5" /></svg>
+      <div data-hf-id="hf-l34k" class="montage-label">PME</div>
+    </div>
+    <div data-hf-id="hf-f2m7" class="montage-item" id="adoption-montage-3">
+      <svg data-hf-id="hf-k3q9" class="montage-icon" viewBox="0 0 100 100"><rect data-hf-id="hf-zzvb" x="18" y="18" width="64" height="64" rx="10" fill="none" stroke="#93c5fd" stroke-width="5" /><path data-hf-id="hf-nlaq" d="M50 32 V68 M32 50 H68" stroke="#facc15" stroke-width="7" stroke-linecap="round" /></svg>
+      <div data-hf-id="hf-v4mq" class="montage-label">Hôpital</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-gpar" id="adoption-gauge-panel-wrap" class="clip" data-start="218.82" data-duration="21.48" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; pointer-events:none;">
+    <div data-hf-id="hf-e7xe" class="map-panel" id="adoption-gauge-panel">
+      <div data-hf-id="hf-cvtm" class="adoption-gauge-textstack">
+        <div data-hf-id="hf-lftf" class="adoption-gauge-headline" id="adoption-gauge-headline-early">60&#160;%</div>
+        <div data-hf-id="hf-k55x" class="adoption-gauge-sub" id="adoption-gauge-sub-early">objectif fédéral d'ici 2034 (PME et entreprises canadiennes)</div>
+        <div data-hf-id="hf-65vp" class="adoption-gauge-headline" id="adoption-gauge-headline">19&#160;%</div>
+        <div data-hf-id="hf-n80x" class="adoption-gauge-sub" id="adoption-gauge-sub">contre une cible initiale de 12&#160;% (Statistique Canada)</div>
+      </div>
+      <div data-hf-id="hf-pl4c" class="adoption-gauge-track">
+        <div data-hf-id="hf-oe6q" class="adoption-gauge-fill" id="adoption-gauge-fill"></div>
+        <div data-hf-id="hf-r4y0" class="adoption-gauge-flag" id="adoption-gauge-flag"><div data-hf-id="hf-jdid" class="flag-line"></div><div data-hf-id="hf-y8r0" class="flag-label">60&#160;% · 2034</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div data-hf-id="hf-091f" class="source-tag" id="adoption-gauge-source" data-parent="adoption-gauge-panel" style="opacity:0; left:60px; bottom:60px;">Source : Statistique Canada / stratégie AI for All</div>
+
+  <div data-hf-id="hf-h82x" id="badge" class="clip" data-start="7.8" data-duration="257.94">
+    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
+  </div>
+  <div data-hf-id="hf-8102" id="fade-out" class="clip" data-start="265.39" data-duration="0.75"></div>
+
+</div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+window.__timelines["chapitre-6"] = gsap.timeline({ paused: true });
+const tl = window.__timelines["chapitre-6"];
+tl.fromTo("#chapter-open-kicker", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+tl.fromTo("#chapter-open-title", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.65);
+tl.to("#chapter-open-rule", { width: 260, duration: 0.4, ease: "power2.out" }, 1.9);
+tl.to("#chapter-open-inner", { opacity: 0, duration: 0.3 }, 5.5);
+tl.set("#chapter-open-inner", { opacity: 0 }, 5.8);
+tl.fromTo("#chapter-open .chapter-opening-photo", { scale: 1.0 }, { scale: 1.07, duration: 5.8, ease: "none" }, 0);
+tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 259.94, ease: "none" }, 5.8);
+tl.set("#main-video", { x: 0 }, 0);
+tl.to("#p6-particle-0", { x: 22, y: -14, duration: 6.4, ease: "sine.inOut", yoyo: true, repeat: 24 }, 0.0);
+tl.to("#p6-particle-1", { x: 32, y: -22, duration: 7.7, ease: "sine.inOut", yoyo: true, repeat: 24 }, 0.4);
+tl.to("#p6-particle-2", { x: 42, y: -30, duration: 9.0, ease: "sine.inOut", yoyo: true, repeat: 24 }, 0.8);
+tl.to("#p6-particle-3", { x: 22, y: -38, duration: 10.3, ease: "sine.inOut", yoyo: true, repeat: 24 }, 1.2);
+tl.to("#p6-particle-4", { x: 32, y: -14, duration: 11.6, ease: "sine.inOut", yoyo: true, repeat: 24 }, 1.6);
+tl.to("#p6-particle-5", { x: 42, y: -22, duration: 6.4, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.0);
+tl.to("#p6-particle-6", { x: 22, y: -30, duration: 7.7, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.4);
+tl.to("#p6-particle-7", { x: 32, y: -38, duration: 9.0, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.8);
+tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 266.14, ease: "none" }, 0);
+tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
+tl.to("#three-battles-col0", { opacity: 1, duration: 0.3 }, 22.1);
+tl.to("#three-battles-col1", { opacity: 1, duration: 0.3 }, 22.55);
+tl.to("#three-battles-col2", { opacity: 1, duration: 0.3 }, 23.0);
+tl.to("#three-battles", { opacity: 0, duration: 0.3 }, 25.8);
+tl.fromTo("#server-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 26.15);
+tl.to("#server-photo-card", { opacity: 0, duration: 0.25 }, 28.15);
+tl.fromTo("#server-photo-card img", { scale: 1.0 }, { scale: 1.06, duration: 2.3, ease: "none" }, 26.1);
+tl.fromTo("#rack-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 28.45);
+tl.to("#rack-panel", { opacity: 0, duration: 0.25 }, 30.39);
+tl.to("#rack-panel .rack-led", { opacity: 0.25, duration: 0.3, repeat: 3, yoyo: true, stagger: 0.08 }, 28.7);
+tl.fromTo("#stacked-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 46.57);
+tl.fromTo("#stacked-row-0", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 46.82);
+tl.fromTo("#stacked-row-1", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 47.11);
+tl.fromTo("#stacked-row-2", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 65.39);
+tl.to("#stacked-panel", { opacity: 0, duration: 0.3 }, 72.14);
+tl.fromTo("#stacked-source", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 47.02);
+tl.to("#stacked-source", { opacity: 0, duration: 0.3 }, 72.14);
+tl.fromTo("#canada-link-0", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 72.94);
+tl.fromTo("#canada-link-1", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 73.12);
+tl.fromTo("#canada-link-2", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 73.3);
+tl.fromTo("#canada-link-3", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 73.48);
+tl.fromTo("#canada-link-4", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 73.66);
+tl.fromTo("#canada-link-5", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 73.84);
+tl.fromTo("#canada-link-6", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 74.02);
+tl.fromTo("#canada-link-7", { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 74.2);
+tl.fromTo("#canada-dot-0", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 72.84);
+tl.fromTo("#canada-dot-1", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.02);
+tl.fromTo("#canada-dot-2", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.2);
+tl.fromTo("#canada-dot-3", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.38);
+tl.fromTo("#canada-dot-4", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.56);
+tl.fromTo("#canada-dot-5", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.74);
+tl.fromTo("#canada-dot-6", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 73.92);
+tl.fromTo("#canada-dot-7", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 74.1);
+tl.fromTo("#canada-dot-8", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 74.28);
+tl.fromTo("#canada-maple", { opacity: 0 }, { opacity: 0.05, duration: 1.0 }, 72.44);
+tl.fromTo("#canada-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 74.64);
+tl.to("#carte-canada", { opacity: 0, duration: 0.3 }, 79.27);
+tl.fromTo("#sprout-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 102.22);
+tl.to("#sprout-panel", { opacity: 0, duration: 0.3 }, 117.12);
+tl.fromTo("#gauge-vert-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 118.95);
+tl.fromTo("#gauge-vert-fill", { height: "0%" }, { height: "100%", duration: 1.2, ease: "power2.out" }, 119.2);
+tl.fromTo("#gauge-vert-value", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 120.2);
+tl.fromTo("#gauge-vert-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 120.5);
+tl.to("#gauge-vert-panel", { opacity: 0, duration: 0.3 }, 127.22);
+tl.set("#dtc-icon-box", { opacity: 1, y: 0 }, 146.0);
+tl.set("#dtc-title", { opacity: 1 }, 146.0);
+tl.set("#dtc-sub", { opacity: 1 }, 146.0);
+tl.to("#dtc-panel", { opacity: 0, duration: 0.3 }, 151.7);
+tl.to("#pichette-timeline-ms0", { opacity: 1, duration: 0.3 }, 193.84);
+tl.to("#pichette-timeline-ms0 .timeline-dot", { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 193.84);
+tl.to("#pichette-timeline-ms1", { opacity: 1, duration: 0.3 }, 198.14);
+tl.to("#pichette-timeline-ms1 .timeline-dot", { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 198.14);
+tl.to("#pichette-timeline-track-fill", { width: "100.0%", duration: 0.4, ease: "power2.out" }, 198.14);
+tl.to("#pichette-timeline", { opacity: 0, duration: 0.3 }, 202.34);
+tl.fromTo("#pichette-source", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 194.14);
+tl.to("#pichette-source", { opacity: 0, duration: 0.3 }, 202.34);
+tl.fromTo("#adoption-montage-0", { opacity: 0 }, { opacity: 1, duration: 0.12 }, 209.82);
+tl.to("#adoption-montage-0", { opacity: 0, duration: 0.12 }, 211.94);
+tl.fromTo("#adoption-montage-1", { opacity: 0 }, { opacity: 1, duration: 0.12 }, 212.06);
+tl.to("#adoption-montage-1", { opacity: 0, duration: 0.12 }, 214.18);
+tl.fromTo("#adoption-montage-2", { opacity: 0 }, { opacity: 1, duration: 0.12 }, 214.3);
+tl.to("#adoption-montage-2", { opacity: 0, duration: 0.12 }, 216.42);
+tl.fromTo("#adoption-montage-3", { opacity: 0 }, { opacity: 1, duration: 0.12 }, 216.54);
+tl.to("#adoption-montage-3", { opacity: 0, duration: 0.12 }, 218.66);
+tl.fromTo("#adoption-gauge-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 218.87);
+tl.fromTo("#adoption-gauge-headline-early", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 218.97);
+tl.fromTo("#adoption-gauge-sub-early", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 219.12);
+tl.fromTo("#adoption-gauge-flag", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 219.07);
+tl.fromTo("#adoption-gauge-fill", { width: "0%" }, { width: "20%", duration: 0.6, ease: "power2.out" }, 228.45);
+tl.to("#adoption-gauge-headline-early", { opacity: 0, duration: 0.25 }, 234.94);
+tl.to("#adoption-gauge-sub-early", { opacity: 0, duration: 0.25 }, 234.94);
+tl.fromTo("#adoption-gauge-headline", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 235.04);
+tl.fromTo("#adoption-gauge-sub", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 235.19);
+tl.to("#adoption-gauge-fill", { width: "31.7%", duration: 0.5, ease: "power2.out" }, 234.94);
+tl.to("#adoption-gauge-panel", { opacity: 0, duration: 0.3 }, 240.0);
+tl.fromTo("#adoption-gauge-source", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 219.32);
+tl.to("#adoption-gauge-source", { opacity: 0, duration: 0.3 }, 240.0);
+tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 7.8);
+tl.to("#fade-out", { opacity: 1, duration: 0.75 }, 265.39);
+</script>
+</body>
+</html>
