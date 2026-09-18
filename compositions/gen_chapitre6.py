@@ -63,7 +63,6 @@ t = make_t(INTRO_PAD)
 # ---------------------------------------------------------------------------
 TRIPTYCH = (16.0, 20.3)          # "trois batailles." @16.04-17.15 -> "la puissance de calcul." @20.2
 ARCHIVE_PHOTO = (20.3, 22.6)     # "Les modèles d'IA...colossales." @20.2-24.8 (1er des "deux plans, cut sec")
-RACK_ICON = (22.6, 24.84)       # 2e plan du même passage
 STACKED_FIGURES = (40.72, 66.64)  # "Jusqu'à 700 millions...ici." -> "...2,3 gigawatts." @41.31-66.64
 CARTE_CANADA = (66.64, 73.77)    # "Le Canada a de vrais atouts...au monde." @66.64-73.77
 SPROUT = (96.37, 111.62)         # "Rappelez-vous le chiffre. 70%...pays...c'est une autre chose." @97.68-111.62
@@ -128,11 +127,6 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- CADRE-TÉLÉ — salle de serveurs (archive, coin haut-droite) ----------- */
 .archive-insert { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
-
-/* ---- CAPSULE-DONNÉE — icône de rack de serveurs qui clignote (incrustation) */
-.rack-icon-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
-.rack-icon-wrap svg { width:88px; height:88px; }
-.rack-icon-label { font-size:19px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.05em; text-align:center; }
 
 /* ---- CAPSULE-DONNÉE — chiffres empilés 2G$/700M$/850MW (incrustation) ----- */
 .stacked-row { display:flex; align-items:center; gap:18px; opacity:0; transform:translateY(10px); }
@@ -315,14 +309,6 @@ BUILDING_ICON = ('<rect x="28" y="14" width="44" height="74" fill="none" stroke=
                   '<line x1="50" y1="14" x2="50" y2="88" stroke="#93c5fd" stroke-width="3"/>')
 ADOPTION_ICON = ('<path d="M15 78 L38 50 L55 65 L85 25" fill="none" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'
                   '<path d="M65 25 H85 V45" fill="none" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>')
-SERVER_RACK_SVG = ('<rect x="26" y="12" width="48" height="76" rx="4" fill="none" stroke="#93c5fd" stroke-width="5"/>'
-             '<line x1="26" y1="30" x2="74" y2="30" stroke="#93c5fd" stroke-width="3"/>'
-             '<line x1="26" y1="48" x2="74" y2="48" stroke="#93c5fd" stroke-width="3"/>'
-             '<line x1="26" y1="66" x2="74" y2="66" stroke="#93c5fd" stroke-width="3"/>'
-             '<circle class="rack-led" cx="66" cy="21" r="3.5" fill="#22c55e"/>'
-             '<circle class="rack-led" cx="66" cy="39" r="3.5" fill="#22c55e"/>'
-             '<circle class="rack-led" cx="66" cy="57" r="3.5" fill="#22c55e"/>'
-             '<circle class="rack-led" cx="66" cy="75" r="3.5" fill="#22c55e"/>')
 LAB_ICON = ('<path d="M42 15 H58 V32 L76 78 C79 85 74 90 66 90 H34 C26 90 21 85 24 78 L42 32 Z" '
             'fill="none" stroke="#93c5fd" stroke-width="5" stroke-linejoin="round"/>'
             '<line x1="38" y1="15" x2="62" y2="15" stroke="#93c5fd" stroke-width="5" stroke-linecap="round"/>'
@@ -384,24 +370,6 @@ timeline_js += [
     f'tl.fromTo("#server-photo-card img", {{ scale: 1.0 }}, {{ scale: 1.06, duration: {round(ap1-ap0,2)}, ease: "none" }}, {t(ap0)});',
 ]
 
-# ---------------------------------------------------------------------------
-# CAPSULE-DONNÉE — icône de rack de serveurs qui clignote (incrustation)
-# ---------------------------------------------------------------------------
-ri0, ri1 = RACK_ICON
-rack_inner = (
-    '      <div class="rack-icon-wrap">\n'
-    f'        <svg viewBox="0 0 100 100">{SERVER_RACK_SVG}</svg>\n'
-    '        <div class="rack-icon-label">Puissance de calcul</div>\n'
-    '      </div>'
-)
-h, js = data_card_panel("rack-panel", rack_inner, t(ri0))
-parts.append(
-    f'  <div id="rack-panel-wrap" class="clip" data-start="{t(ri0)}" data-duration="{round(ri1-ri0,2)}" '
-    f'style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:80px; pointer-events:none;">\n{h}  </div>\n\n'
-)
-timeline_js += js
-timeline_js.append(f'tl.to("#rack-panel", {{ opacity: 0, duration: 0.25 }}, {round(t(ri1)-0.25,3)});')
-timeline_js.append(f'tl.to("#rack-panel .rack-led", {{ opacity: 0.25, duration: 0.3, repeat: 3, yoyo: true, stagger: 0.08 }}, {round(t(ri0)+0.3,3)});')
 
 
 # ---------------------------------------------------------------------------

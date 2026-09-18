@@ -477,11 +477,6 @@ html,body { margin:0; padding:0; background:#000; }
 /* ---- CADRE-TÉLÉ — salle de serveurs (archive, coin haut-droite) ----------- */
 .archive-insert { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
 
-/* ---- CAPSULE-DONNÉE — icône de rack de serveurs qui clignote (incrustation) */
-.rack-icon-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
-.rack-icon-wrap svg { width:88px; height:88px; }
-.rack-icon-label { font-size:19px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.05em; text-align:center; }
-
 /* ---- CAPSULE-DONNÉE — chiffres empilés 2G$/700M$/850MW (incrustation) ----- */
 .stacked-row { display:flex; align-items:center; gap:18px; opacity:0; transform:translateY(10px); }
 .stacked-row .stacked-bar { height:34px; border-radius:6px; background:linear-gradient(90deg,#1d4ed8,#3b82f6); box-shadow:0 0 16px 2px rgba(59,130,246,0.35); }
@@ -638,15 +633,6 @@ html,body { margin:0; padding:0; background:#000; }
     <div data-hf-id="hf-rf7t" class="source-tag" id="server-photo-source" style="right:120px; bottom:auto; top:384px; opacity:1;">Source : archives</div>
   </div>
 
-  <div data-hf-id="hf-9ndl" id="rack-panel-wrap" class="clip" data-start="28.4" data-duration="2.24" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:80px; pointer-events:none;">
-    <div data-hf-id="hf-b5al" class="map-panel" id="rack-panel">
-      <div data-hf-id="hf-4a8u" class="rack-icon-wrap">
-        <svg data-hf-id="hf-fohl" viewBox="0 0 100 100"><rect data-hf-id="hf-mytk" x="26" y="12" width="48" height="76" rx="4" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-v6qa" x1="26" y1="30" x2="74" y2="30" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-vzmi" x1="26" y1="48" x2="74" y2="48" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-qewy" x1="26" y1="66" x2="74" y2="66" stroke="#93c5fd" stroke-width="3" /><circle data-hf-id="hf-5s0i" class="rack-led" cx="66" cy="21" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-vt6r" class="rack-led" cx="66" cy="39" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-tlkf" class="rack-led" cx="66" cy="57" r="3.5" fill="#22c55e" /><circle data-hf-id="hf-ljej" class="rack-led" cx="66" cy="75" r="3.5" fill="#22c55e" /></svg>
-        <div data-hf-id="hf-obii" class="rack-icon-label">Puissance de calcul</div>
-      </div>
-    </div>
-  </div>
-
   <div data-hf-id="hf-qcp7" id="stacked-panel-wrap" class="clip" data-start="46.52" data-duration="25.92" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; pointer-events:none;">
     <div data-hf-id="hf-7725" class="map-panel" id="stacked-panel">
       <div data-hf-id="hf-djna" style="display:flex; flex-direction:column; align-items:flex-start; gap:16px;">
@@ -722,7 +708,7 @@ html,body { margin:0; padding:0; background:#000; }
 
   <div data-hf-id="hf-6ujx" id="dtc-panel" class="clip" data-start="146.0" data-duration="6.0">
     <div data-hf-id="hf-wbnc" class="grid-bg"></div>
-    <div data-hf-id="hf-f3k6" class="dtc-icon-box" id="dtc-icon-box"><svg data-hf-id="hf-c1ot" viewBox="0 0 100 100"><rect data-hf-id="hf-li9p" x="28" y="14" width="44" height="74" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-odqm" x1="28" y1="32" x2="72" y2="32" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-19ve" x1="28" y1="50" x2="72" y2="50" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-lm0q" x1="28" y1="68" x2="72" y2="68" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-sxtk" x1="50" y1="14" x2="50" y2="88" stroke="#93c5fd" stroke-width="3" /></svg></div>
+    <div data-hf-id="hf-f3k6" class="dtc-icon-box" id="dtc-icon-box"><svg data-hf-id="hf-fohl" viewBox="0 0 100 100"><rect data-hf-id="hf-li9p" x="28" y="14" width="44" height="74" fill="none" stroke="#93c5fd" stroke-width="5" /><line data-hf-id="hf-odqm" x1="28" y1="32" x2="72" y2="32" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-19ve" x1="28" y1="50" x2="72" y2="50" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-lm0q" x1="28" y1="68" x2="72" y2="68" stroke="#93c5fd" stroke-width="3" /><line data-hf-id="hf-sxtk" x1="50" y1="14" x2="50" y2="88" stroke="#93c5fd" stroke-width="3" /></svg></div>
     <div data-hf-id="hf-yaxf" class="dtc-title" id="dtc-title">Digital Transformation Canada</div>
     <div data-hf-id="hf-5utc" class="dtc-sub" id="dtc-sub">Mandat : utiliser le pouvoir d'achat de l'État fédéral</div>
   </div>
@@ -813,9 +799,6 @@ tl.to("#three-battles", { opacity: 0, duration: 0.3 }, 25.8);
 tl.fromTo("#server-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 26.15);
 tl.to("#server-photo-card", { opacity: 0, duration: 0.25 }, 28.15);
 tl.fromTo("#server-photo-card img", { scale: 1.0 }, { scale: 1.06, duration: 2.3, ease: "none" }, 26.1);
-tl.fromTo("#rack-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 28.45);
-tl.to("#rack-panel", { opacity: 0, duration: 0.25 }, 30.39);
-tl.to("#rack-panel .rack-led", { opacity: 0.25, duration: 0.3, repeat: 3, yoyo: true, stagger: 0.08 }, 28.7);
 tl.fromTo("#stacked-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 46.57);
 tl.fromTo("#stacked-row-0", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 46.82);
 tl.fromTo("#stacked-row-1", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 47.11);
