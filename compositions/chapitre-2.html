@@ -381,7 +381,14 @@ html,body { margin:0; padding:0; background:#000; }
 .chapter-opening-card .chapter-opening-kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
 .chapter-opening-card .chapter-opening-title {
   margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center;
-  line-height:1.2; opacity:0;
+  line-height:1.2; opacity:0; color:#fff;
+  /* FIX (2026-09-17, chapitre 3 -- premier retour utilisateur sur ce
+     carton) : aucune couleur n'était définie ici, contrairement à toutes
+     les autres classes de texte du carton (.chapter-opening-kicker:
+     #60a5fa, .chapter-opening-readout: #93c5fd) -- le titre héritait donc
+     de la couleur de texte par défaut du navigateur (noir), illisible sur
+     le fond sombre. Affecte potentiellement tous les chapitres utilisant
+     chapter_opening_card_block(), pas seulement chapitre 3. */
 }
 .chapter-opening-card .chapter-opening-rule { margin-top:26px; width:0; height:3px; background:#3b82f6; }
 
@@ -425,7 +432,18 @@ html,body { margin:0; padding:0; background:#000; }
 }
 .timeline:not(.timeline--horizontal) .timeline-milestone { flex-direction:row; gap:20px; }
 .timeline-dot { width:20px; height:20px; border-radius:50%; background:#3b82f6; box-shadow:0 0 20px 4px rgba(59,130,246,0.5); transform:scale(0); flex:none; }
-.timeline-label { font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center; }
+/* FIX (retour utilisateur, 2026-09-17) : ces libellés (Toronto/Google/OpenAI)
+   passent directement sur la vidéo du présentateur -- sans contour, le blanc
+   se fond dans les zones claires (chemise) comme le fond peut se fondre dans
+   les zones sombres. Contour noir simulé par une pile de text-shadow (plus
+   fiable/net à ce corps de texte que -webkit-text-stroke) pour rester lisible
+   quel que soit ce qu'il y a derrière. */
+.timeline-label {
+  font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center;
+  text-shadow:
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 -2.5px 0 #000, 0 2.5px 0 #000, -2.5px 0 0 #000, 2.5px 0 0 #000;
+}
 
 html,body { margin:0; padding:0; background:#000; }
 
@@ -777,7 +795,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-jtq7" class="split2-label">Approche de Toronto (2012)</div>
     </div>
   </div>
-  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;" data-hidden="">
+  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;">
     <div data-hf-id="hf-7jpw" class="montage-item" id="dog-montage-0">
       <svg data-hf-id="hf-rtoe" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:none; transform:none;"><ellipse data-hf-id="hf-tqmu" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-hb6g" cx="34" cy="38" r="14" /><path data-hf-id="hf-pnkt" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gfae" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
       <div data-hf-id="hf-i5dq" class="montage-label">de face</div>
@@ -822,7 +840,6 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-zqj4" class="triptych-label">Objet complet</div>
     </div>
   </div>
-    <div data-hf-id="hf-m7b2" class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-unhy" id="gpu-photo" class="archive-insert clip" data-start="82.9" data-duration="11.8">
@@ -901,7 +918,6 @@ html,body { margin:0; padding:0; background:#000; }
         <circle data-hf-id="hf-cz7s" class="spread-dot" id="spread-dot-6" cx="520" cy="200" r="10" />
         <circle data-hf-id="hf-w5lu" class="spread-dot" id="spread-dot-7" cx="120" cy="180" r="10" />
     </svg>
-    <div data-hf-id="hf-tvfm" class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-97lz" id="explose-montage" class="clip montage-rafale" data-start="163.6" data-duration="14.8" style="justify-content:flex-end; padding-right:150px;">

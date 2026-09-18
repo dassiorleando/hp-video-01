@@ -123,6 +123,7 @@ html,body { margin:0; padding:0; background:#000; }
 /* ---- CAPSULE-DONNÉE — compteur de croissance (plein cadre) --------------- */
 #growth-card { z-index:32; background:#03050a; display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .growth-title { font-size:32px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; opacity:0; }
+.institute-subtitle { font-size:18px; font-weight:600; color:#93c5fd; opacity:0; letter-spacing:0.01em; }
 .growth-dot { fill:#60a5fa; opacity:0; }
 .growth-number { margin-top:26px; font-size:96px; font-weight:900; color:#fff; opacity:0; }
 .growth-caption { margin-top:8px; font-size:24px; color:#cbd5e1; opacity:0; }
@@ -321,7 +322,6 @@ parts.append(f'''  <div id="map-overview" class="clip" data-start="{t(mo0)}" dat
 {map_city_labels_html("mov")}
       </div>
     </div>
-    <div class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
 ''')
@@ -400,7 +400,6 @@ parts.append(f'''  <div id="schema-card" class="clip" data-start="{t(sr0)}" data
 {chr(10).join(lab_icons)}
 {INSTITUTION_ICON}
     </svg>
-    <div class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
 ''')
@@ -533,7 +532,6 @@ parts.append(f'''  <div id="map-pan-mtl" class="clip" data-start="{t(mp0)}" data
 {map_city_labels_html("mpm")}
       </div>
     </div>
-    <div class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
 ''')
@@ -593,11 +591,17 @@ for i, (dx, dy) in enumerate(GROWTH_DOTS):
             f'style="fill:none; stroke:#3b82f6; stroke-width:1;"/>'
         )
         growth_dots_js.append(f'tl.to("#growth-line-{i}", {{ opacity: 0.35, duration: 0.15 }}, {at});')
+# FIX (retour utilisateur) : remplace le médaillon "M" générique par le
+# vrai logo Mila fourni par l'utilisateur, + sa dénomination officielle
+# anglaise sous le titre (texte fourni tel quel par l'utilisateur).
 parts.append(f'''  <div id="growth-card" class="clip" data-start="{t(gc0)}" data-duration="{round(gc1-gc0,2)}">
     <div class="grid-bg"></div>
-    <div style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
-      <div class="logo-badge-mark" id="mila-logo" style="opacity:0;">M</div>
-      <div class="growth-title" id="growth-title" style="margin-bottom:0;">MILA &mdash; DEPUIS 1993</div>
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:10px;">
+      <div class="logo-badge-photo" id="mila-logo" style="opacity:0;"><img src="assets/photos/mila-logo.jpg" alt="Mila"></div>
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:4px;">
+        <div class="growth-title" id="growth-title" style="margin-bottom:0;">MILA &mdash; DEPUIS 1993</div>
+        <div class="institute-subtitle" id="mila-subtitle">Mila - Quebec Artificial Intelligence Institute</div>
+      </div>
     </div>
     <svg viewBox="0 0 1000 440" width="1000" height="440">
 {chr(10).join(growth_lines_html)}
@@ -611,6 +615,7 @@ parts.append(f'''  <div id="growth-card" class="clip" data-start="{t(gc0)}" data
 ''')
 timeline_js.append(f'tl.fromTo("#mila-logo", {{ opacity: 0, scale: 0.6 }}, {{ opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }}, {round(t(gc0)+0.1,3)});')
 timeline_js.append(f'tl.fromTo("#growth-title", {{ opacity: 0, y: -10 }}, {{ opacity: 1, y: 0, duration: 0.3 }}, {round(t(gc0)+0.1,3)});')
+timeline_js.append(f'tl.fromTo("#mila-subtitle", {{ opacity: 0, y: -8 }}, {{ opacity: 1, y: 0, duration: 0.3 }}, {round(t(gc0)+0.2,3)});')
 timeline_js += growth_dots_js
 timeline_js += [
     f'tl.fromTo("#growth-number", {{ opacity: 0, scale: 0.7 }}, {{ opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }}, {round(t(gc1)-1.4,3)});',
@@ -697,7 +702,6 @@ parts.append(f'''  <div id="map-pan-edm" class="clip" data-start="{t(me0)}" data
 {map_city_labels_html("mpe")}
       </div>
     </div>
-    <div class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
 ''')

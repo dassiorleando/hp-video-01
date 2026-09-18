@@ -510,6 +510,16 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
         overrides.append(f'max-width:{title_max_width}px')
     title_style = f' style="{"; ".join(overrides)};"' if overrides else ""
 
+    # FIX (retour utilisateur, 2026-09-17) : readout_text="" (ou None) omet
+    # entièrement la "lecture système" -- certains chapitres n'en ont pas
+    # besoin ("SYSTÈME D'ARCHIVES..." jugé inutile sur chapitre 4) alors que
+    # d'autres la gardent (ex. chapitre 3, noms de villes).
+    readout_html = (
+        f'    <div class="chapter-opening-readout-wrap" id="{card_id}-readout-wrap">'
+        f'<div class="chapter-opening-readout" id="{card_id}-readout">{esc(readout_text)}</div></div>\n'
+        if readout_text else ''
+    )
+
     html_snippet = (
         f'  <div id="{card_id}" class="clip chapter-opening-card" data-start="{start}" '
         f'data-duration="{round(duration, 2)}">\n'
@@ -517,8 +527,7 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
         f'    <img class="chapter-opening-photo" src="{photo_src}" alt="">\n'
         f'    <div class="chapter-opening-overlay"></div>\n'
         f'    <div class="scanlines"></div>\n'
-        f'    <div class="chapter-opening-readout-wrap" id="{card_id}-readout-wrap">'
-        f'<div class="chapter-opening-readout" id="{card_id}-readout">{esc(readout_text)}</div></div>\n'
+        f'{readout_html}'
         f'    <div class="chapter-opening-kicker" id="{card_id}-kicker">{esc(kicker_text)}</div>\n'
         f'    <div class="chapter-opening-title" id="{card_id}-title"{title_style}>{esc(title_text)}</div>\n'
         f'    <div class="chapter-opening-rule" id="{card_id}-rule"></div>\n'
@@ -528,8 +537,12 @@ def chapter_opening_card_block(card_id: str, photo_src: str, readout_text: str,
     )
     exit_at = round(start + duration - 0.3, 3)
     hard_kill_at = round(start + duration, 3)
-    js_lines = [
-        f'tl.to("#{card_id}-readout-wrap", {{ width: {readout_width}, duration: 0.55, ease: "steps(18)" }}, {round(start+0.05,3)});',
+    js_lines = []
+    if readout_text:
+        js_lines.append(
+            f'tl.to("#{card_id}-readout-wrap", {{ width: {readout_width}, duration: 0.55, ease: "steps(18)" }}, {round(start+0.05,3)});'
+        )
+    js_lines += [
         f'tl.fromTo("#{card_id}-kicker", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(start+1.5,3)});',
         f'tl.fromTo("#{card_id}-title", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }}, {round(start+1.65,3)});',
         f'tl.to("#{card_id}-rule", {{ width: 260, duration: 0.4, ease: "power2.out" }}, {round(start+1.9,3)});',

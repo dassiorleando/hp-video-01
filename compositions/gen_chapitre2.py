@@ -463,8 +463,7 @@ h, js = triptych_block("layers-triptych", [
 parts.append(f'''  <div id="layers-card" class="clip" data-start="{t(ly0)}" data-duration="{ly_dur}">
     <div class="grid-bg"></div>
     <div class="layers-title" id="layers-title">APPRENTISSAGE PROFOND &mdash; PLUSIEURS COUCHES</div>
-{h}    <div class="source-tag" style="opacity:1;">Source : illustration</div>
-  </div>
+{h}  </div>
 
 ''')
 timeline_js += js
@@ -678,7 +677,6 @@ parts.append(f'''  <div id="spread-card" class="clip" data-start="{t(sp_0)}" dat
       <circle class="spread-origin" cx="350" cy="170" r="{ORIGIN_R}"/>
 {chr(10).join(dots_html)}
     </svg>
-    <div class="source-tag" style="opacity:1;">Source : illustration</div>
   </div>
 
 ''')

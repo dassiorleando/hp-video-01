@@ -426,4 +426,15 @@ html,body { margin:0; padding:0; background:#000; }
 }
 .timeline:not(.timeline--horizontal) .timeline-milestone { flex-direction:row; gap:20px; }
 .timeline-dot { width:20px; height:20px; border-radius:50%; background:#3b82f6; box-shadow:0 0 20px 4px rgba(59,130,246,0.5); transform:scale(0); flex:none; }
-.timeline-label { font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center; }
+/* FIX (retour utilisateur, 2026-09-17) : ces libellés (Toronto/Google/OpenAI)
+   passent directement sur la vidéo du présentateur -- sans contour, le blanc
+   se fond dans les zones claires (chemise) comme le fond peut se fondre dans
+   les zones sombres. Contour noir simulé par une pile de text-shadow (plus
+   fiable/net à ce corps de texte que -webkit-text-stroke) pour rester lisible
+   quel que soit ce qu'il y a derrière. */
+.timeline-label {
+  font-size:24px; font-weight:800; letter-spacing:0.04em; color:#fff; text-align:center;
+  text-shadow:
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 -2.5px 0 #000, 0 2.5px 0 #000, -2.5px 0 0 #000, 2.5px 0 0 #000;
+}
