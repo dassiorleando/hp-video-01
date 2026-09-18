@@ -447,20 +447,6 @@ html,body { margin:0; padding:0; background:#000; }
 
 html,body { margin:0; padding:0; background:#000; }
 
-/* ---- carton d'ouverture "TORONTO, 2012" — écho exact du cold-open --------
-   Le script demande explicitement "même traitement typographique qu'au cold
-   open" pour créer un effet de reconnaissance immédiate. Patron repris tel
-   quel de compositions/gen_cold_open.py (#intro-card). */
-#intro-card { background:#000; z-index:50; }
-#intro-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#intro-card .intro-readout-wrap { overflow:hidden; width:0; }
-#intro-card .intro-readout { font-family:"Courier New", monospace; font-size:46px; letter-spacing:0.16em; white-space:nowrap; color:#fff; font-weight:700; }
-#intro-card .intro-rule { margin-top:22px; width:0; height:3px; background:#3b82f6; }
-
-/* ---- badge Automathing (identique aux autres compositions) ---- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
-
 /* ---- fiche dossier à DEUX portraits (Krizhevsky / Sutskever) -------------
    Réutilise .dossier-frame/.dossier-avatar/.dossier-label/.dossier-name du
    kit (patron de #hinton-card, chapitre 1) — "même traitement que le
@@ -528,36 +514,39 @@ html,body { margin:0; padding:0; background:#000; }
 </style>
 </head>
 <body>
-<div data-hf-id="hf-m936" id="chapitre-2" data-composition-id="chapitre-2" data-width="3840" data-height="2160" data-fps="60" data-duration="196.32">
+<div data-hf-id="hf-fglo" id="chapitre-2" data-composition-id="chapitre-2" data-width="3840" data-height="2160" data-fps="60" data-duration="199.93">
 <div data-hf-id="hf-7cuk" id="scale-2x">
-  <div data-hf-id="hf-t3gj" id="intro-card" class="clip" data-start="0" data-duration="2.2">
-    <div data-hf-id="hf-66fd" class="clip-inner" id="intro-card-inner">
-    <div data-hf-id="hf-r3fe" class="intro-readout-wrap" id="intro-readout-wrap"><div data-hf-id="hf-5mds" class="intro-readout" id="intro-readout">TORONTO, 2012</div></div>
-    <div data-hf-id="hf-7zoi" class="intro-rule" id="intro-rule"></div>
+  <div data-hf-id="hf-bdts" id="chapter-open" class="clip chapter-opening-card" data-start="0" data-duration="5.8">
+    <div data-hf-id="hf-psio" class="clip-inner" id="chapter-open-inner">
+    <img data-hf-id="hf-2bo6" class="chapter-opening-photo" src="assets/photos/toronto-cn-tower.jpg" alt="">
+    <div data-hf-id="hf-66jr" class="chapter-opening-overlay"></div>
+    <div data-hf-id="hf-8pzc" class="scanlines"></div>
+    <div data-hf-id="hf-8mym" class="chapter-opening-kicker" id="chapter-open-kicker">CHAPITRE 2</div>
+    <div data-hf-id="hf-n9nq" class="chapter-opening-title" id="chapter-open-title">AlexNet, le moment où tout change</div>
+    <div data-hf-id="hf-pyuc" class="chapter-opening-rule" id="chapter-open-rule"></div>
     </div>
   </div>
-
   <div data-hf-id="hf-ix1e" id="video-wrap" class="clip">
-    <video data-hf-id="hf-zwxd" id="main-video" class="clip" src="assets/chapitre_2_alexnet.mp4" muted data-start="2.2" data-duration="193.725" data-hf-media-start-basis="local"></video>
+    <video data-hf-id="hf-u3fy" id="main-video" class="clip" src="assets/chapitre_2_alexnet.mp4" muted data-start="5.8" data-duration="193.725" data-hf-media-start-basis="local"></video>
   </div>
-  <audio data-hf-id="hf-phtm" id="main-audio" src="assets/chapitre_2_alexnet.mp4" data-start="2.2" data-duration="193.725" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-cv5v" id="main-audio" src="assets/chapitre_2_alexnet.mp4" data-start="5.8" data-duration="193.725" data-hf-media-start-basis="local"></audio>
 
-  <audio data-hf-id="hf-5y69" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="2.2" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-6zpw" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="4.2" data-duration="191.72" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-773u" id="bgmusic-1" src="assets/bgmusic.mp3" data-start="5.8" data-duration="2.0" data-media-start="0" data-volume="0.05" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-gahf" id="bgmusic-2" src="assets/bgmusic.mp3" data-start="7.8" data-duration="191.72" data-media-start="2.0" data-volume="0.14" data-hf-media-start-basis="local"></audio>
 
 
   <audio data-hf-id="hf-1hyh" id="whoosh-0" src="assets/whoosh.mp3" data-start="0.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-et7e" id="whoosh-1" src="assets/whoosh.mp3" data-start="6.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-iuoz" id="whoosh-2" src="assets/whoosh.mp3" data-start="15.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-z1jm" id="whoosh-3" src="assets/whoosh.mp3" data-start="34.7" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-2i9k" id="whoosh-4" src="assets/whoosh.mp3" data-start="65.8" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-s8a5" id="whoosh-5" src="assets/whoosh.mp3" data-start="82.9" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-pqs6" id="whoosh-6" src="assets/whoosh.mp3" data-start="111.6" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-z8pb" id="whoosh-7" src="assets/whoosh.mp3" data-start="160.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-vsup" id="whoosh-1" src="assets/whoosh.mp3" data-start="10.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-z09n" id="whoosh-2" src="assets/whoosh.mp3" data-start="19.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-ui0y" id="whoosh-3" src="assets/whoosh.mp3" data-start="38.3" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-rd7k" id="whoosh-4" src="assets/whoosh.mp3" data-start="69.4" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-q6it" id="whoosh-5" src="assets/whoosh.mp3" data-start="86.5" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-pir2" id="whoosh-6" src="assets/whoosh.mp3" data-start="115.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-hw0a" id="whoosh-7" src="assets/whoosh.mp3" data-start="163.8" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
 
-  <div data-hf-id="hf-mmx0" id="grade" class="clip" data-start="2.2" data-duration="193.725"></div>
-  <div data-hf-id="hf-djs1" id="vignette" class="clip" data-start="2.2" data-duration="193.725"></div>
-  <div data-hf-id="hf-cw1v" id="grain-overlay" class="clip" data-start="0" data-duration="196.32" style="filter:url(#grain)"></div>
+  <div data-hf-id="hf-0h3n" id="grade" class="clip" data-start="5.8" data-duration="193.725"></div>
+  <div data-hf-id="hf-fdh8" id="vignette" class="clip" data-start="5.8" data-duration="193.725"></div>
+  <div data-hf-id="hf-yy6t" id="grain-overlay" class="clip" data-start="0" data-duration="199.93" style="filter:url(#grain)"></div>
 
   <svg data-hf-id="hf-8rgt" width="0" height="0" style="position:absolute">
     <defs data-hf-id="hf-mh0t">
@@ -568,7 +557,7 @@ html,body { margin:0; padding:0; background:#000; }
     </defs>
   </svg>
 
-  <svg data-hf-id="hf-30jj" id="p2-particles" class="clip" data-start="0" data-duration="196.32" viewBox="0 0 1920 1080" width="1920" height="1080" style="z-index:20">
+  <svg data-hf-id="hf-gxzh" id="p2-particles" class="clip" data-start="0" data-duration="199.93" viewBox="0 0 1920 1080" width="1920" height="1080" style="z-index:20">
     <circle data-hf-id="hf-v88g" class="particle" id="p2-particle-0" cx="120" cy="180" r="3" />
     <circle data-hf-id="hf-z124" class="particle" id="p2-particle-1" cx="340" cy="620" r="2.5" />
     <circle data-hf-id="hf-rn4f" class="particle" id="p2-particle-2" cx="560" cy="300" r="3.5" />
@@ -579,12 +568,7 @@ html,body { margin:0; padding:0; background:#000; }
     <circle data-hf-id="hf-j5le" class="particle" id="p2-particle-7" cx="1750" cy="860" r="2.5" />
   </svg>
 
-  <div data-hf-id="hf-ztm4" id="progress-track" class="clip" data-start="0" data-duration="196.32">
-    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
-    <div data-hf-id="hf-r8le" id="progress-label">CHAPITRE 2 / 6</div>
-  </div>
-
-  <div data-hf-id="hf-auq9" id="duo-card" class="clip" data-start="6.4" data-duration="4.0">
+  <div data-hf-id="hf-tzto" id="duo-card" class="clip" data-start="10.0" data-duration="4.0">
     <div data-hf-id="hf-zg8z" class="duo-row">
       <div data-hf-id="hf-ab3l" class="dossier-frame" id="duo-frame-1">
         <div data-hf-id="hf-9co5" class="corner tl"></div><div data-hf-id="hf-lrp7" class="corner tr"></div><div data-hf-id="hf-2cxv" class="corner bl"></div><div data-hf-id="hf-34pp" class="corner br"></div>
@@ -611,10 +595,9 @@ html,body { margin:0; padding:0; background:#000; }
         </div>
       </div>
     </div>
-    <div data-hf-id="hf-qydr" class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
-  <div data-hf-id="hf-7pwv" id="imagenet-card" class="clip" data-start="15.4" data-duration="10.25">
+  <div data-hf-id="hf-9a67" id="imagenet-card" class="clip" data-start="19.0" data-duration="10.25">
     <div data-hf-id="hf-q4u8" class="grid-bg"></div>
     <div data-hf-id="hf-5m7u" class="imagenet-title" id="imagenet-title">IMAGENET</div>
     <div data-hf-id="hf-uo0p" class="mosaic-grid">
@@ -767,7 +750,7 @@ html,body { margin:0; padding:0; background:#000; }
     <div data-hf-id="hf-wv8o" class="source-tag" style="opacity:1;">Source : ImageNet</div>
   </div>
 
-  <div data-hf-id="hf-4ck3" id="icon-montage" class="clip montage-rafale" data-start="25.7" data-duration="5.7" style="justify-content:flex-end; padding-right:150px;">
+  <div data-hf-id="hf-hqqb" id="icon-montage" class="clip montage-rafale" data-start="29.3" data-duration="5.7" style="justify-content:flex-end; padding-right:150px;">
     <div data-hf-id="hf-md6v" class="montage-item" id="icon-montage-0">
       <svg data-hf-id="hf-t7ei" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><ellipse data-hf-id="hf-3eo3" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-vw59" cx="34" cy="38" r="14" /><path data-hf-id="hf-e7kc" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-00vn" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
       <div data-hf-id="hf-zpcs" class="montage-label">1 catégorie parmi 1000</div>
@@ -781,7 +764,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-xyod" class="montage-label">1 catégorie parmi 1000</div>
     </div>
   </div>
-  <div data-hf-id="hf-c1bm" id="split2-approches" class="clip split2" data-start="34.7" data-duration="31.2">
+  <div data-hf-id="hf-h756" id="split2-approches" class="clip split2" data-start="38.3" data-duration="31.2">
     <div data-hf-id="hf-qhun" class="split2-panel" id="split2-approches-a">
       <div data-hf-id="hf-wbnc" class="grid-bg"></div>
       <div data-hf-id="hf-veop" style="position:relative; margin-bottom:70px;"><svg data-hf-id="hf-5we0" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4"><ellipse data-hf-id="hf-u4xv" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-g49d" cx="34" cy="38" r="14" /><path data-hf-id="hf-quhw" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gtlf" cx="30" cy="36" r="2" fill="#93c5fd" /></svg></div>
@@ -795,7 +778,7 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-jtq7" class="split2-label">Approche de Toronto (2012)</div>
     </div>
   </div>
-  <div data-hf-id="hf-h6ki" id="dog-montage" class="clip montage-rafale" data-start="46.2" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;">
+  <div data-hf-id="hf-7jql" id="dog-montage" class="clip montage-rafale" data-start="49.8" data-duration="4.6" style="justify-content:flex-start; padding-left:150px;">
     <div data-hf-id="hf-7jpw" class="montage-item" id="dog-montage-0">
       <svg data-hf-id="hf-rtoe" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="4" style="filter:none; transform:none;"><ellipse data-hf-id="hf-tqmu" cx="50" cy="60" rx="26" ry="20" /><circle data-hf-id="hf-hb6g" cx="34" cy="38" r="14" /><path data-hf-id="hf-pnkt" d="M24 28 L16 12 M44 26 L40 8" stroke-linecap="round" /><circle data-hf-id="hf-gfae" cx="30" cy="36" r="2" fill="#93c5fd" /></svg>
       <div data-hf-id="hf-i5dq" class="montage-label">de face</div>
@@ -818,15 +801,15 @@ html,body { margin:0; padding:0; background:#000; }
     </div>
   </div>
   <div data-hf-id="hf-b1i5" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
-  <div data-hf-id="hf-1pl5" id="stamp-impossible-wrap" class="clip stamp-wrap" data-start="53.1" data-duration="1.7">
+  <div data-hf-id="hf-3vzk" id="stamp-impossible-wrap" class="clip stamp-wrap" data-start="56.7" data-duration="1.7">
     <div data-hf-id="hf-0dzl" class="stamp-text" id="stamp-impossible" style="font-size:88px; padding:12px 34px;">Impossible.</div>
   </div>
   </div>
-  <div data-hf-id="hf-ouzd" class="hero clip hero--right" id="hero-hw-apprend" data-start="63.2" data-duration="1.6"><div data-hf-id="hf-3m4e" class="hero-text" id="hw-apprend">APPREND LUI-MÊME</div></div>
-  <div data-hf-id="hf-m0bv" id="layers-card" class="clip" data-start="65.8" data-duration="7.2">
+  <div data-hf-id="hf-xc3k" class="hero clip hero--right" id="hero-hw-apprend" data-start="66.8" data-duration="1.6"><div data-hf-id="hf-3m4e" class="hero-text" id="hw-apprend">APPREND LUI-MÊME</div></div>
+  <div data-hf-id="hf-qt1f" id="layers-card" class="clip" data-start="69.4" data-duration="7.2">
     <div data-hf-id="hf-vj1a" class="grid-bg"></div>
     <div data-hf-id="hf-x448" class="layers-title" id="layers-title">APPRENTISSAGE PROFOND — PLUSIEURS COUCHES</div>
-  <div data-hf-id="hf-bvqr" id="layers-triptych" class="clip triptych" data-start="65.8" data-duration="7.2">
+  <div data-hf-id="hf-d49v" id="layers-triptych" class="clip triptych" data-start="69.4" data-duration="7.2">
     <div data-hf-id="hf-eq6r" class="triptych-col" id="layers-triptych-col0">
       <svg data-hf-id="hf-d0mz" class="layer-icon" viewBox="0 0 100 100" width="110" height="110" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-izrx" d="M10 30 L90 30 M10 50 L90 50 M10 70 L90 70" stroke-linecap="round" /></svg>
       <div data-hf-id="hf-rt67" class="triptych-label">Lignes et contrastes</div>
@@ -842,15 +825,14 @@ html,body { margin:0; padding:0; background:#000; }
   </div>
   </div>
 
-  <div data-hf-id="hf-unhy" id="gpu-photo" class="archive-insert clip" data-start="82.9" data-duration="11.8">
+  <div data-hf-id="hf-jxvq" id="gpu-photo" class="archive-insert clip" data-start="86.5" data-duration="11.8">
     <div data-hf-id="hf-nbut" class="photo-card" id="gpu-photo-card">
       <img data-hf-id="hf-hqsp" src="assets/photos/vintage-computer.jpg" alt="">
       <div data-hf-id="hf-8yzb" class="photo-caption">Calcul à l’époque</div>
     </div>
-    <div data-hf-id="hf-of96" class="source-tag" id="gpu-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
   </div>
 
-  <div data-hf-id="hf-oxs8" id="gpu-fade-wrap" class="clip" data-start="94.8" data-duration="8.0" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:74px;">
+  <div data-hf-id="hf-p4qg" id="gpu-fade-wrap" class="clip" data-start="98.4" data-duration="8.0" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:74px;">
     <div data-hf-id="hf-3vyl" class="map-panel" id="gpu-fade-panel">
       <div data-hf-id="hf-hdyd" class="gpu-fade-title">Des GPU de jeu vidéo… aux réseaux de neurones</div>
       <div data-hf-id="hf-mtrc" style="position:relative; width:190px; height:190px;">
@@ -859,20 +841,19 @@ html,body { margin:0; padding:0; background:#000; }
       </div>
     </div>
   </div>
-  <div data-hf-id="hf-ct6b" id="nvidia-photo" class="archive-insert bottom-left clip" data-start="107.5" data-duration="2.7">
+  <div data-hf-id="hf-7jea" id="nvidia-photo" class="archive-insert bottom-left clip" data-start="111.1" data-duration="2.7">
     <div data-hf-id="hf-xn56" class="photo-card" id="nvidia-photo-card">
       <img data-hf-id="hf-9rsv" src="assets/photos/circuit-board.jpg" alt="">
       <div data-hf-id="hf-aqhz" class="photo-caption">Deux cartes graphiques NVIDIA</div>
     </div>
-    <div data-hf-id="hf-9fh5" class="source-tag" id="nvidia-photo-source" style="opacity:1;">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-owa9" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
-  <div data-hf-id="hf-c5gg" id="rupture-text-wrap" class="clip stamp-wrap" data-start="124.8" data-duration="1.8">
+  <div data-hf-id="hf-q4bc" id="rupture-text-wrap" class="clip stamp-wrap" data-start="128.4" data-duration="1.8">
     <div data-hf-id="hf-52u5" class="stamp-text" id="rupture-text">Rupture</div>
   </div>
   </div>
-  <div data-hf-id="hf-js07" id="bars-card" class="clip" data-start="111.6" data-duration="8.9">
+  <div data-hf-id="hf-ufyn" id="bars-card" class="clip" data-start="115.2" data-duration="8.9">
     <div data-hf-id="hf-uc47" class="grid-bg"></div>
     <div data-hf-id="hf-aevg" class="bars-title" id="bars-title">TAUX D’ERREUR (TOP-5, ILSVRC 2012)</div>
     <div data-hf-id="hf-8h2k" style="display:flex; align-items:flex-end; gap:80px;">
@@ -888,19 +869,19 @@ html,body { margin:0; padding:0; background:#000; }
     <div data-hf-id="hf-glf0" class="source-tag" style="opacity:1;">Source : ILSVRC 2012</div>
   </div>
 
-  <div data-hf-id="hf-9ohz" class="name-tag clip" id="tag-feifeili" data-start="133.8" data-duration="2.0">
+  <div data-hf-id="hf-a9u7" class="name-tag clip" id="tag-feifeili" data-start="137.4" data-duration="2.0">
     Fei-Fei Li<span data-hf-id="hf-01es" class="name-tag-role">ImageNet</span>
   </div>
-  <div data-hf-id="hf-6nip" class="name-tag clip" id="tag-lecun" data-start="135.8" data-duration="3.8">
+  <div data-hf-id="hf-6id5" class="name-tag clip" id="tag-lecun" data-start="139.4" data-duration="3.8">
     Yann LeCun<span data-hf-id="hf-2ze1" class="name-tag-role">réseaux convolutifs</span>
   </div>
   <div data-hf-id="hf-q37c" style="position:absolute; inset:0; z-index:34; display:flex; align-items:center; justify-content:center; pointer-events:none;">
-  <div data-hf-id="hf-8kpt" id="stamp-fonctionne-wrap" class="clip stamp-wrap" data-start="147.9" data-duration="2.0">
+  <div data-hf-id="hf-g38i" id="stamp-fonctionne-wrap" class="clip stamp-wrap" data-start="151.5" data-duration="2.0">
     <div data-hf-id="hf-xdfp" class="stamp-text" id="stamp-fonctionne" style="font-size:80px; padding:12px 34px;">Ça fonctionne.</div>
   </div>
   </div>
-  <div data-hf-id="hf-5bvo" class="hero clip hero--right" id="hero-hw-gpu" data-start="152.6" data-duration="1.8"><div data-hf-id="hf-zlsl" class="hero-text" id="hw-gpu">PUISSANCE DES GPU</div></div>
-  <div data-hf-id="hf-tr1w" id="spread-card" class="clip" data-start="160.2" data-duration="3.4">
+  <div data-hf-id="hf-yb44" class="hero clip hero--right" id="hero-hw-gpu" data-start="156.2" data-duration="1.8"><div data-hf-id="hf-zlsl" class="hero-text" id="hw-gpu">PUISSANCE DES GPU</div></div>
+  <div data-hf-id="hf-l31r" id="spread-card" class="clip" data-start="163.8" data-duration="3.4">
     <div data-hf-id="hf-uqf8" class="grid-bg"></div>
     <div data-hf-id="hf-t1l0" class="spread-title" id="spread-title">L’INDUSTRIE INVESTIT MASSIVEMENT</div>
     <svg data-hf-id="hf-dez8" viewBox="0 0 700 340" width="980" height="476">
@@ -920,7 +901,7 @@ html,body { margin:0; padding:0; background:#000; }
     </svg>
   </div>
 
-  <div data-hf-id="hf-97lz" id="explose-montage" class="clip montage-rafale" data-start="163.6" data-duration="14.8" style="justify-content:flex-end; padding-right:150px;">
+  <div data-hf-id="hf-c5cv" id="explose-montage" class="clip montage-rafale" data-start="167.2" data-duration="14.8" style="justify-content:flex-end; padding-right:150px;">
     <div data-hf-id="hf-i14k" class="montage-item" id="explose-montage-0">
       <svg data-hf-id="hf-seyz" class="montage-icon" viewBox="0 0 100 100" width="140" height="140" fill="none" stroke="#93c5fd" stroke-width="5"><path data-hf-id="hf-k65y" d="M10 50 L25 50 L32 25 L42 75 L52 35 L60 65 L68 50 L90 50" stroke-linecap="round" stroke-linejoin="round" /></svg>
       <div data-hf-id="hf-rezk" class="montage-label">Voix</div>
@@ -938,17 +919,14 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-reef" class="montage-label">Code</div>
     </div>
   </div>
-  <div data-hf-id="hf-3ego" class="hero clip hero--right" id="hero-hw-recette" data-start="182.9" data-duration="1.6"><div data-hf-id="hf-ce49" class="hero-text" id="hw-recette">LA RECETTE</div></div>
-  <div data-hf-id="hf-8g8j" id="recipe-list" class="clip list-overlay" data-start="185.9" data-duration="7.7">
+  <div data-hf-id="hf-406w" class="hero clip hero--right" id="hero-hw-recette" data-start="186.5" data-duration="1.6"><div data-hf-id="hf-ce49" class="hero-text" id="hw-recette">LA RECETTE</div></div>
+  <div data-hf-id="hf-ndtv" id="recipe-list" class="clip list-overlay" data-start="189.5" data-duration="7.7">
     <div data-hf-id="hf-d4wd" class="list-overlay-item" id="recipe-list-item0">Plus de données</div>
     <div data-hf-id="hf-5suf" class="list-overlay-item" id="recipe-list-item1">Plus de calculs</div>
     <div data-hf-id="hf-yp78" class="list-overlay-item" id="recipe-list-item2">Des réseaux de plus en plus profonds</div>
     <div data-hf-id="hf-3pcj" class="list-overlay-item" id="recipe-list-item3">Des modèles qui apprennent leurs propres représentations</div>
   </div>
-  <div data-hf-id="hf-jmgp" id="badge" class="clip" data-start="4.2" data-duration="191.72">
-    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-  <div data-hf-id="hf-q3cg" id="fade-out" class="clip" data-start="195.57" data-duration="0.75"></div>
+  <div data-hf-id="hf-kjk3" id="fade-out" class="clip" data-start="199.18" data-duration="0.75"></div>
 
 </div>
 </div>
@@ -956,11 +934,13 @@ html,body { margin:0; padding:0; background:#000; }
 window.__timelines = window.__timelines || {};
 window.__timelines["chapitre-2"] = gsap.timeline({ paused: true });
 const tl = window.__timelines["chapitre-2"];
-tl.to("#intro-readout-wrap", { width: 500, duration: 0.6, ease: "steps(13)" }, 0.1);
-tl.to("#intro-rule", { width: 300, duration: 0.35, ease: "power2.out" }, 0.75);
-tl.to("#intro-card-inner", { opacity: 0, duration: 0.25 }, 1.9);
-tl.set("#intro-card-inner", { opacity: 0 }, 2.2);
-tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 193.725, ease: "none" }, 2.2);
+tl.fromTo("#chapter-open-kicker", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+tl.fromTo("#chapter-open-title", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.65);
+tl.to("#chapter-open-rule", { width: 260, duration: 0.4, ease: "power2.out" }, 1.9);
+tl.to("#chapter-open-inner", { opacity: 0, duration: 0.3 }, 5.5);
+tl.set("#chapter-open-inner", { opacity: 0 }, 5.8);
+tl.fromTo("#chapter-open .chapter-opening-photo", { scale: 1.0 }, { scale: 1.07, duration: 5.8, ease: "none" }, 0);
+tl.fromTo("#video-wrap", { scale: 1.0 }, { scale: 1.05, duration: 193.725, ease: "none" }, 5.8);
 tl.set("#main-video", { x: 0 }, 0);
 tl.to("#p2-particle-0", { x: 26, y: -18, duration: 6.0, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.0);
 tl.to("#p2-particle-1", { x: 36, y: -26, duration: 7.3, ease: "sine.inOut", yoyo: true, repeat: 20 }, 0.4);
@@ -970,243 +950,240 @@ tl.to("#p2-particle-4", { x: 36, y: -18, duration: 11.2, ease: "sine.inOut", yoy
 tl.to("#p2-particle-5", { x: 46, y: -26, duration: 6.0, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.0);
 tl.to("#p2-particle-6", { x: 26, y: -34, duration: 7.3, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.4);
 tl.to("#p2-particle-7", { x: 36, y: -42, duration: 8.6, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.8);
-tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 196.32, ease: "none" }, 0);
-tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
-tl.fromTo("#duo-frame-1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 6.5);
-tl.fromTo("#duo-frame-2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 6.75);
-tl.to("#duo-card", { opacity: 0, duration: 0.3 }, 10.1);
-tl.fromTo("#imn-tile-0", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.6);
-tl.fromTo("#imn-tile-1", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.612);
-tl.fromTo("#imn-tile-2", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.624);
-tl.fromTo("#imn-tile-3", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.636);
-tl.fromTo("#imn-tile-4", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.648);
-tl.fromTo("#imn-tile-5", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.66);
-tl.fromTo("#imn-tile-6", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.672);
-tl.fromTo("#imn-tile-7", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.684);
-tl.fromTo("#imn-tile-8", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.696);
-tl.fromTo("#imn-tile-9", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.708);
-tl.fromTo("#imn-tile-10", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.72);
-tl.fromTo("#imn-tile-11", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.732);
-tl.fromTo("#imn-tile-12", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.744);
-tl.fromTo("#imn-tile-13", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.756);
-tl.fromTo("#imn-tile-14", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.768);
-tl.fromTo("#imn-tile-15", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 15.78);
-tl.fromTo("#imn-tile-16", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.227);
-tl.fromTo("#imn-tile-17", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.239);
-tl.fromTo("#imn-tile-18", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.251);
-tl.fromTo("#imn-tile-19", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.263);
-tl.fromTo("#imn-tile-20", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.275);
-tl.fromTo("#imn-tile-21", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.287);
-tl.fromTo("#imn-tile-22", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.299);
-tl.fromTo("#imn-tile-23", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.311);
-tl.fromTo("#imn-tile-24", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.323);
-tl.fromTo("#imn-tile-25", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.335);
-tl.fromTo("#imn-tile-26", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.347);
-tl.fromTo("#imn-tile-27", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.359);
-tl.fromTo("#imn-tile-28", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.371);
-tl.fromTo("#imn-tile-29", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.383);
-tl.fromTo("#imn-tile-30", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.395);
-tl.fromTo("#imn-tile-31", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.407);
-tl.fromTo("#imn-tile-32", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.853);
-tl.fromTo("#imn-tile-33", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.865);
-tl.fromTo("#imn-tile-34", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.877);
-tl.fromTo("#imn-tile-35", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.889);
-tl.fromTo("#imn-tile-36", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.901);
-tl.fromTo("#imn-tile-37", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.913);
-tl.fromTo("#imn-tile-38", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.925);
-tl.fromTo("#imn-tile-39", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.937);
-tl.fromTo("#imn-tile-40", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.949);
-tl.fromTo("#imn-tile-41", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.961);
-tl.fromTo("#imn-tile-42", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.973);
-tl.fromTo("#imn-tile-43", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.985);
-tl.fromTo("#imn-tile-44", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 16.997);
-tl.fromTo("#imn-tile-45", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.009);
-tl.fromTo("#imn-tile-46", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.021);
-tl.fromTo("#imn-tile-47", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.033);
-tl.fromTo("#imn-tile-48", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.48);
-tl.fromTo("#imn-tile-49", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.492);
-tl.fromTo("#imn-tile-50", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.504);
-tl.fromTo("#imn-tile-51", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.516);
-tl.fromTo("#imn-tile-52", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.528);
-tl.fromTo("#imn-tile-53", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.54);
-tl.fromTo("#imn-tile-54", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.552);
-tl.fromTo("#imn-tile-55", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.564);
-tl.fromTo("#imn-tile-56", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.576);
-tl.fromTo("#imn-tile-57", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.588);
-tl.fromTo("#imn-tile-58", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.6);
-tl.fromTo("#imn-tile-59", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.612);
-tl.fromTo("#imn-tile-60", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.624);
-tl.fromTo("#imn-tile-61", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.636);
-tl.fromTo("#imn-tile-62", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.648);
-tl.fromTo("#imn-tile-63", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 17.66);
-tl.fromTo("#imn-tile-64", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.107);
-tl.fromTo("#imn-tile-65", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.119);
-tl.fromTo("#imn-tile-66", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.131);
-tl.fromTo("#imn-tile-67", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.143);
-tl.fromTo("#imn-tile-68", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.155);
-tl.fromTo("#imn-tile-69", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.167);
-tl.fromTo("#imn-tile-70", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.179);
-tl.fromTo("#imn-tile-71", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.191);
-tl.fromTo("#imn-tile-72", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.203);
-tl.fromTo("#imn-tile-73", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.215);
-tl.fromTo("#imn-tile-74", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.227);
-tl.fromTo("#imn-tile-75", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.239);
-tl.fromTo("#imn-tile-76", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.251);
-tl.fromTo("#imn-tile-77", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.263);
-tl.fromTo("#imn-tile-78", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.275);
-tl.fromTo("#imn-tile-79", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.287);
-tl.fromTo("#imn-tile-80", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.733);
-tl.fromTo("#imn-tile-81", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.745);
-tl.fromTo("#imn-tile-82", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.757);
-tl.fromTo("#imn-tile-83", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.769);
-tl.fromTo("#imn-tile-84", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.781);
-tl.fromTo("#imn-tile-85", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.793);
-tl.fromTo("#imn-tile-86", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.805);
-tl.fromTo("#imn-tile-87", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.817);
-tl.fromTo("#imn-tile-88", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.829);
-tl.fromTo("#imn-tile-89", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.841);
-tl.fromTo("#imn-tile-90", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.853);
-tl.fromTo("#imn-tile-91", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.865);
-tl.fromTo("#imn-tile-92", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.877);
-tl.fromTo("#imn-tile-93", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.889);
-tl.fromTo("#imn-tile-94", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.901);
-tl.fromTo("#imn-tile-95", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 18.913);
-tl.fromTo("#imn-tile-96", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.36);
-tl.fromTo("#imn-tile-97", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.372);
-tl.fromTo("#imn-tile-98", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.384);
-tl.fromTo("#imn-tile-99", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.396);
-tl.fromTo("#imn-tile-100", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.408);
-tl.fromTo("#imn-tile-101", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.42);
-tl.fromTo("#imn-tile-102", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.432);
-tl.fromTo("#imn-tile-103", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.444);
-tl.fromTo("#imn-tile-104", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.456);
-tl.fromTo("#imn-tile-105", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.468);
-tl.fromTo("#imn-tile-106", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.48);
-tl.fromTo("#imn-tile-107", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.492);
-tl.fromTo("#imn-tile-108", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.504);
-tl.fromTo("#imn-tile-109", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.516);
-tl.fromTo("#imn-tile-110", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.528);
-tl.fromTo("#imn-tile-111", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.54);
-tl.fromTo("#imn-tile-112", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.987);
-tl.fromTo("#imn-tile-113", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.999);
-tl.fromTo("#imn-tile-114", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.011);
-tl.fromTo("#imn-tile-115", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.023);
-tl.fromTo("#imn-tile-116", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.035);
-tl.fromTo("#imn-tile-117", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.047);
-tl.fromTo("#imn-tile-118", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.059);
-tl.fromTo("#imn-tile-119", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.071);
-tl.fromTo("#imn-tile-120", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.083);
-tl.fromTo("#imn-tile-121", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.095);
-tl.fromTo("#imn-tile-122", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.107);
-tl.fromTo("#imn-tile-123", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.119);
-tl.fromTo("#imn-tile-124", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.131);
-tl.fromTo("#imn-tile-125", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.143);
-tl.fromTo("#imn-tile-126", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.155);
-tl.fromTo("#imn-tile-127", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.167);
-tl.fromTo("#imn-tile-128", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.613);
-tl.fromTo("#imn-tile-129", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.625);
-tl.fromTo("#imn-tile-130", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.637);
-tl.fromTo("#imn-tile-131", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.649);
-tl.fromTo("#imn-tile-132", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.661);
-tl.fromTo("#imn-tile-133", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.673);
-tl.fromTo("#imn-tile-134", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.685);
-tl.fromTo("#imn-tile-135", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.697);
-tl.fromTo("#imn-tile-136", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.709);
-tl.fromTo("#imn-tile-137", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.721);
-tl.fromTo("#imn-tile-138", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.733);
-tl.fromTo("#imn-tile-139", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.745);
-tl.fromTo("#imn-tile-140", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.757);
-tl.fromTo("#imn-tile-141", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.769);
-tl.fromTo("#imn-tile-142", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.781);
-tl.fromTo("#imn-tile-143", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.793);
-tl.fromTo("#imagenet-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 15.5);
-tl.fromTo("#imagenet-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 21.44);
-tl.to("#imagenet-card", { opacity: 0, duration: 0.3 }, 25.35);
-tl.set("#icon-montage-0", { opacity: 1 }, 25.7);
-tl.set("#icon-montage-0", { opacity: 0 }, 27.6);
-tl.set("#icon-montage-1", { opacity: 1 }, 27.6);
-tl.set("#icon-montage-1", { opacity: 0 }, 29.5);
-tl.set("#icon-montage-2", { opacity: 1 }, 29.5);
-tl.set("#icon-montage-2", { opacity: 0 }, 31.4);
-tl.fromTo("#split2-approches-a", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 34.75);
-tl.fromTo("#split2-approches-b", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 34.85);
-tl.fromTo("#split2-approches .split2-label", { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.1 }, 35.1);
-tl.set("#dog-montage-0", { opacity: 1 }, 46.2);
-tl.set("#dog-montage-0", { opacity: 0 }, 47.12);
-tl.set("#dog-montage-1", { opacity: 1 }, 47.12);
-tl.set("#dog-montage-1", { opacity: 0 }, 48.04);
-tl.set("#dog-montage-2", { opacity: 1 }, 48.04);
-tl.set("#dog-montage-2", { opacity: 0 }, 48.96);
-tl.set("#dog-montage-3", { opacity: 1 }, 48.96);
-tl.set("#dog-montage-3", { opacity: 0 }, 49.88);
-tl.set("#dog-montage-4", { opacity: 1 }, 49.88);
-tl.set("#dog-montage-4", { opacity: 0 }, 50.8);
-tl.fromTo("#stamp-impossible", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 53.1);
-tl.to("#stamp-impossible", { opacity: 0, duration: 0.25 }, 54.5);
-tl.fromTo("#hw-apprend", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 63.2);
-tl.to("#hw-apprend", { opacity: 0, duration: 0.18 }, 64.55);
-tl.to("#layers-triptych-col0", { opacity: 1, duration: 0.3 }, 67.5);
-tl.to("#layers-triptych-col1", { opacity: 1, duration: 0.3 }, 70.2);
-tl.to("#layers-triptych-col2", { opacity: 1, duration: 0.3 }, 72.2);
-tl.fromTo("#layers-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 66.0);
-tl.to("#layers-card", { opacity: 0, duration: 0.3 }, 72.7);
-tl.fromTo("#gpu-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 83.0);
-tl.to("#gpu-photo-card", { opacity: 0, duration: 0.3 }, 94.35);
-tl.fromTo("#gpu-photo-card img", { scale: 1.0 }, { scale: 1.08, duration: 11.8, ease: "none" }, 82.9);
-tl.fromTo("#gpu-fade-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 94.85);
-tl.to("#gpu-fade-a", { opacity: 0, duration: 0.5 }, 98.8);
-tl.fromTo("#gpu-fade-b", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 98.8);
-tl.fromTo("#nvidia-photo-card", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 107.6);
-tl.to("#nvidia-photo-card", { opacity: 0, duration: 0.3 }, 109.9);
-tl.fromTo("#nvidia-photo-card img", { scale: 1.0 }, { scale: 1.1, duration: 2.7, ease: "none" }, 107.5);
-tl.fromTo("#rupture-text", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 124.8);
-tl.to("#rupture-text", { opacity: 0, duration: 0.25 }, 126.3);
-tl.fromTo("#bars-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 111.7);
-tl.to("#bar-alexnet", { height: 175.2, duration: 0.8, ease: "power2.out" }, 112.2);
-tl.fromTo("#bar-alexnet-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 112.7);
-tl.to("#bar-second", { height: 300, duration: 0.8, ease: "power2.out" }, 112.5);
-tl.fromTo("#bar-second-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 113.0);
-tl.to("#bars-card", { opacity: 0, duration: 0.3 }, 120.2);
-tl.fromTo("#tag-feifeili", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 133.9);
-tl.to("#tag-feifeili", { opacity: 0, duration: 0.25 }, 135.5);
-tl.fromTo("#tag-lecun", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 135.9);
-tl.to("#tag-lecun", { opacity: 0, duration: 0.25 }, 139.3);
-tl.fromTo("#stamp-fonctionne", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 147.9);
-tl.to("#stamp-fonctionne", { opacity: 0, duration: 0.25 }, 149.6);
-tl.fromTo("#hw-gpu", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 152.6);
-tl.to("#hw-gpu", { opacity: 0, duration: 0.18 }, 154.15);
-tl.fromTo("#spread-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 160.35);
-tl.fromTo("#spread-ring-0", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 40 }, duration: 2.2, ease: "power1.out" }, 160.8);
-tl.fromTo("#spread-ring-1", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 90 }, duration: 2.2, ease: "power1.out" }, 161.3);
-tl.fromTo("#spread-ring-2", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 140 }, duration: 2.2, ease: "power1.out" }, 161.8);
-tl.fromTo("#spread-ring-3", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 190 }, duration: 2.2, ease: "power1.out" }, 162.3);
-tl.fromTo("#spread-dot-0", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.0);
-tl.fromTo("#spread-dot-1", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.35);
-tl.fromTo("#spread-dot-2", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 161.7);
-tl.fromTo("#spread-dot-3", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.05);
-tl.fromTo("#spread-dot-4", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.4);
-tl.fromTo("#spread-dot-5", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 162.75);
-tl.fromTo("#spread-dot-6", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 163.1);
-tl.fromTo("#spread-dot-7", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 163.45);
-tl.to("#spread-card", { opacity: 0, duration: 0.3 }, 163.3);
-tl.set("#explose-montage-0", { opacity: 1 }, 163.6);
-tl.set("#explose-montage-0", { opacity: 0 }, 167.3);
-tl.set("#explose-montage-1", { opacity: 1 }, 167.3);
-tl.set("#explose-montage-1", { opacity: 0 }, 171.0);
-tl.set("#explose-montage-2", { opacity: 1 }, 171.0);
-tl.set("#explose-montage-2", { opacity: 0 }, 174.7);
-tl.set("#explose-montage-3", { opacity: 1 }, 174.7);
-tl.set("#explose-montage-3", { opacity: 0 }, 178.4);
-tl.fromTo("#hw-recette", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 182.9);
-tl.to("#hw-recette", { opacity: 0, duration: 0.18 }, 184.25);
-tl.fromTo("#recipe-list", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 185.9);
-tl.fromTo("#recipe-list-item0", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 186.08);
-tl.fromTo("#recipe-list-item1", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 187.1);
-tl.fromTo("#recipe-list-item2", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 188.38);
-tl.fromTo("#recipe-list-item3", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 190.17);
-tl.to("#recipe-list", { opacity: 0, duration: 0.4 }, 193.2);
-tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 4.2);
-tl.to("#fade-out", { opacity: 1, duration: 0.75 }, 195.57);
+tl.fromTo("#duo-frame-1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 10.1);
+tl.fromTo("#duo-frame-2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 10.35);
+tl.to("#duo-card", { opacity: 0, duration: 0.3 }, 13.7);
+tl.fromTo("#imn-tile-0", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.2);
+tl.fromTo("#imn-tile-1", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.212);
+tl.fromTo("#imn-tile-2", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.224);
+tl.fromTo("#imn-tile-3", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.236);
+tl.fromTo("#imn-tile-4", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.248);
+tl.fromTo("#imn-tile-5", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.26);
+tl.fromTo("#imn-tile-6", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.272);
+tl.fromTo("#imn-tile-7", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.284);
+tl.fromTo("#imn-tile-8", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.296);
+tl.fromTo("#imn-tile-9", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.308);
+tl.fromTo("#imn-tile-10", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.32);
+tl.fromTo("#imn-tile-11", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.332);
+tl.fromTo("#imn-tile-12", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.344);
+tl.fromTo("#imn-tile-13", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.356);
+tl.fromTo("#imn-tile-14", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.368);
+tl.fromTo("#imn-tile-15", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.38);
+tl.fromTo("#imn-tile-16", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.827);
+tl.fromTo("#imn-tile-17", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.839);
+tl.fromTo("#imn-tile-18", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.851);
+tl.fromTo("#imn-tile-19", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.863);
+tl.fromTo("#imn-tile-20", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.875);
+tl.fromTo("#imn-tile-21", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.887);
+tl.fromTo("#imn-tile-22", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.899);
+tl.fromTo("#imn-tile-23", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.911);
+tl.fromTo("#imn-tile-24", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.923);
+tl.fromTo("#imn-tile-25", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.935);
+tl.fromTo("#imn-tile-26", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.947);
+tl.fromTo("#imn-tile-27", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.959);
+tl.fromTo("#imn-tile-28", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.971);
+tl.fromTo("#imn-tile-29", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.983);
+tl.fromTo("#imn-tile-30", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 19.995);
+tl.fromTo("#imn-tile-31", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.007);
+tl.fromTo("#imn-tile-32", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.453);
+tl.fromTo("#imn-tile-33", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.465);
+tl.fromTo("#imn-tile-34", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.477);
+tl.fromTo("#imn-tile-35", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.489);
+tl.fromTo("#imn-tile-36", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.501);
+tl.fromTo("#imn-tile-37", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.513);
+tl.fromTo("#imn-tile-38", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.525);
+tl.fromTo("#imn-tile-39", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.537);
+tl.fromTo("#imn-tile-40", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.549);
+tl.fromTo("#imn-tile-41", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.561);
+tl.fromTo("#imn-tile-42", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.573);
+tl.fromTo("#imn-tile-43", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.585);
+tl.fromTo("#imn-tile-44", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.597);
+tl.fromTo("#imn-tile-45", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.609);
+tl.fromTo("#imn-tile-46", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.621);
+tl.fromTo("#imn-tile-47", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 20.633);
+tl.fromTo("#imn-tile-48", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.08);
+tl.fromTo("#imn-tile-49", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.092);
+tl.fromTo("#imn-tile-50", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.104);
+tl.fromTo("#imn-tile-51", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.116);
+tl.fromTo("#imn-tile-52", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.128);
+tl.fromTo("#imn-tile-53", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.14);
+tl.fromTo("#imn-tile-54", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.152);
+tl.fromTo("#imn-tile-55", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.164);
+tl.fromTo("#imn-tile-56", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.176);
+tl.fromTo("#imn-tile-57", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.188);
+tl.fromTo("#imn-tile-58", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.2);
+tl.fromTo("#imn-tile-59", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.212);
+tl.fromTo("#imn-tile-60", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.224);
+tl.fromTo("#imn-tile-61", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.236);
+tl.fromTo("#imn-tile-62", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.248);
+tl.fromTo("#imn-tile-63", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.26);
+tl.fromTo("#imn-tile-64", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.707);
+tl.fromTo("#imn-tile-65", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.719);
+tl.fromTo("#imn-tile-66", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.731);
+tl.fromTo("#imn-tile-67", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.743);
+tl.fromTo("#imn-tile-68", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.755);
+tl.fromTo("#imn-tile-69", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.767);
+tl.fromTo("#imn-tile-70", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.779);
+tl.fromTo("#imn-tile-71", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.791);
+tl.fromTo("#imn-tile-72", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.803);
+tl.fromTo("#imn-tile-73", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.815);
+tl.fromTo("#imn-tile-74", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.827);
+tl.fromTo("#imn-tile-75", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.839);
+tl.fromTo("#imn-tile-76", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.851);
+tl.fromTo("#imn-tile-77", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.863);
+tl.fromTo("#imn-tile-78", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.875);
+tl.fromTo("#imn-tile-79", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 21.887);
+tl.fromTo("#imn-tile-80", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.333);
+tl.fromTo("#imn-tile-81", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.345);
+tl.fromTo("#imn-tile-82", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.357);
+tl.fromTo("#imn-tile-83", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.369);
+tl.fromTo("#imn-tile-84", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.381);
+tl.fromTo("#imn-tile-85", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.393);
+tl.fromTo("#imn-tile-86", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.405);
+tl.fromTo("#imn-tile-87", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.417);
+tl.fromTo("#imn-tile-88", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.429);
+tl.fromTo("#imn-tile-89", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.441);
+tl.fromTo("#imn-tile-90", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.453);
+tl.fromTo("#imn-tile-91", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.465);
+tl.fromTo("#imn-tile-92", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.477);
+tl.fromTo("#imn-tile-93", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.489);
+tl.fromTo("#imn-tile-94", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.501);
+tl.fromTo("#imn-tile-95", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.513);
+tl.fromTo("#imn-tile-96", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.96);
+tl.fromTo("#imn-tile-97", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.972);
+tl.fromTo("#imn-tile-98", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.984);
+tl.fromTo("#imn-tile-99", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 22.996);
+tl.fromTo("#imn-tile-100", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.008);
+tl.fromTo("#imn-tile-101", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.02);
+tl.fromTo("#imn-tile-102", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.032);
+tl.fromTo("#imn-tile-103", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.044);
+tl.fromTo("#imn-tile-104", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.056);
+tl.fromTo("#imn-tile-105", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.068);
+tl.fromTo("#imn-tile-106", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.08);
+tl.fromTo("#imn-tile-107", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.092);
+tl.fromTo("#imn-tile-108", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.104);
+tl.fromTo("#imn-tile-109", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.116);
+tl.fromTo("#imn-tile-110", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.128);
+tl.fromTo("#imn-tile-111", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.14);
+tl.fromTo("#imn-tile-112", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.587);
+tl.fromTo("#imn-tile-113", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.599);
+tl.fromTo("#imn-tile-114", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.611);
+tl.fromTo("#imn-tile-115", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.623);
+tl.fromTo("#imn-tile-116", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.635);
+tl.fromTo("#imn-tile-117", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.647);
+tl.fromTo("#imn-tile-118", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.659);
+tl.fromTo("#imn-tile-119", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.671);
+tl.fromTo("#imn-tile-120", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.683);
+tl.fromTo("#imn-tile-121", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.695);
+tl.fromTo("#imn-tile-122", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.707);
+tl.fromTo("#imn-tile-123", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.719);
+tl.fromTo("#imn-tile-124", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.731);
+tl.fromTo("#imn-tile-125", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.743);
+tl.fromTo("#imn-tile-126", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.755);
+tl.fromTo("#imn-tile-127", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 23.767);
+tl.fromTo("#imn-tile-128", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.213);
+tl.fromTo("#imn-tile-129", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.225);
+tl.fromTo("#imn-tile-130", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.237);
+tl.fromTo("#imn-tile-131", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.249);
+tl.fromTo("#imn-tile-132", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.261);
+tl.fromTo("#imn-tile-133", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.273);
+tl.fromTo("#imn-tile-134", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.285);
+tl.fromTo("#imn-tile-135", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.297);
+tl.fromTo("#imn-tile-136", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.309);
+tl.fromTo("#imn-tile-137", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.321);
+tl.fromTo("#imn-tile-138", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.333);
+tl.fromTo("#imn-tile-139", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.345);
+tl.fromTo("#imn-tile-140", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.357);
+tl.fromTo("#imn-tile-141", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.369);
+tl.fromTo("#imn-tile-142", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.381);
+tl.fromTo("#imn-tile-143", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power1.out" }, 24.393);
+tl.fromTo("#imagenet-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 19.1);
+tl.fromTo("#imagenet-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 25.04);
+tl.to("#imagenet-card", { opacity: 0, duration: 0.3 }, 28.95);
+tl.set("#icon-montage-0", { opacity: 1 }, 29.3);
+tl.set("#icon-montage-0", { opacity: 0 }, 31.2);
+tl.set("#icon-montage-1", { opacity: 1 }, 31.2);
+tl.set("#icon-montage-1", { opacity: 0 }, 33.1);
+tl.set("#icon-montage-2", { opacity: 1 }, 33.1);
+tl.set("#icon-montage-2", { opacity: 0 }, 35.0);
+tl.fromTo("#split2-approches-a", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 38.35);
+tl.fromTo("#split2-approches-b", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 38.45);
+tl.fromTo("#split2-approches .split2-label", { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.1 }, 38.7);
+tl.set("#dog-montage-0", { opacity: 1 }, 49.8);
+tl.set("#dog-montage-0", { opacity: 0 }, 50.72);
+tl.set("#dog-montage-1", { opacity: 1 }, 50.72);
+tl.set("#dog-montage-1", { opacity: 0 }, 51.64);
+tl.set("#dog-montage-2", { opacity: 1 }, 51.64);
+tl.set("#dog-montage-2", { opacity: 0 }, 52.56);
+tl.set("#dog-montage-3", { opacity: 1 }, 52.56);
+tl.set("#dog-montage-3", { opacity: 0 }, 53.48);
+tl.set("#dog-montage-4", { opacity: 1 }, 53.48);
+tl.set("#dog-montage-4", { opacity: 0 }, 54.4);
+tl.fromTo("#stamp-impossible", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 56.7);
+tl.to("#stamp-impossible", { opacity: 0, duration: 0.25 }, 58.1);
+tl.fromTo("#hw-apprend", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 66.8);
+tl.to("#hw-apprend", { opacity: 0, duration: 0.18 }, 68.15);
+tl.to("#layers-triptych-col0", { opacity: 1, duration: 0.3 }, 71.1);
+tl.to("#layers-triptych-col1", { opacity: 1, duration: 0.3 }, 73.8);
+tl.to("#layers-triptych-col2", { opacity: 1, duration: 0.3 }, 75.8);
+tl.fromTo("#layers-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 69.6);
+tl.to("#layers-card", { opacity: 0, duration: 0.3 }, 76.3);
+tl.fromTo("#gpu-photo-card", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 86.6);
+tl.to("#gpu-photo-card", { opacity: 0, duration: 0.3 }, 97.95);
+tl.fromTo("#gpu-photo-card img", { scale: 1.0 }, { scale: 1.08, duration: 11.8, ease: "none" }, 86.5);
+tl.fromTo("#gpu-fade-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 98.45);
+tl.to("#gpu-fade-a", { opacity: 0, duration: 0.5 }, 102.4);
+tl.fromTo("#gpu-fade-b", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 102.4);
+tl.fromTo("#nvidia-photo-card", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 111.2);
+tl.to("#nvidia-photo-card", { opacity: 0, duration: 0.3 }, 113.5);
+tl.fromTo("#nvidia-photo-card img", { scale: 1.0 }, { scale: 1.1, duration: 2.7, ease: "none" }, 111.1);
+tl.fromTo("#rupture-text", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 128.4);
+tl.to("#rupture-text", { opacity: 0, duration: 0.25 }, 129.9);
+tl.fromTo("#bars-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 115.3);
+tl.to("#bar-alexnet", { height: 175.2, duration: 0.8, ease: "power2.out" }, 115.8);
+tl.fromTo("#bar-alexnet-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 116.3);
+tl.to("#bar-second", { height: 300, duration: 0.8, ease: "power2.out" }, 116.1);
+tl.fromTo("#bar-second-label", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 116.6);
+tl.to("#bars-card", { opacity: 0, duration: 0.3 }, 123.8);
+tl.fromTo("#tag-feifeili", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 137.5);
+tl.to("#tag-feifeili", { opacity: 0, duration: 0.25 }, 139.1);
+tl.fromTo("#tag-lecun", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 139.5);
+tl.to("#tag-lecun", { opacity: 0, duration: 0.25 }, 142.9);
+tl.fromTo("#stamp-fonctionne", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 151.5);
+tl.to("#stamp-fonctionne", { opacity: 0, duration: 0.25 }, 153.2);
+tl.fromTo("#hw-gpu", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 156.2);
+tl.to("#hw-gpu", { opacity: 0, duration: 0.18 }, 157.75);
+tl.fromTo("#spread-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 163.95);
+tl.fromTo("#spread-ring-0", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 40 }, duration: 2.2, ease: "power1.out" }, 164.4);
+tl.fromTo("#spread-ring-1", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 90 }, duration: 2.2, ease: "power1.out" }, 164.9);
+tl.fromTo("#spread-ring-2", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 140 }, duration: 2.2, ease: "power1.out" }, 165.4);
+tl.fromTo("#spread-ring-3", { opacity: 0.9, attr: { r: 4 } }, { opacity: 0, attr: { r: 190 }, duration: 2.2, ease: "power1.out" }, 165.9);
+tl.fromTo("#spread-dot-0", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 164.6);
+tl.fromTo("#spread-dot-1", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 164.95);
+tl.fromTo("#spread-dot-2", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 165.3);
+tl.fromTo("#spread-dot-3", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 165.65);
+tl.fromTo("#spread-dot-4", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 166.0);
+tl.fromTo("#spread-dot-5", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 166.35);
+tl.fromTo("#spread-dot-6", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 166.7);
+tl.fromTo("#spread-dot-7", { opacity: 0, r: 3 }, { opacity: 1, r: 10, duration: 0.35, ease: "back.out(2)" }, 167.05);
+tl.to("#spread-card", { opacity: 0, duration: 0.3 }, 166.9);
+tl.set("#explose-montage-0", { opacity: 1 }, 167.2);
+tl.set("#explose-montage-0", { opacity: 0 }, 170.9);
+tl.set("#explose-montage-1", { opacity: 1 }, 170.9);
+tl.set("#explose-montage-1", { opacity: 0 }, 174.6);
+tl.set("#explose-montage-2", { opacity: 1 }, 174.6);
+tl.set("#explose-montage-2", { opacity: 0 }, 178.3);
+tl.set("#explose-montage-3", { opacity: 1 }, 178.3);
+tl.set("#explose-montage-3", { opacity: 0 }, 182.0);
+tl.fromTo("#hw-recette", { opacity: 0, y: 26, scale: 0.94, rotation: -3 }, { opacity: 1, y: 0, scale: 1, rotation: 0, duration: 0.24, ease: "back.out(2.2)" }, 186.5);
+tl.to("#hw-recette", { opacity: 0, duration: 0.18 }, 187.85);
+tl.fromTo("#recipe-list", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 189.5);
+tl.fromTo("#recipe-list-item0", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 189.68);
+tl.fromTo("#recipe-list-item1", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 190.7);
+tl.fromTo("#recipe-list-item2", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 191.98);
+tl.fromTo("#recipe-list-item3", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 193.77);
+tl.to("#recipe-list", { opacity: 0, duration: 0.4 }, 196.8);
+tl.to("#fade-out", { opacity: 1, duration: 0.75 }, 199.18);
 </script>
 </body>
 </html>

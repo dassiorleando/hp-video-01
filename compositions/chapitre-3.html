@@ -599,11 +599,6 @@ html,body { margin:0; padding:0; background:#000; }
     <circle data-hf-id="hf-p48j" class="particle" id="p3-particle-7" cx="1780" cy="900" r="2.5" />
   </svg>
 
-  <div data-hf-id="hf-yi0u" id="progress-track" class="clip" data-start="0" data-duration="153.37">
-    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
-    <div data-hf-id="hf-th9h" id="progress-label">CHAPITRE 3 / 6</div>
-  </div>
-
   <div data-hf-id="hf-e9zm" id="map-overview" class="clip" data-start="5.8" data-duration="7.68">
     <div data-hf-id="hf-q4u8" class="grid-bg"></div>
     <div data-hf-id="hf-cpne" class="map-scene-title" id="map-overview-title">TROIS PÔLES CANADIENS</div>
@@ -632,7 +627,6 @@ html,body { margin:0; padding:0; background:#000; }
       <img data-hf-id="hf-d9fa" src="assets/photos/toronto-cn-tower.jpg" alt="">
       <div data-hf-id="hf-safe" class="photo-caption">Toronto</div>
     </div>
-    <div data-hf-id="hf-3xpz" class="source-tag" id="toronto-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-2ghd" id="schema-card" class="clip" data-start="18.0" data-duration="6.2">
@@ -706,7 +700,6 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-q2e4" class="logo-badge-photo"><img data-hf-id="hf-0s14" src="assets/photos/vector-institute-logo.jpg" alt="Vector Institute"></div>
     </div>
     <div data-hf-id="hf-9x9v" id="medal-flash"></div>
-    <div data-hf-id="hf-qydr" class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-k26a" id="map-pan-mtl" class="clip" data-start="40.36" data-duration="5.0">
@@ -947,7 +940,6 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-jxap" class="medal-name" id="echo-name-sutton" style="margin-top:0;">Richard Sutton</div>
       <div data-hf-id="hf-to1d" class="medal-name" id="echo-name-barto" style="margin-top:0;">Andrew Barto</div>
     </div>
-    <div data-hf-id="hf-7r8v" class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-7svq" id="triptych-recap" class="clip triptych" data-start="122.24" data-duration="17.96">
@@ -966,10 +958,6 @@ html,body { margin:0; padding:0; background:#000; }
   </div>
   <div data-hf-id="hf-o9gn" class="hero clip hero--right" id="hero-hw-disproportion" data-start="144.2" data-duration="2.3"><div data-hf-id="hf-m85f" class="hero-text" id="hw-disproportion">INFLUENCE DISPROPORTIONNÉE</div></div>
   <div data-hf-id="hf-slw4" class="clip hardcut-text" id="hardcut-question" data-start="148.7" data-duration="4.3">Pourquoi les gagnants économiques sont-ils ailleurs?</div>
-  <div data-hf-id="hf-sj94" id="badge" class="clip" data-start="7.8" data-duration="140.9">
-    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-
 </div>
 </div>
 <script>
@@ -993,8 +981,6 @@ tl.to("#p3-particle-4", { x: 34, y: -16, duration: 11.4, ease: "sine.inOut", yoy
 tl.to("#p3-particle-5", { x: 44, y: -24, duration: 6.2, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.0);
 tl.to("#p3-particle-6", { x: 24, y: -32, duration: 7.5, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.4);
 tl.to("#p3-particle-7", { x: 34, y: -40, duration: 8.8, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.8);
-tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 153.37, ease: "none" }, 0);
-tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
 tl.fromTo("#map-overview-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 5.95);
 tl.fromTo("#mov-ring-toronto", { opacity: 0.9, attr: { r: 6 } }, { opacity: 0, attr: { r: 46 }, duration: 1.1, ease: "power1.out" }, 7.5);
 tl.fromTo("#mov-dot-toronto", { opacity: 0, r: 3 }, { opacity: 1, r: 9, duration: 0.3, ease: "back.out(2)" }, 7.5);
@@ -1221,8 +1207,6 @@ tl.fromTo("#hw-disproportion", { opacity: 0, y: 26, scale: 0.94, rotation: -3 },
 tl.to("#hw-disproportion", { opacity: 0, duration: 0.18 }, 146.25);
 tl.set("#hardcut-black", { opacity: 1 }, 148.7);
 tl.fromTo("#hardcut-question", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 148.8);
-tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 7.8);
-tl.to("#badge-inner", { opacity: 0, duration: 0.3 }, 148.4);
 </script>
 </body>
 </html>

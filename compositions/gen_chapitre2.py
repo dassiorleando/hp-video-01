@@ -23,16 +23,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "template-1"))
 from generator_helpers import (  # noqa: E402
     esc, make_t, scale_2x_wrapper, hero_word_block, stamp_block,
     data_card_panel, split2_block, montage_block, triptych_block,
-    list_overlay_block, ken_burns_zoom,
+    list_overlay_block, ken_burns_zoom, chapter_opening_card_block,
 )
 
 COMP_ID = "chapitre-2"
-INTRO_PAD = 2.2                    # écho du carton "TORONTO, 2012" du cold-open
+# 2026-09-18 (retour utilisateur) : remplace l'ancien écho "TORONTO, 2012" du
+# cold-open par un vrai carton d'ouverture de chapitre, même patron que les
+# chapitres 3-6 (chapter_opening_card_block) -- 5.8s recommandé (voir sa
+# docstring dans generator_helpers.py).
+INTRO_PAD = 5.8
 VIDEO_DUR = 193.725                 # durée réelle de assets/chapitre_2_alexnet.mp4 (ffprobe)
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 t = make_t(INTRO_PAD)
 
 # ---------------------------------------------------------------------------
@@ -92,20 +95,6 @@ with open(STYLE_KIT_PATH, encoding="utf-8") as f:
 # ---------------------------------------------------------------------------
 parts.append('''
 html,body { margin:0; padding:0; background:#000; }
-
-/* ---- carton d'ouverture "TORONTO, 2012" — écho exact du cold-open --------
-   Le script demande explicitement "même traitement typographique qu'au cold
-   open" pour créer un effet de reconnaissance immédiate. Patron repris tel
-   quel de compositions/gen_cold_open.py (#intro-card). */
-#intro-card { background:#000; z-index:50; }
-#intro-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
-#intro-card .intro-readout-wrap { overflow:hidden; width:0; }
-#intro-card .intro-readout { font-family:"Courier New", monospace; font-size:46px; letter-spacing:0.16em; white-space:nowrap; color:#fff; font-weight:700; }
-#intro-card .intro-rule { margin-top:22px; width:0; height:3px; background:#3b82f6; }
-
-/* ---- badge Automathing (identique aux autres compositions) ---- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
 
 /* ---- fiche dossier à DEUX portraits (Krizhevsky / Sutskever) -------------
    Réutilise .dossier-frame/.dossier-avatar/.dossier-label/.dossier-name du
@@ -181,22 +170,21 @@ parts.append(html_open)
 timeline_js = []
 
 # ---------------------------------------------------------------------------
-# carton d'ouverture : écho "TORONTO, 2012" (même patron que le cold-open)
+# carton d'ouverture de chapitre — même patron que chapitres 3-6
+# (chapter_opening_card_block), remplace l'ancien écho "TORONTO, 2012" du
+# cold-open (retour utilisateur 2026-09-18 : "le chapitre 2 doit avoir une
+# illustration d'entrée de chapitre comme les autres"). Photo déjà utilisée
+# ailleurs dans ce même chapitre et au chapitre 1/3/4 pour illustrer
+# l'Université de Toronto -- cohérent avec le sujet (AlexNet, Toronto 2012).
+# readout_text="" : pas de ligne "lecture système", même choix que ch.4.
 # ---------------------------------------------------------------------------
-parts.append(f'''  <div id="intro-card" class="clip" data-start="0" data-duration="{INTRO_PAD}">
-    <div class="clip-inner" id="intro-card-inner">
-    <div class="intro-readout-wrap" id="intro-readout-wrap"><div class="intro-readout" id="intro-readout">TORONTO, 2012</div></div>
-    <div class="intro-rule" id="intro-rule"></div>
-    </div>
-  </div>
-
-''')
-timeline_js += [
-    'tl.to("#intro-readout-wrap", { width: 500, duration: 0.6, ease: "steps(13)" }, 0.1);',
-    'tl.to("#intro-rule", { width: 300, duration: 0.35, ease: "power2.out" }, 0.75);',
-    f'tl.to("#intro-card-inner", {{ opacity: 0, duration: 0.25 }}, {round(INTRO_PAD - 0.3, 2)});',
-    f'tl.set("#intro-card-inner", {{ opacity: 0 }}, {INTRO_PAD});',
-]
+h, js = chapter_opening_card_block(
+    "chapter-open", "assets/photos/toronto-cn-tower.jpg",
+    "", "CHAPITRE 2",
+    "AlexNet, le moment où tout change",
+    start=0, duration=INTRO_PAD,
+)
+parts.append(h); timeline_js += js
 
 # ---------------------------------------------------------------------------
 # vidéo présentateur + ambiance partagée
@@ -261,16 +249,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.0 + (i % 5) * 1.3
     timeline_js.append(f'tl.to("#p2-particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 20 }}, {round(i*0.4,2)});')
 
-# progress bar (barre persistante, mise à jour "CHAPITRE 2 / 6")
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 2 / 6</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # ---------------------------------------------------------------------------
 # DUO-CARD — Krizhevsky & Sutskever (plein cadre, même patron que Hinton ch.1)
 # ---------------------------------------------------------------------------
@@ -302,7 +280,6 @@ parts.append(f'''  <div id="duo-card" class="clip" data-start="{t(d0)}" data-dur
         </div>
       </div>
     </div>
-    <div class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -479,7 +456,6 @@ parts.append(f'''  <div id="gpu-photo" class="archive-insert clip" data-start="{
       <img src="assets/photos/vintage-computer.jpg" alt="">
       <div class="photo-caption">Calcul &agrave; l&rsquo;&eacute;poque</div>
     </div>
-    <div class="source-tag" id="gpu-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -546,7 +522,6 @@ parts.append(f'''  <div id="nvidia-photo" class="archive-insert bottom-left clip
       <img src="assets/photos/circuit-board.jpg" alt="">
       <div class="photo-caption">Deux cartes graphiques NVIDIA</div>
     </div>
-    <div class="source-tag" id="nvidia-photo-source" style="opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -728,15 +703,11 @@ parts.append(h)
 timeline_js += js
 
 # ---------------------------------------------------------------------------
-# badge Automathing + fondu de sortie
+# fondu de sortie
 # ---------------------------------------------------------------------------
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(TOTAL_DUR-BADGE_START-0.4,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
+parts.append(f'''  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
 
 ''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
 timeline_js.append(f'tl.to("#fade-out", {{ opacity: 1, duration: {FADE_DUR} }}, {FADE_START});')
 
 parts.append(html_close)

@@ -29,7 +29,6 @@ VIDEO_DUR = 215.133                  # durée réelle de assets/chapitre_4_indus
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 t = make_t(INTRO_PAD)
 
 # ---------------------------------------------------------------------------
@@ -216,16 +215,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.4 + (i % 5) * 1.3
     timeline_js.append(f'tl.to("#p4-particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 24 }}, {round(i*0.4,2)});')
 
-# progress bar
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 4 / 6</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # ---------------------------------------------------------------------------
 # CARTE-CITATION D'OUVERTURE — la phrase d'ouverture ("Une découverte
 # scientifique n'est pas une industrie.", @0.04-2.37) en incrustation sur la
@@ -321,7 +310,6 @@ parts.append(f'''  <div id="dnn-photo" class="archive-insert clip" data-start="{
       <img src="assets/photos/vintage-computer.jpg" alt="">
       <div class="photo-caption">DNNresearch, Toronto</div>
     </div>
-    <div class="source-tag" id="dnn-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -456,7 +444,7 @@ for cx, src, cap, at in TIMELINE_PHOTOS:
     vignette_js.append(f'tl.fromTo("#{vid}", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.3 }}, {round(at+0.05,3)});')
 parts.append(f'  <div id="career-timeline-wrap" class="clip" data-start="{t(tt0)}" data-duration="{round(tt1-tt0,2)}">\n'
              f'    <div class="grid-bg"></div>\n{h}{"".join(vignette_html)}'
-             f'    <div class="source-tag" style="opacity:1;">Source : archives</div>\n  </div>\n\n')
+             f'  </div>\n\n')
 timeline_js += js
 timeline_js += vignette_js
 timeline_js.append(f'tl.to("#career-timeline-wrap", {{ opacity: 0, duration: 0.3 }}, {round(t(tt1)-0.3,3)});')
@@ -601,15 +589,11 @@ timeline_js += [
 ]
 
 # ---------------------------------------------------------------------------
-# badge Automathing + fondu de sortie
+# fondu de sortie
 # ---------------------------------------------------------------------------
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(TOTAL_DUR-BADGE_START-0.4,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
+parts.append(f'''  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
 
 ''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
 timeline_js.append(f'tl.to("#fade-out", {{ opacity: 1, duration: {FADE_DUR} }}, {FADE_START});')
 
 parts.append(html_close)

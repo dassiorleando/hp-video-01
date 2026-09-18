@@ -41,7 +41,6 @@ VIDEO_DUR = 147.169                  # durée réelle de assets/chapitre_3_ecole
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 t = make_t(INTRO_PAD)
 
 # ---------------------------------------------------------------------------
@@ -260,16 +259,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.2 + (i % 5) * 1.3
     timeline_js.append(f'tl.to("#p3-particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 20 }}, {round(i*0.4,2)});')
 
-# progress bar (barre persistante, mise à jour "CHAPITRE 3 / 6")
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 3 / 6</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # ---------------------------------------------------------------------------
 # helper local : ruban "carte plate du Canada" + 3 points de ville
 # (Edmonton / Toronto / Montréal, ordre ouest -> est relatif, pas à l'échelle)
@@ -345,7 +334,6 @@ parts.append(f'''  <div id="toronto-photo" class="archive-insert clip" data-star
       <img src="assets/photos/toronto-cn-tower.jpg" alt="">
       <div class="photo-caption">Toronto</div>
     </div>
-    <div class="source-tag" id="toronto-photo-source" style="right:16px; bottom:44px; opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -493,7 +481,6 @@ parts.append(f'''  <div id="medal-card" class="clip" data-start="{t(tn0)}" data-
       <div class="logo-badge-photo"><img src="assets/photos/vector-institute-logo.jpg" alt="Vector Institute"></div>
     </div>
     <div id="medal-flash"></div>
-    <div class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -794,7 +781,6 @@ parts.append(f'''  <div id="echo-card" class="clip" data-start="{t(te0)}" data-d
       <div class="medal-name" id="echo-name-sutton" style="margin-top:0;">Richard Sutton</div>
       <div class="medal-name" id="echo-name-barto" style="margin-top:0;">Andrew Barto</div>
     </div>
-    <div class="source-tag" style="opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -843,18 +829,6 @@ hq0, hqd = HARDCUT_QUESTION
 h, js = hardcut_block("hardcut-question", "Pourquoi les gagnants économiques sont-ils ailleurs?", t(hq0), hqd, fade_out=False)
 parts.append(h)
 timeline_js += js
-
-# ---------------------------------------------------------------------------
-# badge Automathing (pas de fondu de sortie : la coupure au noir tient déjà
-# l'écran jusqu'à la toute fin de la composition, voir HARDCUT_QUESTION)
-# ---------------------------------------------------------------------------
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(t(HARDCUT_QUESTION[0])-BADGE_START,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
-timeline_js.append(f'tl.to("#badge-inner", {{ opacity: 0, duration: 0.3 }}, {round(t(HARDCUT_QUESTION[0])-0.3,3)});')
 
 parts.append(html_close)
 parts.append('<script>\n')

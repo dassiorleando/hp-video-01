@@ -54,7 +54,6 @@ VIDEO_DUR = 259.94                   # durée réelle de assets/chapitre_6_batai
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 t = make_t(INTRO_PAD)
 
 # ---------------------------------------------------------------------------
@@ -97,10 +96,6 @@ with open(STYLE_KIT_PATH, encoding="utf-8") as f:
 # ---------------------------------------------------------------------------
 parts.append('''
 html,body { margin:0; padding:0; background:#000; }
-
-/* ---- badge Automathing (patron correct -- voir gen_chapitre2.py / cold-open) */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
 
 /* ---- TRIPTYQUE — aperçu des 3 batailles (incrustation, bas de cadre) ------
    triptych_block()/.triptych n'a AUCUN fond opaque (voir style-kit.css) --
@@ -278,16 +273,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.4 + (i % 5) * 1.3
     timeline_js.append(f'tl.to("#p6-particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 24 }}, {round(i*0.4,2)});')
 
-# barre de progression
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 6 / 6</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # ---------------------------------------------------------------------------
 # icônes SVG partagées (traits bleu clair #93c5fd, cohérent avec le reste du
 # projet)
@@ -360,7 +345,6 @@ parts.append(f'''  <div id="server-photo" class="archive-insert clip" data-start
       <img src="assets/photos/server-room.jpg" alt="">
       <div class="photo-caption">Salle de serveurs</div>
     </div>
-    <div class="source-tag" id="server-photo-source" style="right:120px; bottom:auto; top:384px; opacity:1;">Source : archives</div>
   </div>
 
 ''')
@@ -486,8 +470,7 @@ sprout_inner = (
 h, js = data_card_panel("sprout-panel", sprout_inner, t(sp0))
 parts.append(
     # Demande utilisateur (preview live, 01:55) : ce panneau en haut à
-    # droite plutôt qu'en bas-gauche -- aucune collision à cet instant avec
-    # #progress-track (qui n'occupe que la bande tout en haut du cadre).
+    # droite plutôt qu'en bas-gauche.
     f'  <div id="sprout-panel-wrap" class="clip" data-start="{t(sp0)}" data-duration="{round(sp1-sp0,2)}" '
     f'style="display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none;">\n{h}  </div>\n\n'
 )
@@ -551,7 +534,7 @@ tl0, tl1 = TIMELINE_PICHETTE
 # Google dirige la transformation numérique du Canada" en toutes lettres) :
 # le détail Pichette/CFO est déjà donné par la narration juste avant ce plan
 # -- le jalon n'a qu'à ancrer visuellement la boucle Google 2013 -> Canada
-# 2026, cf. "Source : archives / Digital Transformation Canada" déjà présent.
+# 2026.
 h, js = timeline_block("pichette-timeline", [
     ("2013 : Google achète DNNresearch", round(t(tl0)+0.2,3)),
     ("2026 : Digital Transformation Canada", round(t(tl0)+4.5,3)),
@@ -559,9 +542,6 @@ h, js = timeline_block("pichette-timeline", [
 parts.append(h)
 timeline_js += js
 timeline_js.append(f'tl.to("#pichette-timeline", {{ opacity: 0, duration: 0.3 }}, {round(t(tl1)-0.3,3)});')
-parts.append(f'  <div class="source-tag" id="pichette-source" style="left:60px; bottom:60px; opacity:0;">Source : archives / Digital Transformation Canada</div>\n\n')
-timeline_js.append(f'tl.fromTo("#pichette-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(t(tl0)+0.5,3)});')
-timeline_js.append(f'tl.to("#pichette-source", {{ opacity: 0, duration: 0.3 }}, {round(t(tl1)-0.3,3)});')
 
 # ---------------------------------------------------------------------------
 # MONTAGE ICÔNES — adoption : laboratoire / usine / PME / hôpital
@@ -638,16 +618,12 @@ timeline_js.append(f'tl.fromTo("#adoption-gauge-source", {{ opacity: 0 }}, {{ op
 timeline_js.append(f'tl.to("#adoption-gauge-source", {{ opacity: 0, duration: 0.3 }}, {round(t(pg1b)-0.3,3)});')
 
 # ---------------------------------------------------------------------------
-# badge Automathing (fin en fondu -- pas de coupure sèche, ce chapitre
-# enchaîne directement sur la CONCLUSION)
+# fondu de sortie (pas de coupure sèche, ce chapitre enchaîne directement sur
+# la CONCLUSION)
 # ---------------------------------------------------------------------------
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(TOTAL_DUR-BADGE_START-0.4,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
+parts.append(f'''  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
 
 ''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
 timeline_js.append(f'tl.to("#fade-out", {{ opacity: 1, duration: {FADE_DUR} }}, {FADE_START});')
 
 parts.append(html_close)

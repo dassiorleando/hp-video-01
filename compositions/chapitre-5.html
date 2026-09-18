@@ -447,11 +447,6 @@ html,body { margin:0; padding:0; background:#000; }
 
 html,body { margin:0; padding:0; background:#000; }
 
-/* ---- badge Automathing (patron correct -- voir gen_chapitre2.py / cold-open,
-   absent par erreur de gen_chapitre3.py/gen_chapitre4.py) -------------------- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
-
 /* (retiré, retour utilisateur sur preview réel) : le montage d'icônes
    laboratoire/usine/bureau/commerce et le schéma "recherche -> secteurs"
    masquaient tous les deux la vidéo juste après la carte d'ouverture --
@@ -537,11 +532,10 @@ html,body { margin:0; padding:0; background:#000; }
 
 
   <audio data-hf-id="hf-1hyh" id="whoosh-0" src="assets/whoosh.mp3" data-start="0.0" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-ya9b" id="whoosh-1" src="assets/whoosh.mp3" data-start="16.8" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-9806" id="whoosh-2" src="assets/whoosh.mp3" data-start="24.5" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-f63g" id="whoosh-3" src="assets/whoosh.mp3" data-start="64.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-vgk1" id="whoosh-4" src="assets/whoosh.mp3" data-start="115.3" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
-  <audio data-hf-id="hf-pvlo" id="whoosh-5" src="assets/whoosh.mp3" data-start="179.5" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-5q4h" id="whoosh-1" src="assets/whoosh.mp3" data-start="24.5" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-u1p9" id="whoosh-2" src="assets/whoosh.mp3" data-start="64.2" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-f79m" id="whoosh-3" src="assets/whoosh.mp3" data-start="115.3" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
+  <audio data-hf-id="hf-sail" id="whoosh-4" src="assets/whoosh.mp3" data-start="179.5" data-duration="0.3" data-volume="0.4" data-hf-media-start-basis="local"></audio>
 
   <div data-hf-id="hf-1ass" id="grade" class="clip" data-start="5.8" data-duration="194.769"></div>
   <div data-hf-id="hf-grqx" id="vignette" class="clip" data-start="5.8" data-duration="194.769"></div>
@@ -566,11 +560,6 @@ html,body { margin:0; padding:0; background:#000; }
     <circle data-hf-id="hf-cw0o" class="particle" id="p5-particle-6" cx="1580" cy="360" r="3" />
     <circle data-hf-id="hf-2ulf" class="particle" id="p5-particle-7" cx="1770" cy="880" r="2.5" />
   </svg>
-
-  <div data-hf-id="hf-zrar" id="progress-track" class="clip" data-start="0" data-duration="200.97">
-    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
-    <div data-hf-id="hf-o8hf" id="progress-label">CHAPITRE 5 / 6</div>
-  </div>
 
   <div data-hf-id="hf-jeuc" id="counter-panel-wrap" class="clip" data-start="24.5" data-duration="17.6" style="display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; pointer-events:none;">
     <div data-hf-id="hf-wjom" class="map-panel" id="counter-panel">
@@ -659,10 +648,6 @@ html,body { margin:0; padding:0; background:#000; }
     <div data-hf-id="hf-f5f4" class="regionale-caption" id="regionale-caption">PME · manufactures · fermes · hôpitaux · municipalités</div>
   </div>
 
-  <div data-hf-id="hf-onxp" id="badge" class="clip" data-start="7.8" data-duration="192.1">
-    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-
 </div>
 </div>
 <script>
@@ -685,8 +670,6 @@ tl.to("#p5-particle-4", { x: 32, y: -14, duration: 11.6, ease: "sine.inOut", yoy
 tl.to("#p5-particle-5", { x: 42, y: -22, duration: 6.4, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.0);
 tl.to("#p5-particle-6", { x: 22, y: -30, duration: 7.7, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.4);
 tl.to("#p5-particle-7", { x: 32, y: -38, duration: 9.0, ease: "sine.inOut", yoyo: true, repeat: 24 }, 2.8);
-tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 200.97, ease: "none" }, 0);
-tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
 tl.fromTo("#counter-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 24.6);
 tl.fromTo("#counter-1", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 24.74);
 tl.to("#counter-1", { opacity: 0, duration: 0.25 }, 32.27);
@@ -725,8 +708,6 @@ tl.fromTo("#region-dot-8", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, dur
 tl.fromTo("#region-dot-9", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 183.15);
 tl.fromTo("#regionale-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 183.5);
 tl.to("#regionale-card", { opacity: 0, duration: 0.3 }, 188.5);
-tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 7.8);
-tl.to("#badge-inner", { opacity: 0, duration: 0.3 }, 199.6);
 tl.set("#hardcut-black", { opacity: 1 }, 199.9);
 </script>
 </body>

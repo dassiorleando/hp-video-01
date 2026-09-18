@@ -30,7 +30,6 @@ VIDEO_DUR = 194.769                  # durée réelle de assets/chapitre_5_retar
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 t = make_t(INTRO_PAD)
 
 # ---------------------------------------------------------------------------
@@ -64,11 +63,6 @@ with open(STYLE_KIT_PATH, encoding="utf-8") as f:
 # ---------------------------------------------------------------------------
 parts.append('''
 html,body { margin:0; padding:0; background:#000; }
-
-/* ---- badge Automathing (patron correct -- voir gen_chapitre2.py / cold-open,
-   absent par erreur de gen_chapitre3.py/gen_chapitre4.py) -------------------- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
 
 /* (retiré, retour utilisateur sur preview réel) : le montage d'icônes
    laboratoire/usine/bureau/commerce et le schéma "recherche -> secteurs"
@@ -163,9 +157,14 @@ parts.append(f'''  <div id="video-wrap" class="clip">
 
 ''')
 
-# whoosh stingers aux transitions majeures
+# whoosh stingers aux transitions majeures (uniquement là où une
+# illustration coupe réellement sur la vidéo -- pas de whoosh à
+# t(MONTAGE_SECTEURS[1]) : c'était la coupure MONTAGE_SECTEURS ->
+# SCHEMA_VERTICAL, deux illustrations supprimées, retour utilisateur
+# 2026-09-18 : aucun effet sonore ne doit rester là où il n'y a plus rien
+# à ponctuer)
 whoosh_times = [
-    0.0, t(MONTAGE_SECTEURS[1]), t(COMPTEUR[0]), t(KINETIC_PERTINENT[0]),
+    0.0, t(COMPTEUR[0]), t(KINETIC_PERTINENT[0]),
     t(CASCADE_SECTEURS[0]), t(REGIONALE[0]),
 ]
 parts.append('\n')
@@ -206,16 +205,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.4 + (i % 5) * 1.3
     timeline_js.append(f'tl.to("#p5-particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 24 }}, {round(i*0.4,2)});')
 
-# barre de progression
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 5 / 6</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # ---------------------------------------------------------------------------
 # (retiré, retour utilisateur sur preview réel) : le montage d'icônes
 # laboratoire/usine/bureau/commerce puis le schéma "recherche -> secteurs"
@@ -223,8 +212,10 @@ timeline_js.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7,
 # présentateur pendant tout ce passage (0 -> ~18.7s / 00:05.8 -> 00:24.5
 # à l'écran). Les deux illustrations sont supprimées ; MONTAGE_SECTEURS et
 # SCHEMA_VERTICAL restent définis en haut du fichier comme simples repères
-# de temps (le premier sert encore de marqueur pour le whoosh de
-# transition). Seules les icônes encore utilisées plus loin (USINE_ICON
+# de temps -- retour utilisateur (2026-09-18) : le whoosh qui marquait leur
+# coupure a aussi été retiré de whoosh_times plus bas, aucun effet sonore
+# ne doit ponctuer un endroit où il n'y a plus d'illustration. Seules les
+# icônes encore utilisées plus loin (USINE_ICON
 # pour "Manufacture" dans CASCADE_SECTEURS, SERVICES/MUNICIPALITE/CABINET)
 # sont conservées.
 # ---------------------------------------------------------------------------
@@ -451,18 +442,6 @@ timeline_js.append(f'tl.fromTo("#regionale-title", {{ opacity: 0 }}, {{ opacity:
 timeline_js += region_dots_js
 timeline_js.append(f'tl.fromTo("#regionale-caption", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(t(rg0)+4.0,3)});')
 timeline_js.append(f'tl.to("#regionale-card", {{ opacity: 0, duration: 0.3 }}, {round(t(rg1)-0.3,3)});')
-
-# ---------------------------------------------------------------------------
-# badge Automathing (pas de fondu de sortie -- coupure au noir sèche sur
-# "Point final.", voir HARDCUT_FIN, patron identique à gen_chapitre3.py)
-# ---------------------------------------------------------------------------
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(t(HARDCUT_FIN)-BADGE_START,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
-timeline_js.append(f'tl.to("#badge-inner", {{ opacity: 0, duration: 0.3 }}, {round(t(HARDCUT_FIN)-0.3,3)});')
 
 # ---------------------------------------------------------------------------
 # coupure sèche au noir sur "Point final." (script : "cut sec au noir

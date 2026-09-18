@@ -23,7 +23,6 @@ VIDEO_DUR = 150.05
 FADE_START = round(INTRO_PAD + VIDEO_DUR - 0.35, 2)
 FADE_DUR = 0.75
 TOTAL_DUR = round(FADE_START + FADE_DUR, 2)
-BADGE_START = round(INTRO_PAD + 2.0, 2)
 
 def t(x):
     return round(x + INTRO_PAD, 3)
@@ -228,6 +227,12 @@ html,body { margin:0; padding:0; background:#000; }
   background:#030509;
   display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
 }
+/* .clip-inner est position:absolute (voir plus haut), donc le flex du parent
+   #chapter-card ne centre pas son contenu réel sans cette règle explicite
+   (même patron déjà appliqué à #intro-card dans gen_cold_open.py /
+   gen_chapitre2.py). Corrige le bug de texte aligné à gauche signalé le
+   2026-09-18. */
+#chapter-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
 #chapter-card .chapter-photo {
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
   filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
@@ -242,11 +247,6 @@ html,body { margin:0; padding:0; background:#000; }
   position:absolute; inset:0; pointer-events:none;
   background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
   mix-blend-mode:overlay; opacity:0.55;
-}
-#chapter-card .readout-wrap { overflow:hidden; width:0; }
-#chapter-card .readout {
-  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
-  color:#93c5fd; opacity:0.9;
 }
 #chapter-card .kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
 #chapter-card .title { margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center; line-height:1.2; opacity:0; }
@@ -356,10 +356,6 @@ html,body { margin:0; padding:0; background:#000; }
 #cifar-card .cifar-names { margin-top:34px; display:flex; gap:36px; }
 #cifar-card .cifar-name { font-size:28px; font-weight:700; padding:12px 22px; background:rgba(59,130,246,0.15); border:1px solid rgba(96,165,250,0.4); border-radius:8px; opacity:0; }
 
-/* ---- badge ---- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
-
 /* ---- archive scene: server-room illustration ---- */
 .lab-illo { position:absolute; bottom:70px; left:50%; transform:translateX(-50%); opacity:0; }
 .rack { fill:#0c1420; stroke:#3b82f6; stroke-width:1.5; }
@@ -385,11 +381,6 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- ambient floating particles ---- */
 .particle { fill:#3b82f6; opacity:0.22; }
-
-/* ---- progress bar ---- */
-#progress-track { z-index:65; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); }
-#progress-fill { position:absolute; top:0; left:0; height:100%; width:0; background:#3b82f6; }
-#progress-label { position:absolute; top:10px; left:24px; font-size:15px; font-weight:700; letter-spacing:0.14em; color:rgba(147,197,253,0.6); text-transform:uppercase; opacity:0; z-index:66; }
 
 /* ---- archive newspaper clipping insert ---- */
 #archive-clipping { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
@@ -449,7 +440,6 @@ html,body { margin:0; padding:0; background:#000; }
 .split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
 .split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
 .split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
-.split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
 
 /* ---- v8: face-safe repositioning. These transparent overlays were
    centered by default, which collided with the presenter's face/upper
@@ -490,7 +480,6 @@ parts.append(f'''  <div id="chapter-card" class="clip" data-start="0" data-durat
     <img class="chapter-photo" src="assets/photos/vintage-computer.jpg" alt="">
     <div class="chapter-photo-overlay"></div>
     <div class="scanlines"></div>
-    <div class="readout-wrap" id="readout-wrap"><div class="readout" id="readout">SYST&Egrave;ME D'ARCHIVES &mdash; CHRONOLOGIE IA</div></div>
     <svg class="idea-bulb" id="idea-bulb" viewBox="0 0 60 80" width="52" height="70">
       <circle cx="30" cy="28" r="20" fill="none" stroke="#60a5fa" stroke-width="3"/>
       <path d="M22 46 L38 46 M24 52 L36 52 M26 58 L34 58" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" fill="none"/>
@@ -545,20 +534,12 @@ parts.append(f'''  <svg id="particles" class="clip" data-start="0" data-duration
 
 ''')
 
-# progress bar (persistent, top edge)
-parts.append(f'''  <div id="progress-track" class="clip" data-start="0" data-duration="{TOTAL_DUR}">
-    <div id="progress-fill"></div>
-    <div id="progress-label">CHAPITRE 1 / 6</div>
-  </div>
-
-''')
-
 # archive newspaper clipping insert (brief, corner, non-full-frame)
 ac0, ac1 = ARCHIVE_CLIP
 parts.append(f'''  <div id="archive-clipping" class="clip" data-start="{t(ac0)}" data-duration="{round(ac1-ac0,2)}">
     <div class="clipping-card" id="clipping-card">
       <div class="headline">L&rsquo;intelligence artificielle <span class="hl">va changer le monde</span></div>
-      <div class="dateline">&Eacute;dition sp&eacute;ciale &mdash; Sciences &middot; Source : archives</div>
+      <div class="dateline">&Eacute;dition sp&eacute;ciale &mdash; Sciences</div>
     </div>
   </div>
 
@@ -578,7 +559,6 @@ parts.append(f'''  <div id="modern-ai-photo" class="clip" data-start="{t(ma0)}" 
     <div class="photo-card" id="modern-ai-card" style="position:relative;">
       <img src="assets/photos/server-room.jpg" alt="">
       <div class="photo-caption">L&rsquo;IA aujourd&rsquo;hui</div>
-      <div class="source-tag" id="modern-ai-source" style="right:16px; bottom:44px; font-size:14px;">Source : archives</div>
     </div>
   </div>
 
@@ -607,7 +587,6 @@ for sid, (sp0, sp1), photo, caption in SPLITS:
     </div>
     <div class="split-divider" id="{sid}-divider"></div>
     <div class="split-caption" id="{sid}-caption">{esc(caption)}</div>
-    <div class="split-source" id="{sid}-source">Source : archives</div>
   </div>
 
 ''')
@@ -641,7 +620,6 @@ parts.append(f'''  <div id="hinton-card" class="clip" data-start="{t(h0)}" data-
       <img src="assets/photos/toronto-cn-tower.jpg" alt="">
       <div class="skyline-tint"></div>
       <div class="date-badge" id="skyline-badge">Ann&eacute;es 1970</div>
-      <div class="source-tag" id="skyline-source">Source : archives</div>
     </div>
   </div>
 
@@ -662,7 +640,6 @@ parts.append(f'''  <div id="hype-card" class="clip" data-start="{t(hy0)}" data-d
       </svg>
       <div class="hype-caption" id="hype-caption">LES HIVERS DE L&rsquo;INTELLIGENCE ARTIFICIELLE</div>
     </div>
-    <div class="source-tag" id="hype-source">Source : illustration</div>
   </div>
 
 ''')
@@ -687,7 +664,6 @@ parts.append(f'''  <div id="nn-card" class="clip" data-start="{t(nn0)}" data-dur
       <div class="nn-caption" id="nn-caption">on ajuste les connexions &agrave; chaque erreur</div>
     </div>
     <div class="date-badge" id="nn-target-tag" style="top:754px; left:auto; right:280px; background:rgba(34,197,94,0.16); border-color:rgba(74,222,128,0.5); color:#86efac;">cible : chat &check;</div>
-    <div class="source-tag" id="nn-source">Source : illustration</div>
   </div>
 
 ''')
@@ -717,7 +693,6 @@ parts.append(f'''  <div id="map-card" class="clip" data-start="{t(m0)}" data-dur
         <text class="map-label" id="map-label3" x="350" y="250">Toronto</text>
       </svg>
     </div>
-    <div class="source-tag" id="map-source">Source : illustration</div>
   </div>
 
 ''')
@@ -736,7 +711,6 @@ parts.append(f'''  <div id="seed-card" class="clip" data-start="{t(s0)}" data-du
       <div class="seed-icon" id="seed-icon">&#127793;</div>
     </div>
     <div class="seed-label" id="seed-label">une id&eacute;e impopulaire</div>
-    <div class="source-tag" id="seed-source">Source : illustration</div>
   </div>
 
 ''')
@@ -754,16 +728,12 @@ parts.append(f'''  <div id="cifar-card" class="clip" data-start="{t(c0)}" data-d
         <div class="cifar-name" id="cifar-name3">Yann LeCun</div>
       </div>
     </div>
-    <div class="source-tag" id="cifar-source">Source : illustration</div>
   </div>
 
 ''')
 
-# badge + fade out
-parts.append(f'''  <div id="badge" class="clip" data-start="{BADGE_START}" data-duration="{round(TOTAL_DUR-BADGE_START-0.4,2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
+# fade out
+parts.append(f'''  <div id="fade-out" class="clip" data-start="{FADE_START}" data-duration="{FADE_DUR}"></div>
 
 ''')
 
@@ -774,7 +744,6 @@ tl = []
 tl.append('const tl = gsap.timeline({ paused: true });\n')
 
 # archive scene
-tl.append(f'tl.to("#readout-wrap", {{ width: 560, duration: 0.55, ease: "steps(18)" }}, 0.05);')
 tl.append(f'tl.fromTo("#lab-illo", {{ opacity: 0 }}, {{ opacity: 0.8, duration: 0.6 }}, 0.15);')
 def _stable_stagger(s: str) -> int:
     """Décalage pseudo-aléatoire mais 100% déterministe (le hash() natif de
@@ -813,10 +782,6 @@ for i, (px, py, pr) in enumerate(PARTICLES):
     dur = 6.0 + (i % 5) * 1.3
     tl.append(f'tl.to("#particle-{i}", {{ x: {dx}, y: -{dy}, duration: {dur:.1f}, ease: "sine.inOut", yoyo: true, repeat: 20 }}, {round(i*0.4,2)});')
 
-# progress bar — fills across the whole composition
-tl.append(f'tl.fromTo("#progress-fill", {{ width: "0%" }}, {{ width: "100%", duration: {TOTAL_DUR}, ease: "none" }}, 0);')
-tl.append('tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);')
-
 # archive newspaper clipping insert
 acst, acen = t(ac0), t(ac1)
 tl.append(f'tl.fromTo("#clipping-card", {{ opacity: 0, y: -16, rotation: -4 }}, {{ opacity: 0.95, y: 0, rotation: 3, duration: 0.4, ease: "power2.out" }}, {round(acst+0.1,3)});')
@@ -831,7 +796,6 @@ tl.append(f'tl.to("#stamp-text", {{ opacity: 0, duration: 0.25 }}, {round(imen-0
 mast, maen = t(ma0), t(ma1)
 tl.append(f'tl.fromTo("#modern-ai-card", {{ opacity: 0, x: -24 }}, {{ opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }}, {round(mast+0.1,3)});')
 tl.append(f'tl.to("#modern-ai-card", {{ opacity: 0, duration: 0.3 }}, {round(maen-0.35,3)});')
-tl.append(f'tl.fromTo("#modern-ai-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.25 }}, {round(mast+0.3,3)});')
 tl.append(f'tl.fromTo("#modern-ai-card img", {{ scale: 1.0 }}, {{ scale: 1.09, duration: {round(maen-mast,3)}, ease: "none" }}, {round(mast,3)});')
 
 # "FINANCEMENT REFUSÉ" stamp — same fast stamp-in / clean fade as "Impasse"
@@ -854,8 +818,8 @@ for sid, (sp0, sp1) in [("split-1", SPLIT_1), ("split-2", SPLIT_2), ("split-3", 
     spst, spen = t(sp0), t(sp1)
     tl.append(f'tl.fromTo("#{sid}-panel", {{ opacity: 0, x: -30 }}, {{ opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }}, {round(spst+0.1,3)});')
     tl.append(f'tl.fromTo("#{sid}-divider", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.35 }}, {round(spst+0.3,3)});')
-    tl.append(f'tl.fromTo("#{sid}-caption, #{sid}-source", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }}, {round(spst+0.45,3)});')
-    tl.append(f'tl.to("#{sid}-panel, #{sid}-divider, #{sid}-caption, #{sid}-source", {{ opacity: 0, duration: 0.3 }}, {round(spen-0.35,3)});')
+    tl.append(f'tl.fromTo("#{sid}-caption", {{ opacity: 0, y: 10 }}, {{ opacity: 1, y: 0, duration: 0.35 }}, {round(spst+0.45,3)});')
+    tl.append(f'tl.to("#{sid}-panel, #{sid}-divider, #{sid}-caption", {{ opacity: 0, duration: 0.3 }}, {round(spen-0.35,3)});')
     tl.append(f'tl.fromTo("#main-video", {{ x: 0 }}, {{ x: {VIDEO_RECENTER_SHIFT}, duration: 0.4, ease: "power2.out", immediateRender: false }}, {round(spst+0.1,3)});')
     tl.append(f'tl.to("#main-video", {{ x: 0, duration: 0.3 }}, {round(spen-0.35,3)});')
     tl.append(f'tl.fromTo("#{sid}-panel img", {{ scale: 1.0 }}, {{ scale: 1.09, duration: {round(spen-spst,3)}, ease: "none" }}, {round(spst,3)});')
@@ -880,7 +844,6 @@ tl.append(f'tl.fromTo("#epoch-tag", {{ opacity: 0, y: 8 }}, {{ opacity: 1, y: 0,
 tl.append(f'tl.fromTo("#skyline-wrap", {{ opacity: 0 }}, {{ opacity: 0.6, duration: 0.5 }}, {round(hst+0.3,3)});')
 tl.append(f'tl.fromTo("#skyline-wrap img", {{ scale: 1.0 }}, {{ scale: 1.1, duration: {round(hen-hst,3)}, ease: "none" }}, {round(hst,3)});')
 tl.append(f'tl.fromTo("#skyline-badge", {{ opacity: 0 }}, {{ opacity: 0.9, duration: 0.3 }}, {round(hst+0.6,3)});')
-tl.append(f'tl.fromTo("#skyline-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(hst+0.6,3)});')
 tl.append(f'tl.to("#hinton-card", {{ opacity: 0, duration: 0.3 }}, {round(hen-0.3,3)});')
 
 # hype card
@@ -890,7 +853,6 @@ tl.append(f'tl.fromTo("#hype-title", {{ opacity: 0, y: -10 }}, {{ opacity: 1, y:
 tl.append(f'tl.fromTo("#hype-axis-y, #hype-axis-x", {{ opacity: 0 }}, {{ opacity: 0.8, duration: 0.3 }}, {round(hyst+0.3,3)});')
 tl.append(f'tl.to("#hype-path", {{ strokeDashoffset: 0, duration: 5.0, ease: "power1.inOut" }}, {round(hyst+0.4,3)});')
 tl.append(f'tl.fromTo("#hype-caption", {{ opacity: 0, y: 12 }}, {{ opacity: 1, y: 0, duration: 0.35 }}, {round(hyst+5.8,3)});')
-tl.append(f'tl.fromTo("#hype-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(hyst+0.5,3)});')
 tl.append(f'tl.to("#hype-card", {{ opacity: 0, duration: 0.3 }}, {round(hyen-0.3,3)});')
 
 # nn card
@@ -903,7 +865,6 @@ tl.append(f'tl.to(".nn-layer-label", {{ opacity: 0.9, duration: 0.4, stagger: 0.
 tl.append(f'tl.to(".nn-node", {{ fill: "#3b82f6", duration: 0.5, stagger: 0.02, yoyo: true, repeat: 1 }}, {round(nnst+2.0,3)});')
 tl.append(f'tl.fromTo("#nn-caption", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(nnst+15.9,3)});')
 tl.append(f'tl.fromTo("#nn-target-tag", {{ opacity: 0, scale: 0.8 }}, {{ opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }}, {round(nnst+2.3,3)});')
-tl.append(f'tl.fromTo("#nn-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(nnst+0.5,3)});')
 tl.append(f'tl.to("#nn-card", {{ opacity: 0, duration: 0.3 }}, {round(nnen-0.3,3)});')
 
 # map card
@@ -916,7 +877,6 @@ tl.append(f'tl.fromTo("#map-dot2, #map-label2", {{ opacity: 0, scale: 0.5 }}, {{
 tl.append(f'tl.fromTo("#map-line2", {{ opacity: 0 }}, {{ opacity: 0.7, duration: 0.4 }}, {round(mst+1.0,3)});')
 tl.append(f'tl.fromTo("#map-dot3, #map-label3", {{ opacity: 0, scale: 0.5 }}, {{ opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }}, {round(mst+1.2,3)});')
 tl.append(f'tl.fromTo("#map-line3", {{ opacity: 0 }}, {{ opacity: 0.7, duration: 0.4 }}, {round(mst+1.35,3)});')
-tl.append(f'tl.fromTo("#map-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(mst+0.5,3)});')
 tl.append(f'tl.to("#map-card", {{ opacity: 0, duration: 0.3 }}, {round(men-0.3,3)});')
 
 # seed card
@@ -925,7 +885,6 @@ tl.append(f'tl.to(".seed-root", {{ strokeDashoffset: 0, duration: 3.6, ease: "po
 tl.append(f'tl.fromTo("#seed-icon", {{ opacity: 0, y: 20, scale: 0.3 }}, {{ opacity: 1, y: 0, scale: 0.55, duration: 0.6 }}, {round(sst+3.0,3)});')
 tl.append(f'tl.to("#seed-icon", {{ y: -60, scale: 1.3, duration: {round((s1-s0)-4.2,2)}, ease: "power1.in" }}, {round(sst+3.6,3)});')
 tl.append(f'tl.fromTo("#seed-label", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.4 }}, {round(sst+3.4,3)});')
-tl.append(f'tl.fromTo("#seed-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(sst+0.5,3)});')
 tl.append(f'tl.to("#seed-card", {{ opacity: 0, duration: 0.3 }}, {round(sen-0.3,3)});')
 
 # cifar card
@@ -936,11 +895,9 @@ tl.append(f'tl.fromTo("#cifar-org", {{ opacity: 0 }}, {{ opacity: 1, duration: 0
 tl.append(f'tl.fromTo("#cifar-name1", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(cst+3.8,3)});')
 tl.append(f'tl.fromTo("#cifar-name2", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(cst+5.0,3)});')
 tl.append(f'tl.fromTo("#cifar-name3", {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }}, {round(cst+6.3,3)});')
-tl.append(f'tl.fromTo("#cifar-source", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, {round(cst+0.5,3)});')
 tl.append(f'tl.to("#cifar-card", {{ opacity: 0, duration: 0.3 }}, {round(cen-0.3,3)});')
 
-# badge + fade
-tl.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {BADGE_START});')
+# fade
 tl.append(f'tl.to("#fade-out", {{ opacity: 1, duration: {FADE_DUR} }}, {FADE_START});')
 
 tl.append('\nwindow.__timelines = window.__timelines || {};')

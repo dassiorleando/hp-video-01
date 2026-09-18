@@ -82,10 +82,6 @@ html,body { margin:0; padding:0; background:#000; }
 .building2.lit { background:#3b82f6; box-shadow:0 0 30px 5px rgba(59,130,246,0.55); }
 .buildings-caption { margin-top:22px; font-size:20px; color:#cbd5e1; }
 
-/* ---- badge Automathing (identique chapitre 1) ---- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
-
 /* ---- carton de titre final (CARTON DE TITRE) ---- */
 #outro-card { background:#03050a; z-index:60; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 #outro-card .maple-leaf { position:absolute; width:820px; height:820px; opacity:0.06; top:50%; left:50%; transform:translate(-50%,-50%); }
@@ -252,16 +248,6 @@ for i in range(5):
         f'{{ opacity: 1, scaleY: 1, duration: 0.35, ease: "power2.out" }}, {build_start + 0.3 + d:.2f});'
     )
 
-# ---------------------------------------------------------------------------
-# badge Automathing, persistant du début de la vidéo à la fin
-# ---------------------------------------------------------------------------
-badge_start = round(INTRO_PAD + 2.0, 2)
-parts.append(f'''  <div id="badge" class="clip" data-start="{badge_start}" data-duration="{round(VIDEO_DUR - 2.0, 2)}">
-    <div class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
-
-''')
-timeline_js.append(f'tl.fromTo("#badge-inner", {{ opacity: 0 }}, {{ opacity: 0.85, duration: 0.4 }}, {badge_start});')
 
 # ---------------------------------------------------------------------------
 # carton de titre final (CARTON DE TITRE) : mots qui claquent un à un,

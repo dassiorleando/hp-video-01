@@ -30,6 +30,12 @@ html,body { margin:0; padding:0; background:#000; }
   background:#030509;
   display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:50;
 }
+/* .clip-inner est position:absolute (voir plus haut), donc le flex du parent
+   #chapter-card ne centre pas son contenu réel sans cette règle explicite
+   (même patron déjà appliqué à #intro-card dans gen_cold_open.py /
+   gen_chapitre2.py). Corrige le bug de texte aligné à gauche signalé le
+   2026-09-18. */
+#chapter-card .clip-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
 #chapter-card .chapter-photo {
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
   filter:grayscale(0.55) brightness(0.5) contrast(1.08); opacity:0.9;
@@ -44,11 +50,6 @@ html,body { margin:0; padding:0; background:#000; }
   position:absolute; inset:0; pointer-events:none;
   background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 3px);
   mix-blend-mode:overlay; opacity:0.55;
-}
-#chapter-card .readout-wrap { overflow:hidden; width:0; }
-#chapter-card .readout {
-  font-family:"Courier New", monospace; font-size:23px; letter-spacing:0.16em; white-space:nowrap;
-  color:#93c5fd; opacity:0.9;
 }
 #chapter-card .kicker { margin-top:26px; font-size:30px; font-weight:700; letter-spacing:0.12em; color:#60a5fa; opacity:0; }
 #chapter-card .title { margin-top:18px; max-width:1500px; font-size:64px; font-weight:800; text-align:center; line-height:1.2; opacity:0; }
@@ -158,10 +159,6 @@ html,body { margin:0; padding:0; background:#000; }
 #cifar-card .cifar-names { margin-top:34px; display:flex; gap:36px; }
 #cifar-card .cifar-name { font-size:28px; font-weight:700; padding:12px 22px; background:rgba(59,130,246,0.15); border:1px solid rgba(96,165,250,0.4); border-radius:8px; opacity:0; }
 
-/* ---- badge ---- */
-#badge { z-index:40; display:flex; align-items:flex-end; justify-content:flex-end; pointer-events:none; }
-#badge .badge-inner { margin:0 56px 56px 0; padding:14px 28px; background:rgba(10,14,24,0.55); border:1px solid rgba(255,255,255,0.15); border-radius:10px; font-size:24px; font-weight:700; letter-spacing:0.05em; color:#e5e7eb; opacity:0; }
-
 /* ---- archive scene: server-room illustration ---- */
 .lab-illo { position:absolute; bottom:70px; left:50%; transform:translateX(-50%); opacity:0; }
 .rack { fill:#0c1420; stroke:#3b82f6; stroke-width:1.5; }
@@ -187,11 +184,6 @@ html,body { margin:0; padding:0; background:#000; }
 
 /* ---- ambient floating particles ---- */
 .particle { fill:#3b82f6; opacity:0.22; }
-
-/* ---- progress bar ---- */
-#progress-track { z-index:65; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); }
-#progress-fill { position:absolute; top:0; left:0; height:100%; width:0; background:#3b82f6; }
-#progress-label { position:absolute; top:10px; left:24px; font-size:15px; font-weight:700; letter-spacing:0.14em; color:rgba(147,197,253,0.6); text-transform:uppercase; opacity:0; z-index:66; }
 
 /* ---- archive newspaper clipping insert ---- */
 #archive-clipping { z-index:34; display:flex; align-items:flex-start; justify-content:flex-end; padding:110px 120px 0 0; pointer-events:none; }
@@ -251,7 +243,6 @@ html,body { margin:0; padding:0; background:#000; }
 .split-photo-panel .split-tint { position:absolute; inset:0; background:linear-gradient(180deg, rgba(3,5,10,0.25), rgba(3,5,10,0.62)); }
 .split-divider { position:absolute; top:0; left:50%; width:2px; height:100%; background:rgba(96,165,250,0.55); opacity:0; }
 .split-caption { position:absolute; left:36px; bottom:40px; max-width:44%; font-size:19px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#e2e8f0; opacity:0; }
-.split-source { position:absolute; left:36px; bottom:16px; font-size:14px; font-style:italic; color:rgba(203,213,225,0.55); opacity:0; }
 
 /* ---- v8: face-safe repositioning. These transparent overlays were
    centered by default, which collided with the presenter's face/upper
@@ -289,7 +280,6 @@ html,body { margin:0; padding:0; background:#000; }
     <img data-hf-id="hf-amy0" class="chapter-photo" src="assets/photos/vintage-computer.jpg" alt="">
     <div data-hf-id="hf-ispv" class="chapter-photo-overlay"></div>
     <div data-hf-id="hf-8pzc" class="scanlines"></div>
-    <div data-hf-id="hf-d6xi" class="readout-wrap" id="readout-wrap"><div data-hf-id="hf-hqvi" class="readout" id="readout">SYSTÈME D'ARCHIVES — CHRONOLOGIE IA</div></div>
     <svg data-hf-id="hf-krfj" class="idea-bulb" id="idea-bulb" viewBox="0 0 60 80" width="52" height="70">
       <circle data-hf-id="hf-nwyn" cx="30" cy="28" r="20" fill="none" stroke="#60a5fa" stroke-width="3" />
       <path data-hf-id="hf-4o84" d="M22 46 L38 46 M24 52 L36 52 M26 58 L34 58" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -368,15 +358,10 @@ html,body { margin:0; padding:0; background:#000; }
     <circle data-hf-id="hf-pd6j" class="particle" id="particle-7" cx="1750" cy="860" r="2.5" />
   </svg>
 
-  <div data-hf-id="hf-7ew4" id="progress-track" class="clip" data-start="0" data-duration="156.25">
-    <div data-hf-id="hf-c4bu" id="progress-fill"></div>
-    <div data-hf-id="hf-5327" id="progress-label">CHAPITRE 1 / 6</div>
-  </div>
-
   <div data-hf-id="hf-i43h" id="archive-clipping" class="clip" data-start="19.4" data-duration="6.0">
     <div data-hf-id="hf-6sr4" class="clipping-card" id="clipping-card">
       <div data-hf-id="hf-6nav" class="headline">L’intelligence artificielle <span data-hf-id="hf-x46g" class="hl">va changer le monde</span></div>
-      <div data-hf-id="hf-i806" class="dateline">Édition spéciale — Sciences · Source : archives</div>
+      <div data-hf-id="hf-5p0p" class="dateline">Édition spéciale — Sciences</div>
     </div>
   </div>
 
@@ -388,7 +373,6 @@ html,body { margin:0; padding:0; background:#000; }
     <div data-hf-id="hf-jgri" class="photo-card" id="modern-ai-card" style="position:relative;">
       <img data-hf-id="hf-n6u2" src="assets/photos/server-room.jpg" alt="">
       <div data-hf-id="hf-y0h9" class="photo-caption">L’IA aujourd’hui</div>
-      <div data-hf-id="hf-6g7b" class="source-tag" id="modern-ai-source" style="right:16px; bottom:44px; font-size:14px;">Source : archives</div>
     </div>
   </div>
 
@@ -403,7 +387,6 @@ html,body { margin:0; padding:0; background:#000; }
     </div>
     <div data-hf-id="hf-pyng" class="split-divider" id="split-1-divider"></div>
     <div data-hf-id="hf-fkpt" class="split-caption" id="split-1-caption">Archives de recherche</div>
-    <div data-hf-id="hf-7y9y" class="split-source" id="split-1-source">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-21ue" id="split-2" class="clip" data-start="94.8" data-duration="5.5" style="z-index:33; pointer-events:none;">
@@ -413,7 +396,6 @@ html,body { margin:0; padding:0; background:#000; }
     </div>
     <div data-hf-id="hf-65cv" class="split-divider" id="split-2-divider"></div>
     <div data-hf-id="hf-7lwg" class="split-caption" id="split-2-caption">Infrastructure de recherche</div>
-    <div data-hf-id="hf-dz09" class="split-source" id="split-2-source">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-vkco" id="split-3" class="clip" data-start="145.3" data-duration="6.5" style="z-index:33; pointer-events:none;">
@@ -423,7 +405,6 @@ html,body { margin:0; padding:0; background:#000; }
     </div>
     <div data-hf-id="hf-spja" class="split-divider" id="split-3-divider"></div>
     <div data-hf-id="hf-b7z2" class="split-caption" id="split-3-caption">Université de Toronto</div>
-    <div data-hf-id="hf-iuoo" class="split-source" id="split-3-source">Source : archives</div>
   </div>
 
   <div data-hf-id="hf-9fbv" class="hero clip" id="hero-hw1" data-start="7.8" data-duration="1.0"><div data-hf-id="hf-if8y" class="hero-text" id="hw1">PLUSIEURS DÉCENNIES</div></div>
@@ -449,7 +430,6 @@ html,body { margin:0; padding:0; background:#000; }
       <img data-hf-id="hf-m0d6" src="assets/photos/toronto-cn-tower.jpg" alt="">
       <div data-hf-id="hf-ckr9" class="skyline-tint"></div>
       <div data-hf-id="hf-hu1a" class="date-badge" id="skyline-badge">Années 1970</div>
-      <div data-hf-id="hf-n3nr" class="source-tag" id="skyline-source">Source : archives</div>
     </div>
   </div>
 
@@ -466,7 +446,6 @@ html,body { margin:0; padding:0; background:#000; }
       </svg>
       <div data-hf-id="hf-a6g9" class="hype-caption" id="hype-caption">LES HIVERS DE L’INTELLIGENCE ARTIFICIELLE</div>
     </div>
-    <div data-hf-id="hf-b45r" class="source-tag" id="hype-source">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-2uuo" id="nn-card" class="clip" data-start="52.3" data-duration="18.4">
@@ -534,7 +513,6 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-ruuz" class="nn-caption" id="nn-caption">on ajuste les connexions à chaque erreur</div>
     </div>
     <div data-hf-id="hf-yrxu" class="date-badge" id="nn-target-tag" style="top:754px; left:auto; right:280px; background:rgba(34,197,94,0.16); border-color:rgba(74,222,128,0.5); color:#86efac;">cible : chat ✓</div>
-    <div data-hf-id="hf-ihdj" class="source-tag" id="nn-source">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-0cx8" id="map-card" class="clip" data-start="101.8" data-duration="10.0">
@@ -565,7 +543,6 @@ html,body { margin:0; padding:0; background:#000; }
         <text data-hf-id="hf-61ai" class="map-label" id="map-label3" x="350" y="250">Toronto</text>
       </svg>
     </div>
-    <div data-hf-id="hf-iefp" class="source-tag" id="map-source">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-q1jf" id="seed-card" class="clip" data-start="122.8" data-duration="11.0">
@@ -580,7 +557,6 @@ html,body { margin:0; padding:0; background:#000; }
       <div data-hf-id="hf-339r" class="seed-icon" id="seed-icon">🌱</div>
     </div>
     <div data-hf-id="hf-lpy4" class="seed-label" id="seed-label">une idée impopulaire</div>
-    <div data-hf-id="hf-unkw" class="source-tag" id="seed-source">Source : illustration</div>
   </div>
 
   <div data-hf-id="hf-qh00" id="cifar-card" class="clip" data-start="134.0" data-duration="9.3">
@@ -594,18 +570,13 @@ html,body { margin:0; padding:0; background:#000; }
         <div data-hf-id="hf-wjz0" class="cifar-name" id="cifar-name3">Yann LeCun</div>
       </div>
     </div>
-    <div data-hf-id="hf-2tpc" class="source-tag" id="cifar-source">Source : illustration</div>
   </div>
 
-  <div data-hf-id="hf-em0i" id="badge" class="clip" data-start="7.8" data-duration="148.05">
-    <div data-hf-id="hf-plbl" class="badge-inner" id="badge-inner">AUTOMATHING</div>
-  </div>
   <div data-hf-id="hf-hzzb" id="fade-out" class="clip" data-start="155.5" data-duration="0.75"></div>
 
 <script>
 const tl = gsap.timeline({ paused: true });
 
-tl.to("#readout-wrap", { width: 560, duration: 0.55, ease: "steps(18)" }, 0.05);
 tl.fromTo("#lab-illo", { opacity: 0 }, { opacity: 0.8, duration: 0.6 }, 0.15);
 tl.to("#lab-light-0-0", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.7);
 tl.to("#lab-light-0-1", { opacity: 0.25, duration: 0.5, yoyo: true, repeat: 6 }, 0.9);
@@ -645,36 +616,33 @@ tl.to("#particle-4", { x: 36, y: -18, duration: 11.2, ease: "sine.inOut", yoyo: 
 tl.to("#particle-5", { x: 46, y: -26, duration: 6.0, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.0);
 tl.to("#particle-6", { x: 26, y: -34, duration: 7.3, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.4);
 tl.to("#particle-7", { x: 36, y: -42, duration: 8.6, ease: "sine.inOut", yoyo: true, repeat: 20 }, 2.8);
-tl.fromTo("#progress-fill", { width: "0%" }, { width: "100%", duration: 156.25, ease: "none" }, 0);
-tl.fromTo("#progress-label", { opacity: 0 }, { opacity: 0.7, duration: 0.5 }, 0.3);
 tl.fromTo("#clipping-card", { opacity: 0, y: -16, rotation: -4 }, { opacity: 0.95, y: 0, rotation: 3, duration: 0.4, ease: "power2.out" }, 19.5);
 tl.to("#clipping-card", { opacity: 0, y: -10, duration: 0.3 }, 25.05);
 tl.fromTo("#stamp-text", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 78.85);
 tl.to("#stamp-text", { opacity: 0, duration: 0.25 }, 81.1);
 tl.fromTo("#modern-ai-card", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" }, 71.1);
 tl.to("#modern-ai-card", { opacity: 0, duration: 0.3 }, 74.85);
-tl.fromTo("#modern-ai-source", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 71.3);
 tl.fromTo("#modern-ai-card img", { scale: 1.0 }, { scale: 1.09, duration: 4.2, ease: "none" }, 71.0);
 tl.fromTo("#refused-stamp-text", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: "power4.out" }, 50.3);
 tl.to("#refused-stamp-text", { opacity: 0, duration: 0.25 }, 51.85);
 tl.fromTo("#split-1-panel", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 26.2);
 tl.fromTo("#split-1-divider", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 26.4);
-tl.fromTo("#split-1-caption, #split-1-source", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 26.55);
-tl.to("#split-1-panel, #split-1-divider, #split-1-caption, #split-1-source", { opacity: 0, duration: 0.3 }, 30.25);
+tl.fromTo("#split-1-caption", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35 }, 26.55);
+tl.to("#split-1-panel, #split-1-divider, #split-1-caption", { opacity: 0, duration: 0.3 }, 30.25);
 tl.fromTo("#main-video", { x: 0 }, { x: 480, duration: 0.4, ease: "power2.out", immediateRender: false }, 26.2);
 tl.to("#main-video", { x: 0, duration: 0.3 }, 30.25);
 tl.fromTo("#split-1-panel img", { scale: 1.0 }, { scale: 1.09, duration: 4.5, ease: "none" }, 26.1);
 tl.fromTo("#split-2-panel", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 94.9);
 tl.fromTo("#split-2-divider", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 95.1);
-tl.fromTo("#split-2-caption, #split-2-source", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 95.25);
-tl.to("#split-2-panel, #split-2-divider, #split-2-caption, #split-2-source", { opacity: 0, duration: 0.3 }, 99.95);
+tl.fromTo("#split-2-caption", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35 }, 95.25);
+tl.to("#split-2-panel, #split-2-divider, #split-2-caption", { opacity: 0, duration: 0.3 }, 99.95);
 tl.fromTo("#main-video", { x: 0 }, { x: 480, duration: 0.4, ease: "power2.out", immediateRender: false }, 94.9);
 tl.to("#main-video", { x: 0, duration: 0.3 }, 99.95);
 tl.fromTo("#split-2-panel img", { scale: 1.0 }, { scale: 1.09, duration: 5.5, ease: "none" }, 94.8);
 tl.fromTo("#split-3-panel", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 145.4);
 tl.fromTo("#split-3-divider", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 145.6);
-tl.fromTo("#split-3-caption, #split-3-source", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 }, 145.75);
-tl.to("#split-3-panel, #split-3-divider, #split-3-caption, #split-3-source", { opacity: 0, duration: 0.3 }, 151.45);
+tl.fromTo("#split-3-caption", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35 }, 145.75);
+tl.to("#split-3-panel, #split-3-divider, #split-3-caption", { opacity: 0, duration: 0.3 }, 151.45);
 tl.fromTo("#main-video", { x: 0 }, { x: 480, duration: 0.4, ease: "power2.out", immediateRender: false }, 145.4);
 tl.to("#main-video", { x: 0, duration: 0.3 }, 151.45);
 tl.fromTo("#split-3-panel img", { scale: 1.0 }, { scale: 1.09, duration: 6.5, ease: "none" }, 145.3);
@@ -691,14 +659,12 @@ tl.fromTo("#epoch-tag", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3,
 tl.fromTo("#skyline-wrap", { opacity: 0 }, { opacity: 0.6, duration: 0.5 }, 84.3);
 tl.fromTo("#skyline-wrap img", { scale: 1.0 }, { scale: 1.1, duration: 9.7, ease: "none" }, 84.0);
 tl.fromTo("#skyline-badge", { opacity: 0 }, { opacity: 0.9, duration: 0.3 }, 84.6);
-tl.fromTo("#skyline-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 84.6);
 tl.to("#hinton-card", { opacity: 0, duration: 0.3 }, 93.4);
 tl.fromTo("#hype-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 41.05);
 tl.fromTo("#hype-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 41.2);
 tl.fromTo("#hype-axis-y, #hype-axis-x", { opacity: 0 }, { opacity: 0.8, duration: 0.3 }, 41.3);
 tl.to("#hype-path", { strokeDashoffset: 0, duration: 5.0, ease: "power1.inOut" }, 41.4);
 tl.fromTo("#hype-caption", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35 }, 46.8);
-tl.fromTo("#hype-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 41.5);
 tl.to("#hype-card", { opacity: 0, duration: 0.3 }, 49.85);
 tl.fromTo("#nn-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 52.35);
 tl.fromTo("#nn-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 52.45);
@@ -708,7 +674,6 @@ tl.to(".nn-layer-label", { opacity: 0.9, duration: 0.4, stagger: 0.15 }, 53.2);
 tl.to(".nn-node", { fill: "#3b82f6", duration: 0.5, stagger: 0.02, yoyo: true, repeat: 1 }, 54.3);
 tl.fromTo("#nn-caption", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 68.2);
 tl.fromTo("#nn-target-tag", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 54.6);
-tl.fromTo("#nn-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 52.8);
 tl.to("#nn-card", { opacity: 0, duration: 0.3 }, 70.4);
 tl.fromTo("#map-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 101.85);
 tl.fromTo("#map-title", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3 }, 101.95);
@@ -718,13 +683,11 @@ tl.fromTo("#map-dot2, #map-label2", { opacity: 0, scale: 0.5 }, { opacity: 1, sc
 tl.fromTo("#map-line2", { opacity: 0 }, { opacity: 0.7, duration: 0.4 }, 102.8);
 tl.fromTo("#map-dot3, #map-label3", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 103.0);
 tl.fromTo("#map-line3", { opacity: 0 }, { opacity: 0.7, duration: 0.4 }, 103.15);
-tl.fromTo("#map-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 102.3);
 tl.to("#map-card", { opacity: 0, duration: 0.3 }, 111.5);
 tl.to(".seed-root", { strokeDashoffset: 0, duration: 3.6, ease: "power1.out", stagger: 0.15 }, 123.0);
 tl.fromTo("#seed-icon", { opacity: 0, y: 20, scale: 0.3 }, { opacity: 1, y: 0, scale: 0.55, duration: 0.6 }, 125.8);
 tl.to("#seed-icon", { y: -60, scale: 1.3, duration: 6.8, ease: "power1.in" }, 126.4);
 tl.fromTo("#seed-label", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 126.2);
-tl.fromTo("#seed-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 123.3);
 tl.to("#seed-card", { opacity: 0, duration: 0.3 }, 133.5);
 tl.fromTo("#cifar-panel", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 134.05);
 tl.fromTo("#cifar-year", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 134.15);
@@ -732,9 +695,7 @@ tl.fromTo("#cifar-org", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 134.4);
 tl.fromTo("#cifar-name1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 137.8);
 tl.fromTo("#cifar-name2", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 139.0);
 tl.fromTo("#cifar-name3", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 140.3);
-tl.fromTo("#cifar-source", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 134.5);
 tl.to("#cifar-card", { opacity: 0, duration: 0.3 }, 143.0);
-tl.fromTo("#badge-inner", { opacity: 0 }, { opacity: 0.85, duration: 0.4 }, 7.8);
 tl.to("#fade-out", { opacity: 1, duration: 0.75 }, 155.5);
 
 window.__timelines = window.__timelines || {};
